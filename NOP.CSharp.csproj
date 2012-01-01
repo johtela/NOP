@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NOP</RootNamespace>
+    <AssemblyName>NOP</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq">
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Collections\Map.cs" />
+    <Compile Include="Collections\Option.cs" />
+    <Compile Include="Collections\Tree.cs" />
+    <Compile Include="Collections\List.cs" />
+    <Compile Include="NOPException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ref.cs" />
+    <Compile Include="Visual.cs" />
+    <Compile Include="VisualHelpers.cs" />
+    <Compile Include="VisualSettings.cs" />
+    <Compile Include="Interpreter.cs" />
+    <Compile Include="Environment.cs" />
+    <Compile Include="InitialEnv.cs" />
+    <Compile Include="ExprBuilder.cs" />
+    <Compile Include="Collections\TupleExtensions.cs" />
+    <Compile Include="Tester.cs" />
+    <Compile Include="Expression.cs" />
+    <Compile Include="Types\Symbol.cs" />
+    <Compile Include="Types\Definition.cs" />
+    <Compile Include="Types\Value.cs" />
+    <Compile Include="Types\Variable.cs" />
+    <Compile Include="Types\Function.cs" />
+    <Compile Include="Types\Property.cs" />
+    <Compile Include="Types\Member.cs" />
+    <Compile Include="Types\Method.cs" />
+    <Compile Include="Types\Module.cs" />
+    <Compile Include="Types\Class.cs" />
+    <Compile Include="Types\Constructor.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <Folder Include="Types\" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,40 @@
+using System;
+using System.Reflection;
+using NOP.Collections;
+using ExprList = NOP.Collections.List;
+
+namespace NOP
+{
+	/// <summary>
+	/// Method of a class.
+	/// </summary>
+	public class Method : Member
+	{
+		private Meth _call;
+		private MethodInfo _methodInfo;
+			
+		public Method (Meth call)
+		{
+			_call = call;
+		}
+			
+		public Method (MethodInfo mi)
+		{
+			if (mi == null)
+				throw new ArgumentNullException ("mi");
+			_methodInfo = mi;
+		}
+
+		public Meth Call
+		{
+			get
+			{
+				if (_call == null)
+				{
+					_call = _methodInfo.AsMethod ();
+				}
+				return _call;
+			}
+		}
+	}
+}
