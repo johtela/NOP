@@ -76,6 +76,9 @@
     <Compile Include="Types\Module.cs" />
     <Compile Include="Types\Class.cs" />
     <Compile Include="Types\Constructor.cs" />
+    <Compile Include="Types\Namespace.cs" />
+    <Compile Include="Collections\SubArray.cs" />
+    <Compile Include="Collections\ArrayExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

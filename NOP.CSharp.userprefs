@@ -1,9 +1,30 @@
-﻿<Properties>
+﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Types/Variable.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Types/Namespace.cs">
     <Files>
-      <File FileName="Types/Variable.cs" Line="42" Column="1" />
+      <File FileName="Types/Constructor.cs" Line="12" Column="4" />
+      <File FileName="Types/Namespace.cs" Line="18" Column="4" />
+      <File FileName="Types/Class.cs" Line="23" Column="20" />
+      <File FileName="Collections/List.cs" Line="1" Column="1" />
+      <File FileName="Collections/SubArray.cs" Line="34" Column="1" />
+      <File FileName="Collections/TupleExtensions.cs" Line="4" Column="1" />
+      <File FileName="Collections/ArrayExtensions.cs" Line="7" Column="16" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="NOP.CSharp" expanded="True">
+            <Node name="Collections" expanded="True" />
+            <Node name="Types" expanded="True">
+              <Node name="Namespace.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
