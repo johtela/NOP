@@ -11,7 +11,7 @@ namespace NOP
 		private Map<string, Namespace> _namespaces = Map<string, Namespace>.Empty;
 		private static Namespace _root = new Namespace ();
 		
-		private Namespace (string[] path, Namespace parent)
+		protected Namespace (string[] path, Namespace parent)
 		{
 			_path = path;
 			parent._namespaces = parent._namespaces.Add (path [path.Length - 1], this);
