@@ -1,17 +1,17 @@
 ﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Types/TypeDefinition.cs">
+  <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="Types/Constructor.cs" Line="12" Column="4" />
-      <File FileName="Types/Namespace.cs" Line="36" Column="5" />
-      <File FileName="Types/Class.cs" Line="23" Column="17" />
+      <File FileName="Types/Namespace.cs" Line="1" Column="1" />
+      <File FileName="Types/Class.cs" Line="1" Column="1" />
       <File FileName="Collections/List.cs" Line="1" Column="1" />
       <File FileName="Collections/SubArray.cs" Line="1" Column="1" />
       <File FileName="Collections/TupleExtensions.cs" Line="1" Column="1" />
-      <File FileName="Collections/ArrayExtensions.cs" Line="7" Column="16" />
+      <File FileName="Collections/ArrayExtensions.cs" Line="1" Column="1" />
       <File FileName="Types/TypeDefinition.cs" Line="21" Column="3" />
-      <File FileName="Types/Module.cs" Line="21" Column="18" />
-      <File FileName="Environment.cs" Line="26" Column="42" />
+      <File FileName="Types/Module.cs" Line="1" Column="1" />
+      <File FileName="Environment.cs" Line="1" Column="1" />
       <File FileName="Types/Function.cs" Line="1" Column="1" />
     </Files>
     <Pads>
