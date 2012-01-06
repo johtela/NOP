@@ -8,8 +8,8 @@ namespace NOP
 	public class Namespace
 	{
 		private string[] _path;
-		private Map<string, Namespace> _namespaces = Map<string, Namespace>.Empty;
 		private static Namespace _root = new Namespace ();
+		protected Map<string, Namespace> _namespaces = Map<string, Namespace>.Empty;
 		
 		protected Namespace (string[] path, Namespace parent)
 		{
@@ -42,8 +42,15 @@ namespace NOP
 			foreach (var type in types)
 			{
 				var ns = GetOrCreate (type.Namespace);
+				var td = TypeDefinition.CreateType (ns, type);
+				ns._namespaces = ns._namespaces.Add (type.Name, td);
 			}
 			return _root;
+		}
+		
+		public string[] Path
+		{
+			get { return _path; }
 		}
 	}
 }

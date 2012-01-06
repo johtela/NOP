@@ -1,17 +1,15 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using NOP.Collections;
-using ExprList = NOP.Collections.List;
 
 namespace NOP
 {
 	/// <summary>
-	/// Classes are by reference types that can contain all kind of definitions.
+	/// Struct is similar to class, but a value type.
 	/// </summary>
-	public class Class : TypeDefinition
+	public class Struct : TypeDefinition
 	{
-		public Class (Namespace parent, Type type) :
+		public Struct (Namespace parent, Type type) :
 			base(parent, type)
 		{
 			_definitions = Map<string, Definition>.FromPairs (Functions ()
@@ -24,3 +22,4 @@ namespace NOP
 		}
 	}
 }
+

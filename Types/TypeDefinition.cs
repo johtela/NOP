@@ -1,85 +1,103 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NOP.Collections;
 using NameDef = System.Tuple<string, NOP.Definition>;
+using NameType = System.Tuple<string, NOP.TypeDefinition>;
 
 namespace NOP
 {
+	/// <summary>
+	/// Type definition class represents a type that is defined inside a namespace.
+	/// </summary>
 	public abstract class TypeDefinition : Namespace
 	{
-		private Map<string, Definition> _definitions = Map<string, Definition>.Empty;
-		
-		protected TypeDefinition (string[] path, Namespace parent, Type type) :
-			base(path, parent)
+		protected readonly Type _type;
+		protected const BindingFlags _bfStatic = BindingFlags.Public | BindingFlags.Static;
+		protected const BindingFlags _bfInstance = BindingFlags.Public | BindingFlags.Instance;
+		protected Map<string, Definition> _definitions = Map<string, Definition>.Empty;
+			
+		/// <summary>
+		/// Create a new type definition based on the reflected type.
+		/// </summary>
+		/// <param name='path'>The full namespace path.</param>
+		/// <param name='parent'>Parent namespace object.</param>
+		/// <param name='type'>The type object from which the object is initialized.</param>
+		protected TypeDefinition (Namespace parent, Type type) :
+			base(GetPath(parent, type), parent)
 		{
-			var bfStatic = BindingFlags.Public | BindingFlags.Static;
-			var bfInstance = BindingFlags.Public | BindingFlags.Instance;
-			
-			var functions = from mi in type.GetMethods (bfStatic)
-							select FuncDef(mi);
-			
-			var values = from pi in type.GetProperties (bfStatic)
-						 where !pi.CanWrite
-						 select ValDef(pi);
-			
-			var variables = (from pi in type.GetProperties (bfStatic) 
-							where pi.CanWrite
-							select VarDef(pi)).Concat (
-							from fi in type.GetFields (bfStatic)
-							select VarDef(fi));
-			
-			var constructors = from ci in type.GetConstructors (bfInstance)
-							   select ConsDef(ci);
-			 
-			var methods = from mi in type.GetMethods (bfInstance)
-						  select MethDef(mi);
-			
-			var properties = from pi in type.GetProperties (bfInstance)
-							 select PropDef(pi);
-			
-			_definitions = Map<string, Definition>.FromPairs (functions
-				.Concat (values)
-				.Concat (variables)
-				.Concat (constructors)
-				.Concat (methods)
-				.Concat (properties));
+			_type = type;
 		}
 		
-		private NameDef FuncDef (MethodInfo mi)
+		private static string[] GetPath (Namespace parent, Type type)
 		{
-			return new NameDef (GetSignature (mi), new Function (mi));
+			var plen = parent.Path.Length;
+			var path = new string[plen + 1];
+			parent.Path.CopyTo (path, 0);
+			path [plen] = type.Name;
+			return path;
 		}
 		
-		private NameDef ValDef (PropertyInfo pi)
+		protected IEnumerable<NameDef> Functions ()
 		{
-			return new NameDef (GetSignature (pi), new Value (pi));
+			return from mi in _type.GetMethods (_bfStatic)
+				   select new NameDef (Definition.GetSignature (mi), new Function (mi));
+		}
+		
+		protected IEnumerable<NameDef> Values ()
+		{
+			return from pi in _type.GetProperties (_bfStatic)
+				   where !pi.CanWrite
+				   select new NameDef (Definition.GetSignature (pi), new Value (pi));
 		}
 				
-		private NameDef VarDef (MemberInfo mi)
+		protected IEnumerable<NameDef> Variables ()
 		{
-			return new NameDef (GetSignature (mi), new Variable (mi));
+			return (from pi in _type.GetProperties (_bfStatic)
+				   where pi.CanWrite
+				   select new NameDef (Definition.GetSignature (pi), new Variable (pi))).Concat (
+				   from fi in _type.GetFields (_bfStatic)
+				   select new NameDef (Definition.GetSignature (fi), new Variable (fi)));
 		}
 				
-		private NameDef ConsDef (ConstructorInfo ci)
+		protected IEnumerable<NameDef> Constructors ()
 		{
-			return new NameDef (GetSignature (ci), new Constructor (ci));
+			return from ci in _type.GetConstructors (_bfInstance)
+				   select new NameDef (Definition.GetSignature (ci), new Constructor (ci));
 		}
 
-		private NameDef MethDef (MethodInfo mi)
+		protected IEnumerable<NameDef> Methods ()
 		{
-			return new NameDef (GetSignature (mi), new Method (mi));
+			return from mi in _type.GetMethods (_bfInstance)
+				   select new NameDef (Definition.GetSignature (mi), new Method (mi));
 		}
 
-		private NameDef PropDef (PropertyInfo pi)
+		protected IEnumerable<NameDef> Properties ()
 		{
-			return new NameDef (GetSignature (pi), new Property (pi));
+			return from pi in _type.GetProperties (_bfInstance)
+				   select new NameDef (Definition.GetSignature (pi), new Property (pi));
 		}
-
-		private string GetSignature (MemberInfo mi)
+		
+		protected void AddNestedTypes ()
 		{
-			var sig = mi.ToString ();
-			return sig.Substring (sig.IndexOf (' ') + 1);
+			foreach (var nt in _type.GetNestedTypes())
+			{
+				_namespaces = _namespaces.Add (nt.Name, CreateType (this, nt));
+			}
+		}
+					
+		public static TypeDefinition CreateType (Namespace parent, Type type)
+		{
+			if (type.IsClass)
+				return new Class (parent, type);
+			if (type.IsInterface)
+				return new Interface (parent, type);
+			if (type.IsValueType)
+				return new Struct (parent, type);
+			if (type.IsEnum)
+				return new Enum (parent, type);
+			throw new ArgumentException ("Unknown type", "type");
 		}
 	}
 }

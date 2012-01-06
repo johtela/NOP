@@ -18,5 +18,13 @@ namespace NOP.Testbench
 			fun ();
 		}
 	}
+	
+	public struct Foo
+	{
+		public class Bar
+		{
+			
+		}
+	}
 }
 
