@@ -9,11 +9,13 @@ namespace NOP
 		private ConstructorInfo _constructorInfo;
 		
 		public Constructor (Func create)
+			: base (null)
 		{
 			_create = create;
 		}
 		
 		public Constructor (ConstructorInfo ci)
+			: base (ci)
 		{
 			if (ci == null)
 				throw new ArgumentNullException ("ci");

@@ -39,44 +39,49 @@ namespace NOP
 			return path;
 		}
 		
+		private static NameDef NewDef (Definition def)
+		{
+			return new NameDef (def.ToString (), def);
+		}
+		
 		protected IEnumerable<NameDef> Functions ()
 		{
 			return from mi in _type.GetMethods (_bfStatic)
-				   select new NameDef (Definition.GetSignature (mi), new Function (mi));
+				   select NewDef(new Function (mi));
 		}
 		
 		protected IEnumerable<NameDef> Values ()
 		{
 			return from pi in _type.GetProperties (_bfStatic)
 				   where !pi.CanWrite
-				   select new NameDef (Definition.GetSignature (pi), new Value (pi));
+				   select NewDef(new Value (pi));
 		}
 				
 		protected IEnumerable<NameDef> Variables ()
 		{
 			return (from pi in _type.GetProperties (_bfStatic)
 				   where pi.CanWrite
-				   select new NameDef (Definition.GetSignature (pi), new Variable (pi))).Concat (
+				   select NewDef(new Variable (pi))).Concat (
 				   from fi in _type.GetFields (_bfStatic)
-				   select new NameDef (Definition.GetSignature (fi), new Variable (fi)));
+				   select NewDef(new Variable (fi)));
 		}
 				
 		protected IEnumerable<NameDef> Constructors ()
 		{
 			return from ci in _type.GetConstructors (_bfInstance)
-				   select new NameDef (Definition.GetSignature (ci), new Constructor (ci));
+				   select NewDef(new Constructor (ci));
 		}
 
 		protected IEnumerable<NameDef> Methods ()
 		{
 			return from mi in _type.GetMethods (_bfInstance)
-				   select new NameDef (Definition.GetSignature (mi), new Method (mi));
+				   select NewDef(new Method (mi));
 		}
 
 		protected IEnumerable<NameDef> Properties ()
 		{
 			return from pi in _type.GetProperties (_bfInstance)
-				   select new NameDef (Definition.GetSignature (pi), new Property (pi));
+				   select NewDef(new Property (pi));
 		}
 		
 		protected void AddNestedTypes ()
@@ -98,6 +103,11 @@ namespace NOP
 			if (type.IsEnum)
 				return new Enum (parent, type);
 			throw new ArgumentException ("Unknown type", "type");
+		}
+		
+		public Map<string, Definition> Definitions
+		{
+			get { return _definitions; }
 		}
 	}
 }

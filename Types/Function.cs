@@ -13,14 +13,14 @@ namespace NOP
 		private Func _call;
 		private MethodInfo _methodInfo;
 			
-		public Function (Func call)
+		public Function (Func call) : base (null)
 		{
 			if (call == null)
 				throw new ArgumentNullException ("call");
 			_call = call;
 		}
 			
-		public Function (MethodInfo mi)
+		public Function (MethodInfo mi) : base (mi)
 		{
 			if (!(mi as MethodInfo).IsStatic)
 				throw new ArgumentException ("Method wrapped need to be static");

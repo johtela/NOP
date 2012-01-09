@@ -40,17 +40,27 @@ namespace NOP
 		public static Namespace FromTypes (IEnumerable<Type> types)
 		{
 			foreach (var type in types)
-			{
-				var ns = GetOrCreate (type.Namespace);
-				var td = TypeDefinition.CreateType (ns, type);
-				ns._namespaces = ns._namespaces.Add (type.Name, td);
-			}
+				if (type.Namespace != null)
+				{
+					var ns = GetOrCreate (type.Namespace);
+					var td = TypeDefinition.CreateType (ns, type);
+				}
 			return _root;
 		}
 		
 		public string[] Path
 		{
 			get { return _path; }
+		}
+		
+		public Map<string, Namespace> Namespaces
+		{
+			get { return _namespaces; }
+		}
+		
+		public static Namespace Root
+		{
+			get { return _root; }
 		}
 	}
 }

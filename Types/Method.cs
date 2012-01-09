@@ -14,11 +14,13 @@ namespace NOP
 		private MethodInfo _methodInfo;
 			
 		public Method (Meth call)
+			: base (null)
 		{
 			_call = call;
 		}
 			
 		public Method (MethodInfo mi)
+			: base (mi)
 		{
 			if (mi == null)
 				throw new ArgumentNullException ("mi");

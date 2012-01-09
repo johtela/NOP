@@ -15,6 +15,7 @@ namespace NOP
 		private PropertyInfo _propertyInfo;
 		
 		public Property (Func<object, object> getter, Action<object, object> setter)
+			: base (null)
 		{
 			if (getter == null)
 				throw new ArgumentNullException ("getter");
@@ -23,6 +24,7 @@ namespace NOP
 		}
 			
 		public Property (PropertyInfo pi)
+			: base (pi)
 		{
 			if (pi == null)
 				throw new ArgumentNullException ("pi");

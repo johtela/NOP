@@ -11,20 +11,17 @@ namespace NOP
 	public class Value : Definition
 	{
 		private Func<object> _get;
-		protected MemberInfo _memberInfo;
 			
 		public Value (Func<object> getter)
+			: base (null)
 		{
 			if (_get == null)
 				throw new ArgumentNullException ("getter");
 			_get = getter;
 		}
 			
-		public Value (MemberInfo mi)
+		public Value (MemberInfo mi) : base (mi)
 		{
-			if (!((mi is FieldInfo) || (mi is PropertyInfo)))
-				throw new ArgumentException ("Needs to be field or property info", "mi");
-			_memberInfo = mi;
 		}
 			
 		public Func<object> Get
