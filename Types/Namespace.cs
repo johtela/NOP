@@ -47,6 +47,21 @@ namespace NOP
 				}
 			return _root;
 		}
+
+		public static Namespace Find (string path)
+		{
+			var ns = _root;
+			try
+			{
+				foreach (var name in path.Split ('.'))
+					ns = ns._namespaces [name];
+				return ns;
+			}
+			catch (KeyNotFoundException)
+			{
+				return null;
+			}
+		}
 		
 		public string[] Path
 		{

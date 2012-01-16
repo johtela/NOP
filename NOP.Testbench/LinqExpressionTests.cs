@@ -19,11 +19,11 @@ namespace NOP.Testbench
 		}
 	}
 	
-	public struct Foo
+	public class Foo
 	{
-		public class Bar
+		public static int Bar ()
 		{
-			
+			return 42;
 		}
 	}
 }

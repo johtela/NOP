@@ -17,13 +17,15 @@ namespace NOP
 	/// <summary>
 	/// Delegate type for (dynamic) methods.
 	/// </summary>
-	public delegate object Meth (object obj, ExprList args);
+	public delegate object Meth (object obj,ExprList args);
 	
 	/// <summary>
 	/// Extension methods for expressions. 
 	/// </summary>
 	public static class Expression
 	{
+		public static readonly ExprList NoArgs = ExprList.Empty;
+		
 		public static Symbol AsSymbol (this string name)
 		{
 			return new Symbol (name);
