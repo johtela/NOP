@@ -8,9 +8,21 @@ namespace NOP.Testbench
 
 	public class Foo
 	{
+		private int _value;
+		
+		public Foo (int val)
+		{
+			_value = val;
+		}
+		
 		public static int Bar ()
 		{
 			return 42;
+		}
+		
+		public int Add (int other)
+		{
+			return _value + other;
 		}
 	}
 
@@ -34,11 +46,21 @@ namespace NOP.Testbench
 		[Test]
 		public void TestCallingFunction ()
 		{
-			var foo = (Class)Namespace.Find ("NOP.Testbench.Foo");
+			var fooClass = (Class)Namespace.Find ("NOP.Testbench.Foo");
 			
-			Check.AreEqual (42, (foo.Definitions ["Bar()"] as Function).Call (Expression.NoArgs));
+			Check.AreEqual (42, fooClass.GetFunction ("Bar()").Call (Expression.NoArgs));
 		}
-		
+
+		[Test]
+		public void TestCallingMethod ()
+		{
+			var fooClass = (Class)Namespace.Find ("NOP.Testbench.Foo");
+			var args = List.Create<object> (13);
+			
+			var foo = fooClass.GetConstructor (".ctor(Int32)").Create (args);
+			Check.AreEqual (26, fooClass.GetMethod ("Add(Int32)").Call (foo, args));
+		}
+				
 		#region Output functions
 		
 		private void Indent ()

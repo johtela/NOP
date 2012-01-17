@@ -22,5 +22,35 @@ namespace NOP
 				.Concat (Properties ()));
 			AddNestedTypes ();
 		}
+		
+		public Function GetFunction (string signature)
+		{
+			return (Function)Definitions [signature];
+		}
+	
+		public Value GetValue (string name)
+		{
+			return (Value)Definitions [name];
+		}
+
+		public Variable GetVariable (string name)
+		{
+			return (Variable)Definitions [name];
+		}
+		
+		public Constructor GetConstructor (string signature)
+		{
+			return (Constructor)Definitions [signature];
+		}
+
+		public Method GetMethod (string signature)
+		{
+			return (Method)Definitions [signature];
+		}
+
+		public Property GetProperty (string name)
+		{
+			return (Property)Definitions [name];
+		}
 	}
 }

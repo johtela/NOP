@@ -118,7 +118,7 @@ namespace NOP.Collections
 				var node = Tree<Map<K, V>, K>.Search (this, key);
 
 				if (node == Empty)
-					throw new KeyNotFoundException (key.ToString ());
+					throw new KeyNotFoundException ("Key not found: " + key.ToString ());
 				return node.Value;
 			}
 		}

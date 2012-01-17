@@ -1,4 +1,4 @@
-﻿using System;
+﻿										using System;
 using System.Linq;
 using LinqExpr = System.Linq.Expressions;
 using LExpr = System.Linq.Expressions.Expression;
@@ -141,8 +141,8 @@ namespace NOP
 		
 		public static Meth AsMethod (this MethodInfo mi)
 		{
-			if (!mi.IsStatic)
-				throw new ArgumentException ("Method needs to be static", "mi");
+			if (mi.IsStatic)
+				throw new ArgumentException ("Method needs to be instance method", "mi");
 			var obj = LExpr.Parameter (typeof(object), "obj");
 			var args = LExpr.Parameter (typeof(ExprList), "args");
 			var vars = new SysColl.List<LinqExpr.ParameterExpression> ();
@@ -151,9 +151,14 @@ namespace NOP
 			var block = pis.Length > 0 ?
 				EvalParams (args, pis, vars) : 
 				new SysColl.List<LExpr> ();
-			block.Add (LExpr.Call (obj, mi, vars));
+			var call = LExpr.Call (LExpr.Convert (obj, mi.DeclaringType), mi, vars);
 			if (mi.ReturnType == typeof(void))
+			{
+				block.Add (call);
 				block.Add (LExpr.Constant (null, typeof(object)));
+			}
+			else 
+				block.Add (LExpr.Convert (call, typeof(object)));
 			return new Meth (LExpr.Lambda<Meth> (LExpr.Block (vars, block), obj, args).Compile ());			
 		}
 		
