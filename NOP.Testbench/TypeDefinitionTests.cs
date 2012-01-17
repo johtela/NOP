@@ -9,6 +9,7 @@ namespace NOP.Testbench
 	public class Foo
 	{
 		private int _value;
+		public static readonly int Answer = 42;
 		
 		public Foo (int val)
 		{
@@ -24,8 +25,14 @@ namespace NOP.Testbench
 		{
 			return _value + other;
 		}
+		
+		public int Value
+		{
+			get { return _value; }
+			set { _value = value; }
+		}
 	}
-
+	
 	public class TypeDefinitionTests
 	{
 		private int tabs;
@@ -43,22 +50,48 @@ namespace NOP.Testbench
 			OutputNamespace (Namespace.Root);
 		}
 		
+		private static Class GetFooClass ()
+		{
+			return  (Class)Namespace.Find ("NOP.Testbench.Foo");
+		}
+		
+		private static Tuple<Class, object, List<object>> GetFoo (int val)
+		{
+			var fooClass = GetFooClass ();
+			var args = List.Create<object> (val);
+			
+			return Tuple.Create (fooClass, fooClass.GetConstructor (".ctor(Int32)").Create (args), args);
+		}
+		
 		[Test]
 		public void TestCallingFunction ()
 		{
-			var fooClass = (Class)Namespace.Find ("NOP.Testbench.Foo");
-			
-			Check.AreEqual (42, fooClass.GetFunction ("Bar()").Call (Expression.NoArgs));
+			Check.AreEqual (42, GetFooClass ().GetFunction ("Bar()").Call (Expression.NoArgs));
 		}
-
+		
+		[Test]
+		public void TestReadingValue ()
+		{
+			Check.AreEqual (42, GetFooClass ().GetValue ("Answer").Get ());
+		}
+		
 		[Test]
 		public void TestCallingMethod ()
 		{
-			var fooClass = (Class)Namespace.Find ("NOP.Testbench.Foo");
-			var args = List.Create<object> (13);
+			var foo = GetFoo (13);
 			
-			var foo = fooClass.GetConstructor (".ctor(Int32)").Create (args);
-			Check.AreEqual (26, fooClass.GetMethod ("Add(Int32)").Call (foo, args));
+			Check.AreEqual (26, foo.Item1.GetMethod ("Add(Int32)").Call (foo.Item2, foo.Item3));
+		}
+		
+		[Test]
+		public void TestUsingProperty ()
+		{
+			var foo = GetFoo (13);
+			var prop = foo.Item1.GetProperty ("Value");
+			
+			Check.AreEqual (13, prop.Get (foo.Item2));
+			prop.Set (foo.Item2, 15);
+			Check.AreEqual (15, prop.Get (foo.Item2));
 		}
 				
 		#region Output functions

@@ -93,40 +93,40 @@ namespace NOP
 		public static Func<object> AsValueGetter (this PropertyInfo pi)
 		{
 			CheckNoIndexers (pi);
-			return new Func<object> (
-				LExpr.Lambda<Func<object>> (LExpr.Property (null, pi)).Compile ());
+			return new Func<object> (LExpr.Lambda<Func<object>> 
+				(LExpr.Convert (LExpr.Property (null, pi), typeof(object))).Compile ());
 		}
 		
 		public static Func<object> AsValueGetter (this FieldInfo fi)
 		{
-			return new Func<object> (
-				LExpr.Lambda<Func<object>> (LExpr.Field (null, fi)).Compile ());
+			return new Func<object> (LExpr.Lambda<Func<object>> 
+				(LExpr.Convert (LExpr.Field (null, fi), typeof(object))).Compile ());
 		}
 		
 		public static Action<object> AsVariableSetter (this PropertyInfo pi)
 		{
 			CheckNoIndexers (pi);
 			var value = LExpr.Parameter (typeof(object), "value");
-			return new Action<object> (
-				LExpr.Lambda<Action<object>> (
-					LExpr.Assign (LExpr.Property (null, pi), LExpr.Convert (value, pi.PropertyType)), value).Compile ());
+			return new Action<object> (LExpr.Lambda<Action<object>> 
+				(LExpr.Assign (LExpr.Property (null, pi), 
+				LExpr.Convert (value, pi.PropertyType)), value).Compile ());
 		}
 		
 		public static Action<object> AsVariableSetter (this FieldInfo fi)
 		{
 			var value = LExpr.Parameter (typeof(object), "value");
-			return new Action<object> (
-				LExpr.Lambda<Action<object>> (
-					LExpr.Assign (LExpr.Field (null, fi), LExpr.Convert (value, fi.FieldType)), value).Compile ());
+			return new Action<object> (LExpr.Lambda<Action<object>>
+				(LExpr.Assign (LExpr.Field (null, fi), 
+				LExpr.Convert (value, fi.FieldType)), value).Compile ());
 		}
 
 		public static Func<object, object> AsPropertyGetter (this PropertyInfo pi)
 		{
 			CheckNoIndexers (pi);
 			var obj = LExpr.Parameter (typeof(object), "obj");
-			return new Func<object, object> (
-				LExpr.Lambda<Func<object, object>> (LExpr.Property (obj, pi)).Compile ());
-			
+			var target = LExpr.Convert (obj, pi.DeclaringType);
+			return new Func<object, object> (LExpr.Lambda<Func<object, object>> 
+				(LExpr.Convert (LExpr.Property (target, pi), typeof(object)), obj).Compile ());
 		}
 		
 		public static Action<object, object> AsPropertySetter (this PropertyInfo pi)
@@ -134,9 +134,10 @@ namespace NOP
 			CheckNoIndexers (pi);
 			var obj = LExpr.Parameter (typeof(object), "obj");
 			var value = LExpr.Parameter (typeof(object), "value");
-			return new Action<object, object> (
-				LExpr.Lambda<Action<object, object>> (
-					LExpr.Assign (LExpr.Property (obj, pi), LExpr.Convert (value, pi.PropertyType)), obj, value).Compile ());			
+			var target = LExpr.Convert (obj, pi.DeclaringType);
+			return new Action<object, object> (LExpr.Lambda<Action<object, object>> 
+				(LExpr.Assign (LExpr.Property (target, pi), 
+				LExpr.Convert (value, pi.PropertyType)), obj, value).Compile ());
 		}
 		
 		public static Meth AsMethod (this MethodInfo mi)
