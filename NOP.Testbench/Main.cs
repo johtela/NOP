@@ -12,8 +12,7 @@ namespace NOP.Testbench
 				new CollectionTests (),
 				new InterpreterTests (),
 				new MapTests (),
-				new TypeDefinitionTests (),
-				new LinqExpressionTests ());
+				new TypeDefinitionTests ());
 		}
 	}
 }

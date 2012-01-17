@@ -17,7 +17,7 @@ namespace NOP
 	/// <summary>
 	/// Delegate type for (dynamic) methods.
 	/// </summary>
-	public delegate object Meth (object obj,ExprList args);
+	public delegate object Meth (object obj, ExprList args);
 	
 	/// <summary>
 	/// Extension methods for expressions. 
@@ -79,9 +79,14 @@ namespace NOP
 			var block = pis.Length > 0 ?
 				EvalParams (par, pis, vars) : 
 				new SysColl.List<LExpr> ();
-			block.Add (LExpr.Call (mi, vars));
+			var call = LExpr.Call (mi, vars);
 			if (mi.ReturnType == typeof(void))
+			{
+				block.Add (call);
 				block.Add (LExpr.Constant (null, typeof(object)));
+			}
+			else
+				block.Add (LExpr.Convert (call, typeof(object)));
 			return new Func (LExpr.Lambda<Func> (LExpr.Block (vars, block), par).Compile ());			
 		}
 		

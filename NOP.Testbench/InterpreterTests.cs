@@ -62,7 +62,7 @@ namespace NOP.Testbench
 				));
 		}
 		
-		[Test]
+//		[Test]
 		public void TestComparisons ()
 		{
 			AssertEvaluatesTo (true,
@@ -75,7 +75,7 @@ namespace NOP.Testbench
 				Call (">=", A (1), A (1)));
 		}
 		
-		[Test]
+//		[Test]
 		public void TestArithmetics ()
 		{
 			AssertEvaluatesTo (5,

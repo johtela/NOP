@@ -6,6 +6,14 @@ namespace NOP.Testbench
 	using NOP;
 	using NOP.Collections;
 
+	public class Foo
+	{
+		public static int Bar ()
+		{
+			return 42;
+		}
+	}
+
 	public class TypeDefinitionTests
 	{
 		private int tabs;
