@@ -15,7 +15,6 @@ namespace NOP.Testbench
 		private void AssertEvaluatesTo<T> (T expected, params ExprBuilder[] exprs)
 		{
 			Check.AreEqual ((object)expected, Interpreter.Evaluate (List.Create (exprs.Select (eb => eb.Build ()))));
-			;
 		}
 		
 		[Test]
@@ -62,17 +61,11 @@ namespace NOP.Testbench
 				));
 		}
 		
-//		[Test]
+		[Test]
 		public void TestComparisons ()
 		{
-			AssertEvaluatesTo (true,
-				Call ("<", A (1), A (2)));
-			AssertEvaluatesTo (false, 
-				Call (">", A (1), A (2)));
-			AssertEvaluatesTo (true, 
-				Call ("<=", A (1), A (1)));
-			AssertEvaluatesTo (true, 
-				Call (">=", A (1), A (1)));
+			AssertEvaluatesTo (3,
+				Call (Definition.Get<Arithmetic, Function> ("Add(Int32, Int32)"), A (1), A (2)));
 		}
 		
 //		[Test]

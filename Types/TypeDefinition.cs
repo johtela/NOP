@@ -1,18 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using NOP.Collections;
-using NameDef = System.Tuple<string, NOP.Definition>;
-using NameType = System.Tuple<string, NOP.TypeDefinition>;
-
 namespace NOP
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Reflection;
+	using NOP.Collections;
+	using NameDef = System.Tuple<string, NOP.Definition>;
+	using NameType = System.Tuple<string, NOP.TypeDefinition>;
+
 	/// <summary>
 	/// Type definition class represents a type that is defined inside a namespace.
 	/// </summary>
 	public abstract class TypeDefinition : Namespace
 	{
+		internal static Dictionary<Type, TypeDefinition> _typeInfos = new Dictionary<Type, TypeDefinition> ();
 		protected readonly Type _type;
 		protected const BindingFlags _bfStatic = BindingFlags.Public | BindingFlags.Static;
 		protected const BindingFlags _bfInstance = BindingFlags.Public | BindingFlags.Instance;
@@ -28,6 +29,7 @@ namespace NOP
 			base(GetPath(parent, type), parent)
 		{
 			_type = type;
+			_typeInfos.Add (type, this);
 		}
 		
 		private static string[] GetPath (Namespace parent, Type type)

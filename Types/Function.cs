@@ -1,10 +1,9 @@
-using System;
-using System.Reflection;
-using NOP.Collections;
-using ExprList = NOP.Collections.List;
-
 namespace NOP
 {
+	using System;
+	using System.Reflection;
+	using NOP.Collections;
+
 	/// <summary>
 	/// A function that is defined in context of the module.
 	/// </summary>

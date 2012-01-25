@@ -1,6 +1,7 @@
 namespace NOP
 {
 	using System;
+	using System.Reflection;
 	using SysColl = System.Collections.Generic;
 	using NOP.Collections;
 
@@ -160,6 +161,11 @@ namespace NOP
 		public static ExprBuilder Call (string function, params ExprBuilder[] args)
 		{
 			return new ListBuilder (S (function) | List.Create (args));
+		}
+		
+		public static ExprBuilder Call (Function function, params ExprBuilder[] args)
+		{
+			return new ListBuilder (A (function) | List.Create (args));
 		}
 	}
 	

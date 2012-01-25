@@ -91,27 +91,31 @@ namespace NOP
 			{
 				var list = expr as ExprList;
 				var symbol = list.First as Symbol;
-				if (symbol == null)
-					Error (list.First, "Expected a function");
-				
-				switch (symbol.Name)
+				if (symbol != null)
 				{
-					case "quote":
-						return new EvalResult (env, list.Rest);
-					case "if":
-						return EvalIf (env, list.Rest);
-					case "begin":
-						return EvalBegin (env, list.Rest);
-					case "define":
-						return EvalDefine (env, list.Rest);
-					case "lambda":
-						return MakeFunction (env, list.Rest);
-					default:
-						return InvokeFunction (env, symbol, list.Rest);
+					switch (symbol.Name)
+					{
+						case "quote":
+							return new EvalResult (env, list.Rest);
+						case "if":
+							return EvalIf (env, list.Rest);
+						case "begin":
+							return EvalBegin (env, list.Rest);
+						case "define":
+							return EvalDefine (env, list.Rest);
+						case "lambda":
+							return MakeFunction (env, list.Rest);
+						default:
+							return InvokeFunction (env, symbol, list.Rest);
+					}
 				}
+				var func = list.First as Function;
+				if (func != null)
+				{
+					return InvokeFunction (env, func, list.Rest);
+				}
+				Error (list.First, "Expected a function");
 			}
-			if (expr is Func)
-				Error (expr, "Expected a symbol, list, or atom");
 			return new EvalResult (env, expr);
 		}
 
@@ -168,8 +172,6 @@ namespace NOP
 		/// <returns>The updated environment that has the parameters defined.</returns>
 		private static Environment BindParams (Environment env, List<string> names, ExprList values)
 		{
-			EvalResult res;
-			
 			while (true)
 			{
 				if (names.IsEmpty)
@@ -183,10 +185,9 @@ namespace NOP
 					Interpreter.Error (string.Format ("Parameter '{0}' is missing", names.First));
 				if (names.First == ".")
 				{
-					return env.Define (names.Rest.First, values)
-					;
+					return env.Define (names.Rest.First, values);
 				}
-				env = res.Env.Define (names.First, values.First);
+				env = env.Define (names.First, values.First);
 				names = names.Rest;
 				values = values.Rest;
 			}
@@ -214,19 +215,28 @@ namespace NOP
 			if (body.IsEmpty)
 				Interpreter.Error (definition.First, "Function body is missing");
 			return new EvalResult (env, new Func (
-					args => EvalBegin (BindParams (env, parameters, args), body).Result))
-			;
+					args => EvalBegin (BindParams (env, parameters, args), body).Result));
 		}
 
 		/// <summary>
 		/// Invoke a function.
 		/// </summary>
-		static internal EvalResult InvokeFunction (Environment env, Symbol fname, ExprList fargs)
+		private static EvalResult InvokeFunction (Environment env, Symbol fname, ExprList fargs)
 		{
 			var func = env.Lookup (fname.Name) as Func;
 			if (func == null)
 				Error (fname, "Expected a function");
-			return new EvalResult (env, func (fargs.Map (expr => Eval (env, expr).Result)));
+			return new EvalResult (env, func (EvaluateArguments (env, fargs)));
+		}
+		
+		private static EvalResult InvokeFunction (Environment env, Function function, ExprList fargs)
+		{
+			return new EvalResult (env, function.Call (EvaluateArguments (env, fargs)));
+		}
+					
+		private static ExprList EvaluateArguments (Environment env, ExprList fargs)
+		{
+			return fargs.Map (expr => Eval (env, expr).Result);
 		}
 	}
 }

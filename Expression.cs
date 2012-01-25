@@ -1,14 +1,14 @@
-﻿										using System;
-using System.Linq;
-using LinqExpr = System.Linq.Expressions;
-using LExpr = System.Linq.Expressions.Expression;
-using System.Reflection;
-using NOP.Collections;
-using ExprList = NOP.Collections.List<object>;
-using SysColl = System.Collections.Generic;
-
-namespace NOP
+﻿namespace NOP
 {
+	using System;
+	using System.Linq;
+	using LinqExpr = System.Linq.Expressions;
+	using LExpr = System.Linq.Expressions.Expression;
+	using System.Reflection;
+	using NOP.Collections;
+	using ExprList = NOP.Collections.List<object>;
+	using SysColl = System.Collections.Generic;
+	
 	/// <summary>
 	/// Delegate type for (static) functions.
 	/// </summary>

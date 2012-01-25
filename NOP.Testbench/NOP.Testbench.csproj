@@ -40,6 +40,7 @@
     <Compile Include="InterpreterTests.cs" />
     <Compile Include="MapTests.cs" />
     <Compile Include="TypeDefinitionTests.cs" />
+    <Compile Include="Arithmetic.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

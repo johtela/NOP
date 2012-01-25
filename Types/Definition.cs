@@ -20,5 +20,10 @@ namespace NOP
 			var sig = _memberInfo.ToString ();
 			return sig.Substring (sig.IndexOf (' ') + 1);
 		}
+		
+		public static D Get<T, D> (string name) where D : Definition
+		{
+			return (D)TypeDefinition._typeInfos [typeof(T)].Definitions [name];
+		}
 	}
 }
