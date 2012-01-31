@@ -167,6 +167,11 @@ namespace NOP
 		{
 			return new ListBuilder (A (function) | List.Create (args));
 		}
+		
+		public static ExprBuilder Set (Variable variable, ExprBuilder value)
+		{
+			return new ListBuilder (List.Create (S ("set!"), A (variable), value));
+		}
 	}
 	
 	/// <summary>

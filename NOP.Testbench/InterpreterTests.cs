@@ -62,11 +62,33 @@ namespace NOP.Testbench
 		}
 		
 		[Test]
-		public void TestComparisons ()
+		public void TestFunctionCall ()
 		{
 			AssertEvaluatesTo (3,
 				Call (Definition.Get<Arithmetic, Function> ("Add(Int32, Int32)"), A (1), A (2)));
 		}
+		
+		[Test]
+		public void TestValue ()
+		{
+			AssertEvaluatesTo (Math.PI, A (Definition.Get<Arithmetic, Value> ("Pi"))); 
+		}
+		
+		[Test]
+		public void TestVariable ()
+		{
+			var baseVar = Definition.Get<Arithmetic, Variable> ("Base");
+			
+			AssertEvaluatesTo(16,
+				Set (baseVar, A(16)),
+				A (baseVar));
+		}
+
+//		[Test]
+//		public void TestMethod ()
+//		{
+//			
+//		}
 		
 //		[Test]
 		public void TestArithmetics ()

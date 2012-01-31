@@ -105,17 +105,20 @@ namespace NOP
 							return EvalDefine (env, list.Rest);
 						case "lambda":
 							return MakeFunction (env, list.Rest);
+						case "set!":
+							return EvalSet (env, list.Rest);
 						default:
 							return InvokeFunction (env, symbol, list.Rest);
 					}
 				}
 				var func = list.First as Function;
 				if (func != null)
-				{
 					return InvokeFunction (env, func, list.Rest);
-				}
 				Error (list.First, "Expected a function");
 			}
+			var val = expr as Value;
+			if (val != null)
+				return new EvalResult(env, val.Get());
 			return new EvalResult (env, expr);
 		}
 
@@ -237,6 +240,19 @@ namespace NOP
 		private static ExprList EvaluateArguments (Environment env, ExprList fargs)
 		{
 			return fargs.Map (expr => Eval (env, expr).Result);
+		}
+		
+		/// <summary>
+		/// Evaluates a set! assignment expression.
+		/// </summary>
+		private static EvalResult EvalSet (Environment env, ExprList exprs)
+		{
+			var variable = exprs.First as Variable;
+			if (variable == null)
+				Error (variable, "Expected a variable");
+			var val = Eval (env, exprs.Rest.First).Result;
+			variable.Set (val);
+			return new EvalResult(env, val);
 		}
 	}
 }
