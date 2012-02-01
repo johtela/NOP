@@ -85,14 +85,19 @@ namespace NOP
 		/// <returns>The new envonment and the result of the expression.</returns>
 		static internal EvalResult Eval (Environment env, object expr)
 		{
+			// Is this a symbol?
 			if (expr is Symbol)
 				return new EvalResult (env, env.Lookup ((expr as Symbol).Name));
+			// Or is it a list?
 			if (expr is ExprList)
 			{
 				var list = expr as ExprList;
+				if (list.IsEmpty)
+					return new EvalResult(env, ExprList.Empty);
 				var symbol = list.First as Symbol;
 				if (symbol != null)
 				{
+					// Check if we have any of the special forms as first item.
 					switch (symbol.Name)
 					{
 						case "quote":
@@ -111,10 +116,15 @@ namespace NOP
 							return InvokeFunction (env, symbol, list.Rest);
 					}
 				}
+				// Is this an external function call?
 				var func = list.First as Function;
 				if (func != null)
 					return InvokeFunction (env, func, list.Rest);
-				Error (list.First, "Expected a function");
+				// Or is it a method call?
+				var obj = list.First;
+				if ((!list.Rest.IsEmpty) && (list.Rest.First is Method))
+					return InvokeMethod(env, obj, list.Rest.First as Method, list.Rest.Rest);
+				Error (list.First, "Expected a function or method call");
 			}
 			var val = expr as Value;
 			if (val != null)
@@ -224,22 +234,32 @@ namespace NOP
 		/// <summary>
 		/// Invoke a function.
 		/// </summary>
-		private static EvalResult InvokeFunction (Environment env, Symbol fname, ExprList fargs)
+		private static EvalResult InvokeFunction (Environment env, Symbol fname, ExprList args)
 		{
 			var func = env.Lookup (fname.Name) as Func;
 			if (func == null)
 				Error (fname, "Expected a function");
-			return new EvalResult (env, func (EvaluateArguments (env, fargs)));
+			return new EvalResult (env, func (EvaluateArguments (env, args)));
 		}
 		
-		private static EvalResult InvokeFunction (Environment env, Function function, ExprList fargs)
+		private static EvalResult InvokeFunction (Environment env, Function function, ExprList args)
 		{
-			return new EvalResult (env, function.Call (EvaluateArguments (env, fargs)));
+			return new EvalResult (env, function.Call (EvaluateArguments (env, args)));
+		}
+		
+		/// <summary>
+		/// Call a method.
+		/// </summary>
+		private static EvalResult InvokeMethod (Environment env, object obj, Method method, ExprList args)
+		{
+			if (!method.Info.DeclaringType.IsAssignableFrom (obj.GetType()))
+				Error (string.Format("Object of type {0} does have method {1}", obj.GetType(), method)); 
+			return new EvalResult (env, method.Call (obj, EvaluateArguments (env, args)));
 		}
 					
-		private static ExprList EvaluateArguments (Environment env, ExprList fargs)
+		private static ExprList EvaluateArguments (Environment env, ExprList args)
 		{
-			return fargs.Map (expr => Eval (env, expr).Result);
+			return args.Map (expr => Eval (env, expr).Result);
 		}
 		
 		/// <summary>

@@ -84,23 +84,15 @@ namespace NOP.Testbench
 				A (baseVar));
 		}
 
-//		[Test]
-//		public void TestMethod ()
-//		{
-//			
-//		}
-		
-//		[Test]
-		public void TestArithmetics ()
+		[Test]
+		public void TestMethod ()
 		{
-			AssertEvaluatesTo (5,
-				Call ("+", A (2), A (3)));
-			AssertEvaluatesTo (0, 
-				Call ("-", A (5), A (3), A (2)));
-			AssertEvaluatesTo (3.3 * 3.0, 
-				Call ("*", A (3.3), A (3.0)));
-			AssertEvaluatesTo (5.0 / 2.0, 
-				Call ("/", A (5.0), A (2.0)));
+			var method = Definition.Get<Number, Method>("Add(NOP.Testbench.Number)");
+			var num1 = new Number(3);
+			var num2 = new Number(4);
+			
+			AssertEvaluatesTo(7,
+				Call (num1, method, A(num2)));
 		}
 	}
 }

@@ -13,5 +13,20 @@ namespace NOP.Testbench
 		
 		public static int Base { get; set; }
 	}
+	
+	public class Number
+	{
+		public readonly int Value;
+		
+		public Number (int value)
+		{
+			Value = value;
+		}
+		
+		public int Add(Number other)
+		{
+			return Value + other.Value;
+		}
+	}
 }
 

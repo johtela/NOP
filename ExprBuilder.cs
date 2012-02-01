@@ -168,6 +168,11 @@ namespace NOP
 			return new ListBuilder (A (function) | List.Create (args));
 		}
 		
+		public static ExprBuilder Call (object obj, Method method, params ExprBuilder[] args)
+		{
+			return new ListBuilder (A (obj) | (A (method) | List.Create (args)));
+		}
+		
 		public static ExprBuilder Set (Variable variable, ExprBuilder value)
 		{
 			return new ListBuilder (List.Create (S ("set!"), A (variable), value));

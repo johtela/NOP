@@ -62,7 +62,7 @@ namespace NOP.Collections
 
 			public ConsList (T first, List<T> rest)
 			{
- _first = first;
+				_first = first;
 				_rest = rest;
 			}
 
