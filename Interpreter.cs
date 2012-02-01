@@ -35,6 +35,7 @@ namespace NOP
 	/// <summary>
 	/// The interpreter for evaluating expressions.
 	/// </summary>
+	// TODO: Handle the list depleting prematurely by adding an Expect() method.
 	public static class Interpreter
 	{
 		/// <summary>
