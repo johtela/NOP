@@ -182,6 +182,11 @@ namespace NOP
 		{
 			return new ListBuilder (List.Create (S ("set!"), A (variable), value));
 		}
+
+		public static ExprBuilder Set (object obj, Property property, ExprBuilder value)
+		{
+			return new ListBuilder (List.Create (S ("set!"), A (obj), A (property), value));
+		}
 	}
 	
 	/// <summary>

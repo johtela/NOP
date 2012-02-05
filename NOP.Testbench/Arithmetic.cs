@@ -33,5 +33,21 @@ namespace NOP.Testbench
 			get { return Value * Value; }
 		}
 	}
+	
+	public class MutableNumber
+	{
+		private int _value;
+		
+		public MutableNumber (int value)
+		{
+			_value = value;
+		}
+		
+		public int Value
+		{
+			get { return _value; }
+			set { _value = value; }
+		}
+	}
 }
 

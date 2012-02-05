@@ -271,6 +271,8 @@ namespace NOP
 		/// </summary>
 		private static EvalResult GetProperty (Environment env, object obj, Property prop)
 		{
+			if (!prop.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
+				Error (string.Format ("Object of type {0} does have property {1}", obj.GetType (), prop)); 
 			return new EvalResult (env, prop.Get (obj));
 		}
 					
@@ -284,12 +286,45 @@ namespace NOP
 		/// </summary>
 		private static EvalResult EvalSet (Environment env, ExprList exprs)
 		{
-			var variable = exprs.First as Variable;
-			if (variable == null)
-				Error (variable, "Expected a variable");
-			var val = Eval (env, exprs.Rest.First).Result;
-			variable.Set (val);
+			Property prop = null;
+			object obj = null;	
+			Variable variable;
+			
+			if (!NextToken<Variable>(ref exprs, out variable))
+			{
+				obj = Expect<object>(ref exprs, "object");
+				prop = Expect<Property>(ref exprs, "property");
+				if (!prop.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
+					Error (obj, string.Format ("Object of type {0} does have property {1}", obj.GetType (), prop)); 
+			}
+			var val = Expect<object>(ref exprs, "right hand side of assignment clause");
+			if (prop != null) prop.Set (obj, val);
+			else variable.Set (val);
 			return new EvalResult (env, val);
+		}
+		
+		private static T Expect<T>(ref ExprList exprs, string token) where T: class
+		{
+			if (exprs.IsEmpty)
+				Error (exprs, string.Format ("Expected {0} but reached end of list.", token));
+			var obj = exprs.First as T;
+			if (obj == null)
+				Error (exprs, string.Format ("Expected {0} but got {1}.", token, exprs.First));
+			exprs = exprs.Rest;
+			return obj;
+		}
+		
+		private static bool NextToken<T>(ref ExprList exprs, out T token) where T: class
+		{
+			if (exprs.IsEmpty)
+				Error (exprs, string.Format ("Unexpected end of list."));
+			token = exprs.First as T;
+			if (token != null)
+			{
+				exprs = exprs.Rest;
+				return true;
+			}
+			return false;
 		}
 	}
 }

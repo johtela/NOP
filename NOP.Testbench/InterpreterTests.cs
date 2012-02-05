@@ -96,12 +96,23 @@ namespace NOP.Testbench
 		}
 		
 		[Test]
-		public void TestProperty ()
+		public void TestPropertyRead ()
 		{
 			var prop = Definition.Get<Number, Property> ("ValueSquared");
 			var num1 = new Number (3);
 			
 			AssertEvaluatesTo(9, Prop (num1, prop));
+		}
+		
+		[Test]
+		public void TestPropertyWrite ()
+		{
+			var prop = Definition.Get<MutableNumber, Property> ("Value");
+			var num = new MutableNumber (3);
+			
+			AssertEvaluatesTo(6,
+				Set(num, prop, A (6)),
+				Prop (num, prop));
 		}
 	}
 }
