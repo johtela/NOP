@@ -146,12 +146,9 @@ namespace NOP
 		/// </summary>
 		static internal EvalResult EvalDefine (Environment env, ExprList exprs)
 		{
-			var symbol = exprs.First as Symbol;
-			if (symbol == null)
-				Error (exprs.First, "Expected a symbol after define.");
-			if (exprs.Rest.IsEmpty)
-				Error (exprs.First, "Incomplete define clause.");
-			var res = Eval (env, exprs.Rest.First).Result;
+			var symbol = Expect<Symbol>(ref exprs, "symbol");
+			var val = Expect<object>(ref exprs, "right hand side of definition clause");
+			var res = Eval (env, val).Result;
 			return new EvalResult (env.Define (symbol.Name, res), res);
 		}
 
@@ -220,9 +217,7 @@ namespace NOP
 		/// </summary>
 		private static EvalResult MakeFunction (Environment env, ExprList definition)
 		{
-			var list = definition.First as ExprList;
-			if (list == null)
-				Interpreter.Error (definition.First, "Expected list of parameters");
+			var list = Expect<ExprList>(ref definition, "list of parameters");
 			var parameters = list.Map (expr =>
 			{
 				var sym = expr as Symbol;
@@ -233,11 +228,10 @@ namespace NOP
 			var dot = parameters.FindNext (".");
 			if (!dot.IsEmpty && dot.Length != 2)
 				Interpreter.Error ("There should be only one parameter after '.'");
-			var body = definition.Rest;
-			if (body.IsEmpty)
-				Interpreter.Error (definition.First, "Function body is missing");
+			if (definition.IsEmpty)
+				Interpreter.Error (definition, "Function body is missing");
 			return new EvalResult (env, new Func (
-					args => EvalBegin (BindParams (env, parameters, args), body).Result));
+				args => EvalBegin (BindParams (env, parameters, args), definition).Result));
 		}
 
 		/// <summary>
@@ -261,8 +255,7 @@ namespace NOP
 		/// </summary>
 		private static EvalResult InvokeMethod (Environment env, object obj, Method method, ExprList args)
 		{
-			if (!method.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
-				Error (string.Format ("Object of type {0} does have method {1}", obj.GetType (), method)); 
+			CheckIsMember(method, obj);
 			return new EvalResult (env, method.Call (obj, EvaluateArguments (env, args)));
 		}
 		
@@ -271,8 +264,7 @@ namespace NOP
 		/// </summary>
 		private static EvalResult GetProperty (Environment env, object obj, Property prop)
 		{
-			if (!prop.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
-				Error (string.Format ("Object of type {0} does have property {1}", obj.GetType (), prop)); 
+			CheckIsMember (prop, obj);
 			return new EvalResult (env, prop.Get (obj));
 		}
 					
@@ -294,8 +286,7 @@ namespace NOP
 			{
 				obj = Expect<object>(ref exprs, "object");
 				prop = Expect<Property>(ref exprs, "property");
-				if (!prop.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
-					Error (obj, string.Format ("Object of type {0} does have property {1}", obj.GetType (), prop)); 
+				CheckIsMember (prop, obj); 
 			}
 			var val = Expect<object>(ref exprs, "right hand side of assignment clause");
 			if (prop != null) prop.Set (obj, val);
@@ -325,6 +316,12 @@ namespace NOP
 				return true;
 			}
 			return false;
+		}
+		
+		static void CheckIsMember (Member member, object obj)
+		{
+			if (!member.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
+				Error (obj, string.Format ("Object of type {0} does have member {1}", obj.GetType (), member));
 		}
 	}
 }

@@ -56,10 +56,5 @@ namespace NOP
 				return _set;
 			}
 		}
-		
-		public PropertyInfo Info
-		{
-			get { return _propertyInfo; }
-		}
 	}
 }

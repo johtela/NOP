@@ -10,5 +10,10 @@ namespace NOP
 		protected Member (MemberInfo mi) : base (mi)
 		{
 		}
+		
+		public MemberInfo Info
+		{
+			get { return _memberInfo; }
+		}
 	}
 } 
