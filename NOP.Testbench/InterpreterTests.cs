@@ -79,20 +79,29 @@ namespace NOP.Testbench
 		{
 			var baseVar = Definition.Get<Arithmetic, Variable> ("Base");
 			
-			AssertEvaluatesTo(16,
-				Set (baseVar, A(16)),
+			AssertEvaluatesTo (16,
+				Set (baseVar, A (16)),
 				A (baseVar));
 		}
 
 		[Test]
 		public void TestMethod ()
 		{
-			var method = Definition.Get<Number, Method>("Add(NOP.Testbench.Number)");
-			var num1 = new Number(3);
-			var num2 = new Number(4);
+			var method = Definition.Get<Number, Method> ("Add(NOP.Testbench.Number)");
+			var num1 = new Number (3);
+			var num2 = new Number (4);
 			
-			AssertEvaluatesTo(7,
-				Call (num1, method, A(num2)));
+			AssertEvaluatesTo (7,
+				Call (num1, method, A (num2)));
+		}
+		
+		[Test]
+		public void TestProperty ()
+		{
+			var prop = Definition.Get<Number, Property> ("ValueSquared");
+			var num1 = new Number (3);
+			
+			AssertEvaluatesTo(9, Prop (num1, prop));
 		}
 	}
 }

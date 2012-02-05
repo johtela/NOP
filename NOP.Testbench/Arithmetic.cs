@@ -23,9 +23,14 @@ namespace NOP.Testbench
 			Value = value;
 		}
 		
-		public int Add(Number other)
+		public int Add (Number other)
 		{
 			return Value + other.Value;
+		}
+		
+		public object ValueSquared
+		{
+			get { return Value * Value; }
 		}
 	}
 }

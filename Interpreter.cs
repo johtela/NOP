@@ -94,7 +94,7 @@ namespace NOP
 			{
 				var list = expr as ExprList;
 				if (list.IsEmpty)
-					return new EvalResult(env, ExprList.Empty);
+					return new EvalResult (env, ExprList.Empty);
 				var symbol = list.First as Symbol;
 				if (symbol != null)
 				{
@@ -121,15 +121,23 @@ namespace NOP
 				var func = list.First as Function;
 				if (func != null)
 					return InvokeFunction (env, func, list.Rest);
-				// Or is it a method call?
+				// Or is it a method call or property read?
 				var obj = list.First;
-				if ((!list.Rest.IsEmpty) && (list.Rest.First is Method))
-					return InvokeMethod(env, obj, list.Rest.First as Method, list.Rest.Rest);
-				Error (list.First, "Expected a function or method call");
+				var rest = list.Rest;
+				if (!rest.IsEmpty)
+				{
+					if (rest.First is Method)
+						return InvokeMethod (env, obj, rest.First as Method, rest.Rest);
+					else
+					if (rest.First is Property)
+						return GetProperty (env, obj, rest.First as Property);
+				}
+				// Otherwise throw an error.
+				Error (rest.First, "Expected a function or method call, or property read.");
 			}
 			var val = expr as Value;
 			if (val != null)
-				return new EvalResult(env, val.Get());
+				return new EvalResult (env, val.Get ());
 			return new EvalResult (env, expr);
 		}
 
@@ -253,9 +261,17 @@ namespace NOP
 		/// </summary>
 		private static EvalResult InvokeMethod (Environment env, object obj, Method method, ExprList args)
 		{
-			if (!method.Info.DeclaringType.IsAssignableFrom (obj.GetType()))
-				Error (string.Format("Object of type {0} does have method {1}", obj.GetType(), method)); 
+			if (!method.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
+				Error (string.Format ("Object of type {0} does have method {1}", obj.GetType (), method)); 
 			return new EvalResult (env, method.Call (obj, EvaluateArguments (env, args)));
+		}
+		
+		/// <summary>
+		/// Gets the value of a property.
+		/// </summary>
+		private static EvalResult GetProperty (Environment env, object obj, Property prop)
+		{
+			return new EvalResult (env, prop.Get (obj));
 		}
 					
 		private static ExprList EvaluateArguments (Environment env, ExprList args)
@@ -273,7 +289,7 @@ namespace NOP
 				Error (variable, "Expected a variable");
 			var val = Eval (env, exprs.Rest.First).Result;
 			variable.Set (val);
-			return new EvalResult(env, val);
+			return new EvalResult (env, val);
 		}
 	}
 }
