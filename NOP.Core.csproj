@@ -54,17 +54,7 @@
     <Compile Include="Collections\List.cs" />
     <Compile Include="NOPException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ref.cs" />
-    <Compile Include="Visual.cs" />
-    <Compile Include="VisualHelpers.cs" />
-    <Compile Include="VisualSettings.cs" />
-    <Compile Include="Interpreter.cs" />
-    <Compile Include="Environment.cs" />
-    <Compile Include="InitialEnv.cs" />
-    <Compile Include="ExprBuilder.cs" />
     <Compile Include="Collections\TupleExtensions.cs" />
-    <Compile Include="Tester.cs" />
-    <Compile Include="Expression.cs" />
     <Compile Include="Types\Symbol.cs" />
     <Compile Include="Types\Definition.cs" />
     <Compile Include="Types\Value.cs" />
@@ -82,6 +72,15 @@
     <Compile Include="Types\Interface.cs" />
     <Compile Include="Types\Struct.cs" />
     <Compile Include="Types\Enum.cs" />
+    <Compile Include="Visuals\Visual.cs" />
+    <Compile Include="Visuals\VisualHelpers.cs" />
+    <Compile Include="Visuals\VisualSettings.cs" />
+    <Compile Include="Interpreter\Environment.cs" />
+    <Compile Include="Interpreter\Expression.cs" />
+    <Compile Include="Interpreter\InitialEnv.cs" />
+    <Compile Include="Interpreter\Interpreter.cs" />
+    <Compile Include="Testing\ExprBuilder.cs" />
+    <Compile Include="Testing\Tester.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -93,5 +92,8 @@
   -->
   <ItemGroup>
     <Folder Include="Types\" />
+    <Folder Include="Visuals\" />
+    <Folder Include="Interpreter\" />
+    <Folder Include="Testing\" />
   </ItemGroup>
 </Project>
