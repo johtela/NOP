@@ -81,6 +81,7 @@
     <Compile Include="Interpreter\Interpreter.cs" />
     <Compile Include="Testing\ExprBuilder.cs" />
     <Compile Include="Testing\Tester.cs" />
+    <Compile Include="Visuals\VisualBox.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -35,12 +35,12 @@ namespace NOP
 	/// <summary>
 	/// The interpreter for evaluating expressions.
 	/// </summary>
-	// TODO: Handle the list depleting prematurely by adding an Expect() method.
 	public static class Interpreter
 	{
 		/// <summary>
 		/// An interpretation error with given expression.
 		/// </summary>
+		// TODO: Change the argument of the interpreter error to specify the location.
 		static internal void Error (object expr, string message)
 		{
 			throw new InterpreterException (expr, message);
@@ -235,7 +235,7 @@ namespace NOP
 		}
 
 		/// <summary>
-		/// Invoke a function.
+		/// Invoke a function defined by locally and represented by symbol.
 		/// </summary>
 		private static EvalResult InvokeFunction (Environment env, Symbol fname, ExprList args)
 		{
@@ -245,15 +245,19 @@ namespace NOP
 			return new EvalResult (env, func (EvaluateArguments (env, args)));
 		}
 		
+		/// <summary>
+		/// Invokes a function defined externally and represented by Function object.
+		/// </summary>
 		private static EvalResult InvokeFunction (Environment env, Function function, ExprList args)
 		{
 			return new EvalResult (env, function.Call (EvaluateArguments (env, args)));
 		}
 		
 		/// <summary>
-		/// Call a method.
+		/// Calls a method defined externally.
 		/// </summary>
-		private static EvalResult InvokeMethod (Environment env, object obj, Method method, ExprList args)
+		private static EvalResult InvokeMethod (Environment env, object obj, Method method, 
+			ExprList args)
 		{
 			CheckIsMember(method, obj);
 			return new EvalResult (env, method.Call (obj, EvaluateArguments (env, args)));
@@ -267,7 +271,10 @@ namespace NOP
 			CheckIsMember (prop, obj);
 			return new EvalResult (env, prop.Get (obj));
 		}
-					
+
+		/// <summary>
+		/// Evaluates the arguments of a function or method call.
+		/// </summary>
 		private static ExprList EvaluateArguments (Environment env, ExprList args)
 		{
 			return args.Map (expr => Eval (env, expr).Result);
@@ -294,6 +301,11 @@ namespace NOP
 			return new EvalResult (env, val);
 		}
 		
+		/// <summary>
+		/// A helper function to get the next token in the list. If the list is exhausted
+		/// or the type of the token does not match, an error is raised. Advances the
+		/// list of expressions to the next item.
+		/// </summary>
 		private static T Expect<T>(ref ExprList exprs, string token) where T: class
 		{
 			if (exprs.IsEmpty)
@@ -305,6 +317,11 @@ namespace NOP
 			return obj;
 		}
 		
+		/// <summary>
+		/// Checks if the next token in the list is of given type. Raises an error
+		/// if the list is exhausted. If the specified token is read the list is
+		/// advanced to the next item. Otherwise the list remains the same.
+		/// </summary>
 		private static bool NextToken<T>(ref ExprList exprs, out T token) where T: class
 		{
 			if (exprs.IsEmpty)
@@ -318,10 +335,14 @@ namespace NOP
 			return false;
 		}
 		
+		/// <summary>
+		/// Checks that the member can be found in a given object.
+		/// </summary>
 		static void CheckIsMember (Member member, object obj)
 		{
 			if (!member.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
-				Error (obj, string.Format ("Object of type {0} does have member {1}", obj.GetType (), member));
+				Error (obj, string.Format ("Object of type {0} does have member {1}", 
+					obj.GetType (), member));
 		}
 	}
 }
