@@ -38,14 +38,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core">
     </Reference>
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq">
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\Map.cs" />
@@ -73,8 +65,6 @@
     <Compile Include="Types\Struct.cs" />
     <Compile Include="Types\Enum.cs" />
     <Compile Include="Visuals\Visual.cs" />
-    <Compile Include="Visuals\VisualHelpers.cs" />
-    <Compile Include="Visuals\VisualSettings.cs" />
     <Compile Include="Interpreter\Environment.cs" />
     <Compile Include="Interpreter\Expression.cs" />
     <Compile Include="Interpreter\InitialEnv.cs" />

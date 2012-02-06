@@ -43,7 +43,7 @@ namespace NOP
 				if (type.Namespace != null)
 				{
 					var ns = GetOrCreate (type.Namespace);
-					var td = TypeDefinition.CreateType (ns, type);
+					TypeDefinition.CreateType (ns, type);
 				}
 			return _root;
 		}
