@@ -44,9 +44,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\NOP.CSharp.csproj">
+    <ProjectReference Include="..\NOP.Core.csproj">
       <Project>{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}</Project>
-      <Name>NOP.CSharp</Name>
+      <Name>NOP.Core</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

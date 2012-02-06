@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NOP.CSharp", "NOP.CSharp.csproj", "{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NOP.Core", "NOP.Core.csproj", "{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NOP.Testbench", "NOP.Testbench\NOP.Testbench.csproj", "{38209F25-6A1F-4AD2-A0B7-123E63687CFC}"
 EndProject
