@@ -53,7 +53,7 @@ namespace NOP
 		/// Returns the horizontal union with another box. This means that the
 		/// width of the result is the maximum of the box widths.
 		/// </summary>
-		public VisualBox HUnion (VisualBox other)
+		public VisualBox HMax (VisualBox other)
 		{
 			return new VisualBox (Math.Max (Width, other.Width), Height);
 		}
@@ -62,7 +62,7 @@ namespace NOP
 		/// Returns the horizontal intersection with another box. This means that the
 		/// width of the result is the minimum of the box widths.
 		/// </summary>
-		public VisualBox HIntersect (VisualBox other)
+		public VisualBox HMin (VisualBox other)
 		{
 			return new VisualBox (Math.Min (Width, other.Width), Height);
 		}
@@ -87,7 +87,7 @@ namespace NOP
 		/// Returns the vertical union with another box. This means that the
 		/// height of the result is the maximum of the box heights.
 		/// </summary>
-		public VisualBox VUnion (VisualBox other)
+		public VisualBox VMax (VisualBox other)
 		{
 			return new VisualBox (Width, Math.Max (Height, other.Height));
 		}
@@ -96,7 +96,7 @@ namespace NOP
 		/// Returns the vertical intersection with another box. This means that the
 		/// height of the result is the minimum of the box heights.
 		/// </summary>
-		public VisualBox VIntersect (VisualBox other)
+		public VisualBox VMin (VisualBox other)
 		{
 			return new VisualBox (Width, Math.Min (Height, other.Height));
 		}
