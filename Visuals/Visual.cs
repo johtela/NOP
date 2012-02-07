@@ -3,12 +3,23 @@
 	using System;
 	using System.Linq;
 	using Cairo;
+	using NOP.Collections;
 	
 	/// <summary>
 	/// Enumeration for defining the stack direction.
 	/// </summary>
 	public enum StackDirection { Horizontal, Vertical };
 	
+	/// <summary>
+	/// Horizontal alignment of the items in a stack.
+	/// </summary>
+	public enum HAlign { Left, Center, Right };
+	
+	/// <summary>
+	/// Vertical alignment of the items in a stack.
+	/// </summary>
+	public enum VAlign { Top, Center, Bottom };
+		
 	/// <summary>
 	/// Visuals that represent the elements in the program.
 	/// </summary>
@@ -29,8 +40,7 @@
 		/// <param name="context">The Cairo context to which the visual is drawn to.</param>
 		/// <param name='availableSize'>The available size into which the visual should
 		/// fit.</param>
-		/// <returns>The actual size taken by the visual after it is drawn.</returns>
-		protected abstract VisualBox Draw (Context context, VisualBox availableSize);
+		protected abstract void Draw (Context context, VisualBox availableSize);
 		
 		/// <summary>
 		/// A label that renders some static text into the output.
@@ -61,12 +71,37 @@
 			/// <summary>
 			/// Draw the label into the specified context.
 			/// </summary>
-			protected override VisualBox Draw (Context context, VisualBox availableSize)
+			protected override void Draw (Context context, VisualBox availableSize)
 			{
-				var size = CalculateSize (context).VMax (availableSize);
-				context.MoveTo (0, size.Height);
+				context.MoveTo (0, availableSize.Height);
 				context.ShowText (Text);
-				return size;
+			}
+		}
+		
+		private class _Stack : Visual
+		{
+			public readonly List<Visual> Items;
+			public readonly StackDirection Direction;
+			public readonly HAlign HorizAlign;
+			public readonly VAlign VertAlign;
+			
+			public _Stack (List<Visual> items, StackDirection direction, HAlign horizAlign,
+				VAlign vertAlign)
+			{
+				Items = items;
+				Direction = direction;
+				HorizAlign = horizAlign;
+				VertAlign = vertAlign;
+			}
+			
+			protected override VisualBox CalculateSize (Context context)
+			{
+				throw new NotImplementedException ();
+			}
+			
+			protected override void Draw (Context context, VisualBox availableSize)
+			{
+				throw new NotImplementedException ();
 			}
 		}
 
