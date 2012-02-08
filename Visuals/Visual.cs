@@ -8,17 +8,31 @@
 	/// <summary>
 	/// Enumeration for defining the stack direction.
 	/// </summary>
-	public enum StackDirection { Horizontal, Vertical };
+	public enum StackDirection
+	{
+		Horizontal,
+		Vertical
+	};
 	
 	/// <summary>
 	/// Horizontal alignment of the items in a stack.
 	/// </summary>
-	public enum HAlign { Left, Center, Right };
+	public enum HAlign
+	{
+		Left,
+		Center,
+		Right
+	};
 	
 	/// <summary>
 	/// Vertical alignment of the items in a stack.
 	/// </summary>
-	public enum VAlign { Top, Center, Bottom };
+	public enum VAlign
+	{
+		Top,
+		Center,
+		Bottom
+	};
 		
 	/// <summary>
 	/// Visuals that represent the elements in the program.
@@ -96,12 +110,64 @@
 			
 			protected override VisualBox CalculateSize (Context context)
 			{
-				throw new NotImplementedException ();
+				return Items.Fold (VisualBox.Empty, (acc, v) => 
+				{
+					var box = v.CalculateSize (context);
+					return Direction == StackDirection.Horizontal ?
+						acc.VMax (box).HAdd (box) :
+						acc.HMax (box).VAdd (box);
+				});
+			}
+			
+			private double DeltaX (double outerWidth, double innerWidth)
+			{
+				switch (HorizAlign)
+				{
+					case HAlign.Center: return (outerWidth - innerWidth) / 2;
+					case HAlign.Right: return outerWidth - innerWidth;
+					default: return 0;
+				}
+			}
+			
+			private double DeltaY (double outerHeight, double innerHeight)
+			{
+				switch (VertAlign)
+				{
+					case VAlign.Center: return (outerHeight - innerHeight) / 2;
+					case VAlign.Bottom: return outerHeight - innerHeight;
+					default: return 0;
+				}
 			}
 			
 			protected override void Draw (Context context, VisualBox availableSize)
 			{
-				throw new NotImplementedException ();
+				var stack = CalculateSize (context);
+				
+				foreach (Visual visual in Items)
+				{
+					if (availableSize.IsEmpty) break;
+					
+					var inner = visual.CalculateSize (context);
+					var outer = Direction == StackDirection.Horizontal ?
+						new VisualBox (inner.Width, stack.Height) :
+						new VisualBox (stack.Width, inner.Height);
+					context.Save ();
+					context.Translate (DeltaX (outer.Width, inner.Width), 
+						DeltaY (outer.Height, inner.Height));
+					visual.Draw (context, inner);
+					context.Restore ();
+					
+					if (Direction == StackDirection.Horizontal)
+					{
+						context.Translate (outer.Width, 0);
+						availableSize = availableSize.HSub (outer);
+					}
+					else
+					{
+						context.Translate (0, outer.Height);
+						availableSize = availableSize.VSub (outer);
+					}
+				}
 			}
 		}
 
