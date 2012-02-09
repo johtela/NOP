@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NOP.Collections
+﻿namespace NOP.Collections
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Text;
+
 	/// <summary>
 	/// Exception that is thrown if empty list is accessed.
 	/// </summary>
 	public class EmptyListException : Exception
 	{
-		public EmptyListException () : base("The list is empty")
-		{
-		}
+		public EmptyListException () : base("The list is empty") { }
 	}
 
 	/// <summary>
@@ -20,34 +18,21 @@ namespace NOP.Collections
 	/// <typeparam name="T">The item type of the list.</typeparam>
 	public abstract class List<T> : IEnumerable<T>
 	{
-		public abstract T First
-		{
-			get;
-		}
+		public abstract T First { get; }
 
-		public abstract List<T> Rest
-		{
-			get;
-			protected set;
-		}
+		public abstract List<T> Rest { get; protected set; }
 
 		// Empty list.
 		private sealed class EmptyList : List<T>
 		{
 			public override T First
 			{
-				get
-				{
-					throw new EmptyListException ();
-				}
+				get { throw new EmptyListException (); }
 			}
 
 			public override List<T> Rest
 			{
-				get
-				{
-					throw new EmptyListException ();
-				}
+				get { throw new EmptyListException (); }
 				protected set { }
 			}
 		}
@@ -88,6 +73,10 @@ namespace NOP.Collections
 			return new ConsList (first, rest);
 		}
 		
+		/// <summary>
+		/// Construct a list from an enumerable.
+		/// </summary>
+		/// <param name='values'>The enumeration of values.</param>
 		public static List<T> FromEnumerable (IEnumerable<T> values)
 		{
 			var result = Empty;
@@ -112,7 +101,10 @@ namespace NOP.Collections
 		{
 			get { return _empty; }
 		}
-
+		
+		/// <summary>
+		/// Is the list empty.
+		/// </summary>
 		public bool IsEmpty
 		{
 			get { return this == Empty; }
@@ -167,7 +159,7 @@ namespace NOP.Collections
 		/// or an empty list if the item is not found.</returns>
 		public List<T> FindNext (T item)
 		{
-			List<T > list = this;
+			List<T> list = this;
 			
 			while (!list.IsEmpty && !list.First.Equals (item))
 				list = list.Rest;
@@ -224,10 +216,7 @@ namespace NOP.Collections
 				prevLast = last;
 				last = new ConsList (list.First, Empty);
 				prevLast.Rest = last;
-				if (first.IsEmpty)
-				{
-					first = last;
-				}
+				if (first.IsEmpty) first = last;
 				list = list.Rest;
 			}
 			return new Tuple<List<T>, List<T>> (first, last);
@@ -401,6 +390,12 @@ namespace NOP.Collections
 			return result;
 		}
 
+		/// <summary>
+		/// Folds the list with a specified function and initial value.
+		/// </summary>
+		/// <param name='acc'>The initial value of the accumulator.</param>
+		/// <param name='func'>The function to fold the list.</param>
+		/// <typeparam name='U'>The type of the accumulator.</typeparam>
 		public U Fold<U> (U acc, Func<U, T, U> func)
 		{
 			for (var list = this; !list.IsEmpty; list = list.Rest)
@@ -408,6 +403,12 @@ namespace NOP.Collections
 			return acc;
 		}
 
+		/// <summary>
+		/// Folds the list backwards with a specified function and initial value.
+		/// </summary>
+		/// <param name='acc'>The initial value of the accumulator.</param>
+		/// <param name='func'>The function to fold the list.</param>
+		/// <typeparam name='U'>The type of the accumulator.</typeparam>
 		public U FoldBack<U> (U acc, Func<U, T, U> func)
 		{
 			for (var list = Reverse (); !list.IsEmpty; list = list.Rest)

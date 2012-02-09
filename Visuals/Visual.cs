@@ -1,6 +1,7 @@
 ﻿namespace NOP
 {
 	using System;
+	using SeqVisual=System.Collections.Generic.IEnumerable<Visual>;
 	using System.Linq;
 	using Cairo;
 	using NOP.Collections;
@@ -78,13 +79,39 @@
 			}
 		}
 		
+		/// <summary>
+		/// Stack of visuals that are laid out either horizontally (left to right) or
+		/// vertically (top to bottom).
+		/// </summary>
 		private class _Stack : Visual
 		{
+			/// <summary>
+			/// The visuals in the stack.
+			/// </summary>
 			public readonly List<Visual> Items;
+			
+			/// <summary>
+			/// The direction of the stack (horizontal or vertical)
+			/// </summary>
 			public readonly StackDirection Direction;
+			
+			/// <summary>
+			/// This setting controls how the items in stack are aligned horizontally,
+			/// that is, whether they are aligned by their left or right edges or centered. 
+			/// The setting only has effect, if the stack is vertical.
+			/// </summary>
 			public readonly HAlign HorizAlign;
+			
+			/// <summary>
+			/// This setting controls how the items in stack are aligned vertically,
+			/// that is, whether they are aligned by their top or bottom edges or centered. 
+			/// The setting only has effect, if the stack is horizontal.
+			/// </summary>
 			public readonly VAlign VertAlign;
 			
+			/// <summary>
+			/// Initializes a new stack.
+			/// </summary>
 			public _Stack (List<Visual> items, StackDirection direction, HAlign horizAlign,
 				VAlign vertAlign)
 			{
@@ -94,6 +121,17 @@
 				VertAlign = vertAlign;
 			}
 			
+			/// <summary>
+			/// Override to calculates the size of the visual. 
+			/// </summary>
+			/// <description>
+			/// If the stack is horizontal, the width of the stack is the sum of the 
+			/// widths of the visuals in it. The height of the stack is the height of 
+			/// the tallest item.<para/>
+			/// If the stack is vertical, the height of the stack is the sum of the 
+			/// heights of the visuals in it. The width of the stack is the with of 
+			/// the widest item.
+			/// </description>
 			protected override VisualBox CalculateSize (Context context)
 			{
 				return Items.Fold (VisualBox.Empty, (acc, v) => 
@@ -105,6 +143,9 @@
 				});
 			}
 			
+			/// <summary>
+			/// Calulate the horizontal offset of a visual based on the alignment.
+			/// </summary>
 			private double DeltaX (double outerWidth, double innerWidth)
 			{
 				switch (HorizAlign)
@@ -115,6 +156,9 @@
 				}
 			}
 			
+			/// <summary>
+			/// Calulate the vertival offset of a visual based on the alignment.
+			/// </summary>
 			private double DeltaY (double outerHeight, double innerHeight)
 			{
 				switch (VertAlign)
@@ -125,6 +169,9 @@
 				}
 			}
 			
+			/// <summary>
+			/// Draw the stack into the specified context.
+			/// </summary>
 			protected override void Draw (Context context, VisualBox availableSize)
 			{
 				var stack = CalculateSize (context);
@@ -163,6 +210,38 @@
 		public Visual Label (string text)
 		{
 			return new _Label (text);
+		}
+		
+		/// <summary>
+		/// Create a horizontal stack.
+		/// </summary>
+		public Visual HorizontalStack (VAlign alignment, SeqVisual visuals)
+		{
+			return new _Stack (List.Create (visuals), StackDirection.Horizontal, HAlign.Left, alignment);
+		}
+		
+		/// <summary>
+		/// Create a horizontal stack.
+		/// </summary>
+		public Visual HorizontalStack (VAlign alignment, params Visual[] visuals)
+		{
+			return new _Stack (List.Create (visuals), StackDirection.Horizontal, HAlign.Left, alignment);
+		}
+		
+		/// <summary>
+		/// Create a vertical stack.
+		/// </summary>
+		public Visual VerticalStack (HAlign alignment, SeqVisual visuals)
+		{
+			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
+		}
+		
+		/// <summary>
+		/// Create a vertical stack.
+		/// </summary>
+		public Visual HorizontalStack (HAlign alignment, params Visual[] visuals)
+		{
+			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
 		}
 	}
 }
