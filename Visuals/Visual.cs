@@ -8,31 +8,17 @@
 	/// <summary>
 	/// Enumeration for defining the stack direction.
 	/// </summary>
-	public enum StackDirection
-	{
-		Horizontal,
-		Vertical
-	};
+	public enum StackDirection { Horizontal, Vertical };
 	
 	/// <summary>
 	/// Horizontal alignment of the items in a stack.
 	/// </summary>
-	public enum HAlign
-	{
-		Left,
-		Center,
-		Right
-	};
+	public enum HAlign { Left, Center, Right };
 	
 	/// <summary>
 	/// Vertical alignment of the items in a stack.
 	/// </summary>
-	public enum VAlign
-	{
-		Top,
-		Center,
-		Bottom
-	};
+	public enum VAlign { Top, Center, Bottom };
 		
 	/// <summary>
 	/// Visuals that represent the elements in the program.
