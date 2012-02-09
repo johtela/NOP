@@ -16,51 +16,44 @@
 	/// An immutable linked list.
 	/// </summary>
 	/// <typeparam name="T">The item type of the list.</typeparam>
-	public abstract class List<T> : IEnumerable<T>
+	public class List<T> : IEnumerable<T>
 	{
-		public abstract T First { get; }
-
-		public abstract List<T> Rest { get; protected set; }
-
-		// Empty list.
-		private sealed class EmptyList : List<T>
-		{
-			public override T First
+		private static readonly List<T> _empty = new List<T> (default(T), null);
+		private T _first;
+		private List<T> _rest;
+		
+		/// <summary>
+		/// The first item in the list.
+		/// </summary>
+		public T First
+		{ 
+			get
 			{
-				get { throw new EmptyListException (); }
-			}
-
-			public override List<T> Rest
-			{
-				get { throw new EmptyListException (); }
-				protected set { }
+				if (this == _empty) throw new EmptyListException ();
+				return _first;
 			}
 		}
-
-		// The singleton empty list.
-		private static readonly EmptyList _empty = new EmptyList ();
-
-		protected sealed class ConsList : List<T>
+			
+		/// <summary>
+		/// The rest of the list.
+		/// </summary>
+		public List<T> Rest
+		{ 
+			get
+			{
+				if (this == _empty) throw new EmptyListException ();
+				return _rest;
+			}
+			private set
+			{
+				if (this != _empty) _rest =	value;
+			}
+		}
+		
+		private List (T first, List<T> rest)
 		{
-			private T _first;
-			private List<T> _rest;
-
-			public ConsList (T first, List<T> rest)
-			{
-				_first = first;
-				_rest = rest;
-			}
-
-			public override T First
-			{
-				get { return _first; }
-			}
-
-			public override List<T> Rest
-			{
-				get { return _rest; }
-				protected set { _rest = value; }
-			}
+			_first = first;
+			_rest = rest;
 		}
 
 		/// <summary>
@@ -70,7 +63,7 @@
 		/// <param name="tail">The tail of the list.</param>
 		public static List<T> Cons (T first, List<T> rest)
 		{
-			return new ConsList (first, rest);
+			return new List<T> (first, rest);
 		}
 		
 		/// <summary>
@@ -214,7 +207,7 @@
 			while (!list.IsEmpty && list != stop)
 			{
 				prevLast = last;
-				last = new ConsList (list.First, Empty);
+				last = Cons (list.First, Empty);
 				prevLast.Rest = last;
 				if (first.IsEmpty) first = last;
 				list = list.Rest;
@@ -235,7 +228,7 @@
 			
 			return CopyUpTo (tail).Bind ((prefixFirst, prefixLast) =>
 			{
-				var cons = new ConsList (item, tail);
+				var cons = Cons (item, tail);
 				prefixLast.Rest = cons;
 				return prefixFirst.IsEmpty ? cons : prefixFirst;
 			});
@@ -336,7 +329,7 @@
 			
 			for (var list = this; !(list.IsEmpty || other.IsEmpty); list = list.Rest,other = other.Rest)
 			{
-				var cons = new List<Tuple<T, U>>.ConsList (Tuple.Create (list.First, other.First), List<Tuple<T, U>>.Empty);
+				var cons = List<Tuple<T, U>>.Cons (Tuple.Create (list.First, other.First), List<Tuple<T, U>>.Empty);
 				if (result.IsEmpty)
 				{
 					result = cons;
@@ -375,7 +368,7 @@
 					otherItem = other.First;
 					other = other.Rest;
 				}
-				var cons = new List<Tuple<T, U>>.ConsList (Tuple.Create (listItem, otherItem), List<Tuple<T, U>>.Empty);
+				var cons = List<Tuple<T, U>>.Cons (Tuple.Create (listItem, otherItem), List<Tuple<T, U>>.Empty);
 				if (result.IsEmpty)
 				{
 					result = cons;

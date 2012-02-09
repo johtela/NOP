@@ -1,5 +1,9 @@
 namespace NOP
 {
+	// TODO: Change the argument of the interpreter error to specify the location.
+	// TODO: Transform the special forms (lists starting with symbols "if", "lambda", etc.)
+	// 		 to their own classes.
+	
 	using System;
 	using NOP.Collections;
 	using ExprList = NOP.Collections.List<object>;
@@ -40,7 +44,6 @@ namespace NOP
 		/// <summary>
 		/// An interpretation error with given expression.
 		/// </summary>
-		// TODO: Change the argument of the interpreter error to specify the location.
 		static internal void Error (object expr, string message)
 		{
 			throw new InterpreterException (expr, message);
