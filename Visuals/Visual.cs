@@ -33,7 +33,7 @@
 		/// drawn to.</param>
 		/// <returns>The desired size of the visual that should alwasys be smaller than 
 		/// the available space.</returns>
-		protected abstract VisualBox CalculateSize (Context context);
+		public abstract VisualBox CalculateSize (Context context);
 		
 		/// <summary>
 		/// Draw the visual into specified context using the available size.
@@ -41,7 +41,7 @@
 		/// <param name="context">The Cairo context to which the visual is drawn to.</param>
 		/// <param name='availableSize'>The available size into which the visual should
 		/// fit.</param>
-		protected abstract void Draw (Context context, VisualBox availableSize);
+		public abstract void Draw (Context context, VisualBox availableSize);
 		
 		/// <summary>
 		/// A label that renders some static text into the output.
@@ -64,7 +64,7 @@
 			/// <summary>
 			/// Calculates the size of the label.
 			/// </summary>
-			protected override VisualBox CalculateSize (Context context)
+			public override VisualBox CalculateSize (Context context)
 			{
 				return new VisualBox (context.TextExtents (Text).Width, context.FontExtents.Height);
 			}
@@ -72,7 +72,7 @@
 			/// <summary>
 			/// Draw the label into the specified context.
 			/// </summary>
-			protected override void Draw (Context context, VisualBox availableSize)
+			public override void Draw (Context context, VisualBox availableSize)
 			{
 				context.MoveTo (0, availableSize.Height);
 				context.ShowText (Text);
@@ -132,7 +132,7 @@
 			/// heights of the visuals in it. The width of the stack is the with of 
 			/// the widest item.
 			/// </description>
-			protected override VisualBox CalculateSize (Context context)
+			public override VisualBox CalculateSize (Context context)
 			{
 				return Items.Fold (VisualBox.Empty, (acc, v) => 
 				{
@@ -172,7 +172,7 @@
 			/// <summary>
 			/// Draw the stack into the specified context.
 			/// </summary>
-			protected override void Draw (Context context, VisualBox availableSize)
+			public override void Draw (Context context, VisualBox availableSize)
 			{
 				var stack = CalculateSize (context);
 				
@@ -207,7 +207,7 @@
 		/// <summary>
 		/// Create a new label.
 		/// </summary>
-		public Visual Label (string text)
+		public static Visual Label (string text)
 		{
 			return new _Label (text);
 		}
@@ -215,7 +215,7 @@
 		/// <summary>
 		/// Create a horizontal stack.
 		/// </summary>
-		public Visual HorizontalStack (VAlign alignment, SeqVisual visuals)
+		public static Visual HorizontalStack (VAlign alignment, SeqVisual visuals)
 		{
 			return new _Stack (List.Create (visuals), StackDirection.Horizontal, HAlign.Left, alignment);
 		}
@@ -223,7 +223,7 @@
 		/// <summary>
 		/// Create a horizontal stack.
 		/// </summary>
-		public Visual HorizontalStack (VAlign alignment, params Visual[] visuals)
+		public static Visual HorizontalStack (VAlign alignment, params Visual[] visuals)
 		{
 			return new _Stack (List.Create (visuals), StackDirection.Horizontal, HAlign.Left, alignment);
 		}
@@ -231,7 +231,7 @@
 		/// <summary>
 		/// Create a vertical stack.
 		/// </summary>
-		public Visual VerticalStack (HAlign alignment, SeqVisual visuals)
+		public static Visual VerticalStack (HAlign alignment, SeqVisual visuals)
 		{
 			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
 		}
@@ -239,7 +239,7 @@
 		/// <summary>
 		/// Create a vertical stack.
 		/// </summary>
-		public Visual HorizontalStack (HAlign alignment, params Visual[] visuals)
+		public static Visual HorizontalStack (HAlign alignment, params Visual[] visuals)
 		{
 			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
 		}

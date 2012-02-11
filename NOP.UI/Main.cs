@@ -1,8 +1,8 @@
-using System;
-using Gtk;
-
 namespace NOP.UI
 {
+	using System;
+	using Gtk;
+	
 	class MainClass
 	{
 		/// <summary>

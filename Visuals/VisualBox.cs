@@ -109,5 +109,10 @@ namespace NOP
 		{
 			get { return Width <= 0 || Height <= 0; }
 		}
+		
+		public override string ToString ()
+		{
+			return string.Format ("({0}, {1})", Width, Height);
+		}
 	}
 }
