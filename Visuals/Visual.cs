@@ -66,7 +66,7 @@
 			/// </summary>
 			public override VisualBox CalculateSize (Context context)
 			{
-				return new VisualBox (context.TextExtents (Text).Width, context.FontExtents.Height);
+				return new VisualBox (context.TextExtents (Text).XAdvance, context.FontExtents.Height);
 			}
 			
 			/// <summary>
@@ -239,7 +239,7 @@
 		/// <summary>
 		/// Create a vertical stack.
 		/// </summary>
-		public static Visual HorizontalStack (HAlign alignment, params Visual[] visuals)
+		public static Visual VerticalStack (HAlign alignment, params Visual[] visuals)
 		{
 			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
 		}

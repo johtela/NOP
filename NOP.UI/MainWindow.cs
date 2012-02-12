@@ -3,7 +3,7 @@ namespace NOP.UI
 	using System;
 	using Cairo;
 	using Gtk;
-	using NOP;
+	using V=NOP.Visual;
 	
 	public partial class MainWindow: Gtk.Window
 	{	
@@ -22,11 +22,23 @@ namespace NOP.UI
 		{
 			using (Context context = Gdk.CairoHelper.Create (drawingarea.GdkWindow))
 			{
-				var visual = NOP.Visual.Label ("Hello world");
+				var size = new VisualBox (args.Event.Area.Width, args.Event.Area.Height);
 				
-				var vb = visual.CalculateSize (context);
-				visual.Draw (context, vb);
+				context.SelectFontFace ("Monospace", FontSlant.Normal, FontWeight.Normal);
+				context.SetFontSize (12);
+				var visual = TestVisual ();
+				
+				visual.Draw (context, size);
+				
+				context.Target.Dispose ();
 			}
+		}
+		
+		private Visual TestVisual ()
+		{
+			return V.VerticalStack (HAlign.Left,
+				V.HorizontalStack (VAlign.Bottom, V.Label ("Hello"), V.Label (" "), V.Label ("world!")),
+				V.HorizontalStack (VAlign.Bottom, V.Label ("Pump "), V.Label ("up "), V.Label ("the volume!")));
 		}
 	}
 }
