@@ -66,7 +66,7 @@ namespace NOP.Testbench
 		[Test]
 		public void TestCallingFunction ()
 		{
-			Check.AreEqual (42, GetFooClass ().GetFunction ("Bar()").Call (Expression.NoArgs));
+			Check.AreEqual (42, GetFooClass ().GetFunction ("Bar()").Call (Wrappers.NoArgs));
 		}
 		
 		[Test]

@@ -2,27 +2,17 @@
 {
 	using System;
 	using System.Linq;
+	using System.Reflection;
 	using LinqExpr = System.Linq.Expressions;
 	using LExpr = System.Linq.Expressions.Expression;
-	using System.Reflection;
-	using NOP.Collections;
-	using ExprList = NOP.Collections.List<object>;
 	using SysColl = System.Collections.Generic;
+	using ExprList = NOP.Collections.List<object>;
+	using NOP.Collections;
 	
 	/// <summary>
-	/// Delegate type for (static) functions.
+	/// Method and field wrappers.
 	/// </summary>
-	public delegate object Func (ExprList args);
-	
-	/// <summary>
-	/// Delegate type for (dynamic) methods.
-	/// </summary>
-	public delegate object Meth (object obj, ExprList args);
-	
-	/// <summary>
-	/// Extension methods for expressions. 
-	/// </summary>
-	public static class Expression
+	public static class Wrappers
 	{
 		public static readonly ExprList NoArgs = ExprList.Empty;
 		

@@ -22,21 +22,6 @@ namespace NOP
 	}
 
 	/// <summary>
-	/// Result of the interpreter evaluation.
-	/// </summary>
-	internal struct EvalResult
-	{
-		public readonly Environment Env;
-		public readonly object Result;
-
-		public EvalResult (Environment env, object result)
-		{
-			Env = env;
-			Result = result;
-		}
-	}
-
-	/// <summary>
 	/// The interpreter for evaluating expressions.
 	/// </summary>
 	public static class Interpreter

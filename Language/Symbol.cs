@@ -1,12 +1,11 @@
-using NOP.Collections;
-using ExprList = NOP.Collections.List<object>;
-
 namespace NOP
 {
+	using System;
+	
 	/// <summary>
 	/// Symbols used by the programs. 
 	/// </summary>
-	public sealed class Symbol
+	public sealed class Symbol : Expression
 	{
 		public readonly string Name;
 
@@ -28,6 +27,16 @@ namespace NOP
 		public override string ToString ()
 		{
 			return Name;
+		}
+		
+		public override T Parse<T> (ParserState<T> state)
+		{
+			return state.NextHandler (this, state.State).State;
+		}
+		
+		protected override ParserState<EvalResult> Evaluate (EvalResult lastResult)
+		{
+			return new ParserState<EvalResult> (new EvalResult (lastResult.Env, lastResult.Env.Lookup (Name)), null);
 		}
 	}
 }
