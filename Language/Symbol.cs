@@ -34,9 +34,10 @@ namespace NOP
 			return state.NextHandler (this, state.State).State;
 		}
 		
-		protected override ParserState<EvalResult> Evaluate (EvalResult lastResult)
-		{
-			return new ParserState<EvalResult> (new EvalResult (lastResult.Env, lastResult.Env.Lookup (Name)), null);
-		}
+		// Move to interpreter.
+		//protected override ParserState<EvalResult> Evaluate (EvalResult lastResult)
+		//{
+		//	return new ParserState<EvalResult> (new EvalResult (lastResult.Env, lastResult.Env.Lookup (Name)), null);
+		//}
 	}
 }

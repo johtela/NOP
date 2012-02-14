@@ -5,11 +5,11 @@ namespace NOP
 	/// <summary>
 	/// The atom is the base class for singular values in the language.
 	/// </summary>
-	public class Atom : Expression
+	public class Literal : Expression
 	{
 		public readonly object Value;
 		
-		public Atom (object value)
+		public Literal (object value)
 		{
 			Value = value;
 		}
@@ -18,11 +18,12 @@ namespace NOP
 		{
 			return state.NextHandler (this, state.State).State;
 		}
-		
-		protected override ParserState<EvalResult> Evaluate (EvalResult lastResult)
-		{
-			return new ParserState<EvalResult>(new EvalResult (lastResult.Env, Value), null);
-		}
+	
+		// Move to interpreter
+		//protected override ParserState<EvalResult> Evaluate (EvalResult lastResult)
+		//{
+		//	return new ParserState<EvalResult>(new EvalResult (lastResult.Env, Value), null);
+		//}
 	}
 }
 

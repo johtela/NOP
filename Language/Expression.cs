@@ -59,10 +59,5 @@ namespace NOP
 		/// parsing the program structure.</typeparam>
 		public abstract T Parse<T> (ParserState<T> state);
 		
-		/// <summary>
-		/// Evaluate this expression.
-		/// </summary>
-		/// <param name='env'>The current environment.</param>
-		protected abstract ParserState<EvalResult> Evaluate (EvalResult lastResult);
 	}
 }

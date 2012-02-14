@@ -1,0 +1,14 @@
+The NOP grammar is expression-based, like in all Lisps. Below is the formal
+definition of the grammar.
+
+Expression	=	Literal |
+			 	Symbol |
+			 	Value |
+			 	Function |
+				( quote Expresion ) |
+				( if Expression Expression Expression) |
+				( begin Expression+ ) |
+				( define Symbol Expression ) |
+				( lambda ( Symbol* ) Expression+ ) |
+				( Expression Expression* ) |
+				( Expression Method Expression* ) 
