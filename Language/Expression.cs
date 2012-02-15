@@ -52,12 +52,6 @@ namespace NOP
 		/// Parsing traverses through the program structure calling a function for each
 		/// expression parsed.
 		/// </summary>
-		/// <param name='func'>The function called for each expression.</param>
-		/// <param name='initial'>The initial value of the state carried along when
-		/// parsing the progran structure.</para>
-		/// <typeparam name='T'>Type of the state that is carried along when 
-		/// parsing the program structure.</typeparam>
 		public abstract T Parse<T> (ParserState<T> state);
-		
 	}
 }

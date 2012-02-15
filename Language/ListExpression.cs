@@ -14,7 +14,10 @@ namespace NOP
 		
 		public override T Parse<T> (ParserState<T> state)
 		{
-			throw new NotImplementedException ();
+			if (Items.First is Symbol)
+			{
+				
+			}
 		}
 	}
 }
