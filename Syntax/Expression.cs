@@ -4,16 +4,6 @@ namespace NOP
 	using ExprList = NOP.Collections.List<object>;
 
 	/// <summary>
-	/// Delegate type for (static) functions.
-	/// </summary>
-	public delegate object Func (ExprList args);
-	
-	/// <summary>
-	/// Delegate type for (dynamic) methods.
-	/// </summary>
-	public delegate object Meth (object obj, ExprList args);
-	
-	/// <summary>
 	/// Result of the interpreter evaluation.
 	/// </summary>
 	public struct EvalResult

@@ -72,10 +72,11 @@
     <Compile Include="Testing\Tester.cs" />
     <Compile Include="Visuals\VisualBox.cs" />
     <Compile Include="Interpreter\Wrappers.cs" />
-    <Compile Include="Language\Expression.cs" />
     <Compile Include="Types\SExpr.cs" />
     <Compile Include="Types\Symbol.cs" />
-    <Compile Include="Types\ListExpression.cs" />
+    <Compile Include="Types\Literal.cs" />
+    <Compile Include="Types\SList.cs" />
+    <Compile Include="Syntax\Expression.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -90,7 +91,7 @@
     <Folder Include="Visuals\" />
     <Folder Include="Interpreter\" />
     <Folder Include="Testing\" />
-    <Folder Include="Language\" />
+    <Folder Include="Syntax\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Grammar.txt" />

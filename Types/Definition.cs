@@ -1,7 +1,18 @@
-using System.Reflection;
-
 namespace NOP
 {
+	using System.Reflection;
+	using ExprList = NOP.Collections.List<object>;
+
+	/// <summary>
+	/// Delegate type for (static) functions.
+	/// </summary>
+	public delegate object Func (ExprList args);
+	
+	/// <summary>
+	/// Delegate type for (dynamic) methods.
+	/// </summary>
+	public delegate object Meth (object obj, ExprList args);
+	
 	/// <summary>
 	/// Modules consist of definitions. A definition is either a value, 
 	/// variable or a function.
