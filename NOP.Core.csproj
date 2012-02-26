@@ -77,6 +77,12 @@
     <Compile Include="Types\Literal.cs" />
     <Compile Include="Types\SList.cs" />
     <Compile Include="Syntax\Expression.cs" />
+    <Compile Include="Syntax\AtomExpression.cs" />
+    <Compile Include="Syntax\SymbolExpression.cs" />
+    <Compile Include="Syntax\LiteralExpression.cs" />
+    <Compile Include="Syntax\ListExpression.cs" />
+    <Compile Include="Syntax\QuoteExpression.cs" />
+    <Compile Include="Syntax\IfExpression.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

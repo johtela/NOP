@@ -9,6 +9,21 @@ namespace NOP
 	using ExprList = NOP.Collections.List<object>;
 
 	/// <summary>
+	/// Result of the interpreter evaluation.
+	/// </summary>
+	public struct EvalResult
+	{
+		public readonly Environment Env;
+		public readonly object Result;
+
+		public EvalResult (Environment env, object result)
+		{
+			Env = env;
+			Result = result;
+		}
+	}
+	
+	/// <summary>
 	/// Exception for interpreter errors.
 	/// </summary>
 	public class InterpreterException : Exception

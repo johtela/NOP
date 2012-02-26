@@ -3,20 +3,26 @@ definition of the grammar.
 
 SExp:			Literal | Symbol | Value | Function | Method | List ( SExp* )
 			 	
-Expression:		LiteralExpression | SymbolExpression | ValueExpression | ListExpression
-				
-ListExpression:	List ( QuoteExpression ) |
-				List ( IfExpression ) |
-				List ( BeginExpression ) |
-				List ( DefineExpression ) |
-				List ( LambdaExpression ) |
-				List ( MethodCallExpression ) |
-				List ( FunctionCallExpression )
+Expression:		AtomExpression | ListExpression
 
-QuoteExpression: 	Symbol( quote ) Expression 
-IfExpression:		Symbol( if ) Expression Expression Expression
-BeginExpression: 	Symbol( begin ) Expression+
-DefineExpression:	Symbol( define ) Symbol Expression
-LambdaExpression:	Symbol( lambda ) List ( Symbol* ) Expression+
-MethodCallExpression: Expression Method Expression*
-FunctionCallExpression: Expression+
+AtomExpression: SymbolExpression | ValueExpression | LiteralExpression
+				
+SymbolExpression: 	Symbol
+ValueExpression:  	Value
+LiteralExpression:	Literal
+
+ListExpression:	QuoteExpression |
+				IfExpression |
+				BeginExpression |
+				DefineExpression |
+				LambdaExpression |
+				MethodCallExpression |
+				FunctionCallExpression
+
+QuoteExpression: 	List ( Symbol( quote ) Expression )
+IfExpression:		List ( Symbol( if ) Expression Expression Expression )
+BeginExpression: 	List ( Symbol( begin ) Expression+ )
+DefineExpression:	List ( Symbol( define ) Symbol Expression )
+LambdaExpression:	List ( Symbol( lambda ) List ( Symbol* ) Expression+ )
+MethodCallExpression: List ( Expression Method Expression* )
+FunctionCallExpression: List ( Expression+ )
