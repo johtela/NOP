@@ -52,14 +52,14 @@ namespace NOP
 					{
 						case "quote":
 							return new QuoteExpression (slist);
-//						case "if":
-//							return EvalIf (env, list.Rest);
-//						case "begin":
-//							return EvalBegin (env, list.Rest);
-//						case "define":
-//							return EvalDefine (env, list.Rest);
-//						case "lambda":
-//							return MakeFunction (env, list.Rest);
+						case "if":
+							return new IfExpression (slist);
+						case "begin":
+							return new BeginExpression (slist);
+						case "define":
+							return new DefineExpression (slist);
+						case "lambda":
+							return new LambdaExpression(slist);
 //						case "set!":
 //							return EvalSet (env, list.Rest);
 //						default:
@@ -118,7 +118,7 @@ namespace NOP
 		/// Raises an error if the list is exhausted. If the specified S-expression is 
 		/// read the list is advanced to the next item. Otherwise the list remains the same.
 		/// </summary>
-		private bool NextSExp<T>(ref List<SExpr> sexps, out T sexp) where T: SExpr
+		protected bool NextSExp<T>(ref List<SExpr> sexps, out T sexp) where T: SExpr
 		{
 			if (sexps.IsEmpty)
 				ParseError (SExp, string.Format ("Unexpected end of list."));

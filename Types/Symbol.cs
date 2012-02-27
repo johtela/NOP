@@ -10,6 +10,17 @@ namespace NOP
 		{
 			Name = name;
 		}
+		
+		public override bool Equals (object obj)
+		{
+			var other = obj as Symbol;
+			return other != null && other.Name == Name;
+		}
+		
+		public override int GetHashCode ()
+		{
+			return Name.GetHashCode ();
+		}
 	}
 }
 
