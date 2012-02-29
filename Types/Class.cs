@@ -17,7 +17,6 @@ namespace NOP
 			_definitions = Map<string, Definition>.FromPairs (Functions ()
 				.Concat (Values ())
 				.Concat (Variables ())
-				.Concat (Constructors ())
 				.Concat (Methods ())
 				.Concat (Properties ()));
 			AddNestedTypes ();
@@ -38,11 +37,6 @@ namespace NOP
 			return (Variable)Definitions [name];
 		}
 		
-		public Constructor GetConstructor (string signature)
-		{
-			return (Constructor)Definitions [signature];
-		}
-
 		public Method GetMethod (string signature)
 		{
 			return (Method)Definitions [signature];

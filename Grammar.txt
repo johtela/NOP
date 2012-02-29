@@ -1,28 +1,35 @@
 The NOP grammar is expression-based, like in all Lisps. Below is the formal
 definition of the grammar.
 
-SExp:			Literal | Symbol | Value | Function | Method | List ( SExp* )
+SExp:			Literal | Symbol | Value | Variable | Function | Method | Property | 
+				List ( SExp* )
 			 	
 Expression:		AtomExpression | ListExpression
 
-AtomExpression: SymbolExpression | ValueExpression | LiteralExpression
+AtomExpression: SymbolExpression | ValueExpression | LiteralExpression | FunctionExpression
 				
-SymbolExpression: 	Symbol
-ValueExpression:  	Value
-LiteralExpression:	Literal
+LiteralExpression:		Literal
+SymbolExpression: 		Symbol
+ValueExpression:  		Value
+VariableExpresssion: 	Variable
+FunctionExpression:		Function
 
 ListExpression:	QuoteExpression |
 				IfExpression |
 				BeginExpression |
 				DefineExpression |
 				LambdaExpression |
+				SetExpression |
 				MethodCallExpression |
-				FunctionCallExpression
-
-QuoteExpression: 	List ( Symbol( quote ) Expression )
-IfExpression:		List ( Symbol( if ) Expression Expression Expression )
-BeginExpression: 	List ( Symbol( begin ) Expression+ )
-DefineExpression:	List ( Symbol( define ) Symbol Expression )
-LambdaExpression:	List ( Symbol( lambda ) List ( Symbol* ) Expression+ )
-MethodCallExpression: List ( Expression Method Expression* )
+				FunctionCallExpression |
+				PropertyExpression
+				
+QuoteExpression: 		List ( Symbol("quote") Expression )
+IfExpression:			List ( Symbol("if") Expression Expression Expression )
+BeginExpression: 		List ( Symbol("begin") Expression+ )
+DefineExpression:		List ( Symbol("define") Symbol Expression )
+LambdaExpression:		List ( Symbol("lambda") List ( Symbol* ) Expression+ )
+SetExpression:			List ( Symbol("set!") VariableExpression Expression )
+MethodCallExpression: 	List ( Expression Method Expression* )
 FunctionCallExpression: List ( Expression+ )
+PropertyExpression:		List ( Expression Property+ )

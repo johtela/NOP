@@ -56,7 +56,6 @@
     <Compile Include="Types\Member.cs" />
     <Compile Include="Types\Method.cs" />
     <Compile Include="Types\Class.cs" />
-    <Compile Include="Types\Constructor.cs" />
     <Compile Include="Types\Namespace.cs" />
     <Compile Include="Collections\SubArray.cs" />
     <Compile Include="Collections\ArrayExtensions.cs" />
@@ -86,6 +85,8 @@
     <Compile Include="Syntax\BeginExpression.cs" />
     <Compile Include="Syntax\DefineExpression.cs" />
     <Compile Include="Syntax\LambdaExpression.cs" />
+    <Compile Include="Syntax\SetExpression.cs" />
+    <Compile Include="Syntax\VariableExpression.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -60,7 +60,7 @@ namespace NOP.Testbench
 			var fooClass = GetFooClass ();
 			var args = List.Create<object> (val);
 			
-			return Tuple.Create (fooClass, fooClass.GetConstructor (".ctor(Int32)").Create (args), args);
+			return Tuple.Create (fooClass, fooClass.GetFunction ("Foo(Int32)").Call (args), args);
 		}
 		
 		[Test]

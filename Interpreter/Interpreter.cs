@@ -3,7 +3,6 @@ namespace NOP
 	// TODO: Change the argument of the interpreter error to specify the location.
 	// TODO: Transform the special forms (lists starting with symbols "if", "lambda", etc.)
 	// 		 to their own classes.
-	
 	using System;
 	using NOP.Collections;
 	using ExprList = NOP.Collections.List<object>;
@@ -149,8 +148,8 @@ namespace NOP
 		/// </summary>
 		static internal EvalResult EvalDefine (Environment env, ExprList exprs)
 		{
-			var symbol = Expect<Symbol>(ref exprs, "symbol");
-			var val = Expect<object>(ref exprs, "right hand side of definition clause");
+			var symbol = Expect<Symbol> (ref exprs, "symbol");
+			var val = Expect<object> (ref exprs, "right hand side of definition clause");
 			var res = Eval (env, val).Result;
 			return new EvalResult (env.Define (symbol.Name, res), res);
 		}
@@ -192,7 +191,8 @@ namespace NOP
 		/// </summary>
 		/// <param name="values">The parameter values given.</param>
 		/// <returns>The updated environment that has the parameters defined.</returns>
-		private static Environment BindParams (Environment env, List<string> names, ExprList values)
+		private static Environment BindParams (Environment env, List<string> names, 
+			ExprList values)
 		{
 			while (true)
 			{
@@ -220,7 +220,7 @@ namespace NOP
 		/// </summary>
 		private static EvalResult MakeFunction (Environment env, ExprList definition)
 		{
-			var list = Expect<ExprList>(ref definition, "list of parameters");
+			var list = Expect<ExprList> (ref definition, "list of parameters");
 			var parameters = list.Map (expr =>
 			{
 				var sym = expr as Symbol;
@@ -251,7 +251,8 @@ namespace NOP
 		/// <summary>
 		/// Invokes a function defined externally and represented by Function object.
 		/// </summary>
-		private static EvalResult InvokeFunction (Environment env, Function function, ExprList args)
+		private static EvalResult InvokeFunction (Environment env, Function function, 
+			ExprList args)
 		{
 			return new EvalResult (env, function.Call (EvaluateArguments (env, args)));
 		}
@@ -262,7 +263,7 @@ namespace NOP
 		private static EvalResult InvokeMethod (Environment env, object obj, Method method, 
 			ExprList args)
 		{
-			CheckIsMember(method, obj);
+			CheckIsMember (method, obj);
 			return new EvalResult (env, method.Call (obj, EvaluateArguments (env, args)));
 		}
 		
@@ -292,13 +293,13 @@ namespace NOP
 			object obj = null;	
 			Variable variable;
 			
-			if (!NextToken<Variable>(ref exprs, out variable))
+			if (!NextToken<Variable> (ref exprs, out variable))
 			{
-				obj = Expect<object>(ref exprs, "object");
-				prop = Expect<Property>(ref exprs, "property");
+				obj = Expect<object> (ref exprs, "object");
+				prop = Expect<Property> (ref exprs, "property");
 				CheckIsMember (prop, obj); 
 			}
-			var val = Expect<object>(ref exprs, "right hand side of assignment clause");
+			var val = Expect<object> (ref exprs, "right hand side of assignment clause");
 			if (prop != null) prop.Set (obj, val);
 			else variable.Set (val);
 			return new EvalResult (env, val);
@@ -309,7 +310,7 @@ namespace NOP
 		/// or the type of the token does not match, an error is raised. Advances the
 		/// list of expressions to the next item.
 		/// </summary>
-		private static T Expect<T>(ref ExprList exprs, string token) where T: class
+		private static T Expect<T> (ref ExprList exprs, string token) where T: class
 		{
 			if (exprs.IsEmpty)
 				Error (exprs, string.Format ("Expected {0} but reached end of list.", token));
@@ -325,7 +326,7 @@ namespace NOP
 		/// if the list is exhausted. If the specified token is read the list is
 		/// advanced to the next item. Otherwise the list remains the same.
 		/// </summary>
-		private static bool NextToken<T>(ref ExprList exprs, out T token) where T: class
+		private static bool NextToken<T> (ref ExprList exprs, out T token) where T: class
 		{
 			if (exprs.IsEmpty)
 				Error (exprs, string.Format ("Unexpected end of list."));

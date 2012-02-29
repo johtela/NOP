@@ -48,42 +48,38 @@ namespace NOP
 		
 		protected IEnumerable<NameDef> Functions ()
 		{
-			return from mi in _type.GetMethods (_bfStatic)
-				   select NewDef(new Function (mi));
+			return (from ci in _type.GetConstructors (_bfInstance)
+				   select NewDef (new Function (ci))).Concat (
+				   from mi in _type.GetMethods (_bfStatic)
+				   select NewDef (new Function (mi)));
 		}
 		
 		protected IEnumerable<NameDef> Values ()
 		{
 			return from pi in _type.GetProperties (_bfStatic)
 				   where !pi.CanWrite
-				   select NewDef(new Value (pi));
+				   select NewDef (new Value (pi));
 		}
 				
 		protected IEnumerable<NameDef> Variables ()
 		{
 			return (from pi in _type.GetProperties (_bfStatic)
 				   where pi.CanWrite
-				   select NewDef(new Variable (pi))).Concat (
+				   select NewDef (new Variable (pi))).Concat (
 				   from fi in _type.GetFields (_bfStatic)
-				   select NewDef(new Variable (fi)));
+				   select NewDef (new Variable (fi)));
 		}
 				
-		protected IEnumerable<NameDef> Constructors ()
-		{
-			return from ci in _type.GetConstructors (_bfInstance)
-				   select NewDef(new Constructor (ci));
-		}
-
 		protected IEnumerable<NameDef> Methods ()
 		{
 			return from mi in _type.GetMethods (_bfInstance)
-				   select NewDef(new Method (mi));
+				   select NewDef (new Method (mi));
 		}
 
 		protected IEnumerable<NameDef> Properties ()
 		{
 			return from pi in _type.GetProperties (_bfInstance)
-				   select NewDef(new Property (pi));
+				   select NewDef (new Property (pi));
 		}
 		
 		protected void AddNestedTypes ()

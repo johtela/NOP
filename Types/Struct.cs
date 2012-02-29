@@ -15,7 +15,6 @@ namespace NOP
 			_definitions = Map<string, Definition>.FromPairs (Functions ()
 				.Concat (Values ())
 				.Concat (Variables ())
-				.Concat (Constructors ())
 				.Concat (Methods ())
 				.Concat (Properties ()));
 			AddNestedTypes ();

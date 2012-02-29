@@ -10,7 +10,7 @@ namespace NOP
 	public class Function : Definition
 	{
 		private Func _call;
-		private MethodInfo _methodInfo;
+		private MethodBase _methodBase;
 			
 		public Function (Func call) : base (null)
 		{
@@ -19,11 +19,19 @@ namespace NOP
 			_call = call;
 		}
 			
-		public Function (MethodInfo mi) : base (mi)
+		public Function (MethodBase mb) : base (mb)
 		{
-			if (!(mi as MethodInfo).IsStatic)
+			if (!(mb is ConstructorInfo || mb.IsStatic))
 				throw new ArgumentException ("Method wrapped need to be static");
-			_methodInfo = mi;
+			_methodBase = mb;
+		}
+		
+		public override string ToString ()
+		{
+			if (_methodBase is MethodInfo) 
+				return base.ToString ();
+			var sig = _methodBase.ToString ();
+			return _methodBase.DeclaringType.Name + sig.Substring (sig.IndexOf ('('));
 		}
 
 		public Func Call
@@ -32,15 +40,17 @@ namespace NOP
 			{
 				if (_call == null)
 				{
-					_call = _methodInfo.AsFunction ();
+					_call = _methodBase is ConstructorInfo ?
+						(_methodBase as ConstructorInfo).AsFunction () :
+						(_methodBase as MethodInfo).AsFunction();
 				}
 				return _call;
 			}
 		}
 		
-		public MethodInfo MethodInfo
+		public MethodBase MethodBase
 		{
-			get { return _methodInfo; }
+			get { return _methodBase; }
 		}
 	}
 }
