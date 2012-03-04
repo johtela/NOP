@@ -59,9 +59,9 @@ namespace NOP
 						case "define":
 							return new DefineExpression (slist);
 						case "lambda":
-							return new LambdaExpression(slist);
-//						case "set!":
-//							return EvalSet (env, list.Rest);
+							return new LambdaExpression (slist);
+						case "set!":
+							return new SetExpression (slist);
 //						default:
 //							return InvokeFunction (env, symbol, list.Rest);
 					}

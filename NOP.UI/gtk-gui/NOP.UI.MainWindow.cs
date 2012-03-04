@@ -35,8 +35,7 @@ namespace NOP.UI
 			w2.Expand = false;
 			w2.Fill = false;
 			this.Add (this.vbox);
-			if ((this.Child != null))
-			{
+			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
 			this.DefaultWidth = 400;

@@ -21,8 +21,8 @@ ListExpression:	QuoteExpression |
 				LambdaExpression |
 				SetExpression |
 				MethodCallExpression |
-				FunctionCallExpression |
-				PropertyExpression
+				PropertyExpression |
+				FunctionCallExpression
 				
 QuoteExpression: 		List ( Symbol("quote") Expression )
 IfExpression:			List ( Symbol("if") Expression Expression Expression )
@@ -31,5 +31,5 @@ DefineExpression:		List ( Symbol("define") Symbol Expression )
 LambdaExpression:		List ( Symbol("lambda") List ( Symbol* ) Expression+ )
 SetExpression:			List ( Symbol("set!") VariableExpression Expression )
 MethodCallExpression: 	List ( Expression Method Expression* )
-FunctionCallExpression: List ( Expression+ )
 PropertyExpression:		List ( Expression Property+ )
+FunctionCallExpression: List ( Expression+ )
