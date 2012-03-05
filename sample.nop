@@ -1,0 +1,9 @@
+(namespace MyProject
+    (class Foo
+        (val Number 2)
+        (var Mutator 3)
+        (func Bar (a b) (+ a b))
+        (func Baz (b) (+ b 2))
+        (meth Doh (d) (+ d Number))
+    )
+)
