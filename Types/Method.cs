@@ -38,5 +38,10 @@ namespace NOP
 				return _call;
 			}
 		}
+		
+		public MethodInfo MethodInfo
+		{
+			get { return _methodInfo; }
+		}
 	}
 }

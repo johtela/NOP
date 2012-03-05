@@ -87,6 +87,9 @@
     <Compile Include="Syntax\LambdaExpression.cs" />
     <Compile Include="Syntax\SetExpression.cs" />
     <Compile Include="Syntax\VariableExpression.cs" />
+    <Compile Include="Syntax\MethodCallExpression.cs" />
+    <Compile Include="Syntax\ValueExpression.cs" />
+    <Compile Include="Syntax\FunctionExpression.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
