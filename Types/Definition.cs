@@ -17,7 +17,7 @@ namespace NOP
 	/// Modules consist of definitions. A definition is either a value, 
 	/// variable or a function.
 	/// </summary>
-	public abstract class Definition : SExpr
+	public abstract class Definition
 	{
 		protected readonly MemberInfo _memberInfo;
 		

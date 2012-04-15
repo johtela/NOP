@@ -1,14 +1,18 @@
 namespace NOP
 {
 	using System;
+	using Collections;
 	
-	public class FunctionExpression : AtomExpression
+	public class FunctionExpression : ListExpression
 	{
-		public readonly Function Function;
+		public readonly Expression FuncName;
+		public readonly List<Expression> Parameters;
 		
-		public FunctionExpression (Function function) : base (function)
+		public FunctionExpression (SList funcExpr) : base (funcExpr)
 		{
-			Function = function;
+			var sexps = funcExpr.Items;
+			FuncName = Parse (Expect<SExpr> (ref sexps, "function name or lambda expression"));
+			Parameters = sexps.Map (sexp => Parse(sexp));
 		}
 	}
 }

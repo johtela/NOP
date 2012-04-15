@@ -5,7 +5,7 @@ using NOP.Collections;
 
 namespace NOP
 {
-	public class Namespace : SExpr
+	public class Namespace
 	{
 		private string[] _path;
 		private static Namespace _root = new Namespace ();

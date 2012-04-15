@@ -34,19 +34,8 @@ namespace NOP
 		/// </summary>
 		public static Expression Parse (SExpr sexp)
 		{
-			// Is this a symbol?
 			if (sexp is Symbol)
 				return new SymbolExpression (sexp as Symbol);
-			// Or is it a value?
-			if (sexp is Value)
-				return new ValueExpression (sexp as Value);
-			// Or is it a literal?
-			if (sexp is Literal)
-				return new LiteralExpression (sexp as Literal);
-			// Or maybe a function reference?
-			if (sexp is Function)
-				return new FunctionExpression (sexp as Function);
-			// Then it has to be a list, right?
 			var slist = sexp as SList;
 			if (slist != null)
 			{
@@ -73,26 +62,9 @@ namespace NOP
 							return new SetExpression (slist);
 					}
 				}
-				// Or is this a method call or property read?
-				var rest = list.Rest;
-				if (!rest.IsEmpty)
-				{
-					if (rest.First is Method)
-						return new MethodCallExpression (slist);
-//					else
-//					if (rest.First is Property)
-//						return GetProperty (env, obj, rest.First as Property);
-				}
-//				// Is this an external function call?
-//				var func = list.First as Function;
-//				if (func != null)
-//					return InvokeFunction (env, func, list.Rest);
-				// Otherwise throw an error.
-//				Error (rest.First, "Expected a function or method call, or property read.");
+				// Otherwise do a function call.
+				return new FunctionExpression(slist);
 			}
-//			var val = expr as Value;
-//			if (val != null)
-//				return new EvalResult (env, val.Get ());
 			return new LiteralExpression (sexp as Literal);
 		}
 
