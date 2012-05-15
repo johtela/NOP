@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,10 +12,14 @@
     <AssemblyName>NOP</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,6 +52,7 @@
     <Compile Include="NOPException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Collections\TupleExtensions.cs" />
+    <Compile Include="Syntax\ExprType.cs" />
     <Compile Include="Types\Definition.cs" />
     <Compile Include="Types\Value.cs" />
     <Compile Include="Types\Variable.cs" />
@@ -99,14 +104,9 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="Types\" />
-    <Folder Include="Visuals\" />
-    <Folder Include="Interpreter\" />
-    <Folder Include="Testing\" />
-    <Folder Include="Syntax\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Grammar.txt" />
+    <None Include="Types\ClassDiagram1.cd" />
   </ItemGroup>
 </Project>
