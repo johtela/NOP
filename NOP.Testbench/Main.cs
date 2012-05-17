@@ -12,6 +12,7 @@ namespace NOP.Testbench
 				new CollectionTests (),
 				new InterpreterTests (),
 				new MapTests (),
+				new SetTests (),
 				new TypeDefinitionTests ());
 		}
 	}

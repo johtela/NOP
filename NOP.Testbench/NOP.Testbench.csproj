@@ -9,7 +9,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>NOP.Testbench</RootNamespace>
     <AssemblyName>NOP.Testbench</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +40,7 @@
     <Compile Include="MapTests.cs" />
     <Compile Include="TypeDefinitionTests.cs" />
     <Compile Include="Arithmetic.cs" />
+    <Compile Include="SetTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,7 +10,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NOP</RootNamespace>
     <AssemblyName>NOP</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -40,8 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core">
-    </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="Mono.Cairo" />
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +90,7 @@
     <Compile Include="Syntax\LambdaExpression.cs" />
     <Compile Include="Syntax\SetExpression.cs" />
     <Compile Include="Syntax\FunctionExpression.cs" />
+    <Compile Include="Collections\Set.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -104,6 +103,5 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="Grammar.txt" />
-    <None Include="Types\ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

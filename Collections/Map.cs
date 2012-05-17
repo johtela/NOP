@@ -13,9 +13,7 @@ namespace NOP.Collections
 		/// <summary>
 		/// The default constructor.
 		/// </summary>
-		public EmptyMapException () : base("Map is empty")
-		{
-		}
+		public EmptyMapException () : base("Map is empty") { }
 	}
 
 	/// <summary>
@@ -101,7 +99,7 @@ namespace NOP.Collections
 		/// <returns>True, if the map contains the key; false, otherwise.</returns>
 		public bool Contains (K key)
 		{
-			return !(Tree<Map<K, V>, K>.Search (this, key) == Empty);
+			return Tree<Map<K, V>, K>.Search (this, key) != Empty;
 		}
 
 		/// <summary>
