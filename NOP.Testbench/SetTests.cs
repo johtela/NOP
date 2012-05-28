@@ -90,5 +90,15 @@ namespace NOP.Testbench
 
 			Check.AreEqual (_itemCount, s.Count);
 		}
+		
+		[Test]
+		public void TestDuplicatesAreIgnored ()
+		{
+			var s = Set<string>.Create("foo", "bar", "cool", "bar");
+			Check.AreEqual (3, s.Count);
+			
+			s = s.Add("foo");
+			Check.AreEqual (3, s.Count);
+		}
 	}
 }

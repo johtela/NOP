@@ -34,6 +34,11 @@
 		protected abstract ExprType ApplySub (Substitution sub);
 		
 		/// <summary>
+		/// Gets the type variables of the type.
+		/// </summary>
+//		protected abstract Set<string> GetTypeVars ();
+		
+		/// <summary>
 		/// Lambda type, Argument -> Result
 		/// </summary>
         public class Lam : ExprType
@@ -50,6 +55,11 @@
 			{
 				return new Lam(Argument.ApplySub(sub), Result.ApplySub(sub));
 			}
+			
+//			protected override Set<string> GetTypeVars ()
+//			{
+//				return 
+//			}
 			
 			public override bool Equals (object obj)
 			{
@@ -133,6 +143,13 @@
 				return TypeArgs.Fold (Name.GetHashCode (), (h, t) => h ^ t.GetHashCode ());
 			}
         }
+		
+		public class Polytype
+		{
+			public readonly ExprType Type;
+			public readonly Set<string> TypeVars;
+			
+		}
 		
     }
 }

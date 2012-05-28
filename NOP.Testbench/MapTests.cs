@@ -134,5 +134,21 @@ namespace NOP.Testbench
 
 			Check.AreEqual (_itemCount, dictionary.Count);
 		}
+		
+		[Test]
+		public void TestThrowsIfDuplicate ()
+		{
+			Check.Throws<ArgumentException>(() =>
+				Map<string, int>.FromPairs(Tuple.Create("foo", 1), 
+		                                   Tuple.Create("bar", 2),
+			                               Tuple.Create("foo", 3)));
+			Check.Throws<ArgumentException>(() =>
+           	{
+				var map = Map<string, int>.Empty;
+				map = map.Add("foo", 1);
+				map = map.Add("bar", 2);
+				map = map.Add("foo", 3);
+			});
+		}
 	}
 }

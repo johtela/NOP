@@ -49,7 +49,7 @@ namespace NOP.Collections
 		{
 			var array = items.Select<T, Set<T>> (v => new _SetNode (v, Empty, Empty)).ToArray ();
 
-			return Tree<Set<T>, T>.FromArray (array);
+			return Tree<Set<T>, T>.FromArray (array, false);
 		}
 
 		/// <summary>
@@ -69,7 +69,9 @@ namespace NOP.Collections
 		/// <returns>A new set that contains the given item.</returns>
 		public Set<T> Add (T item)
 		{
-			return Tree<Set<T>, T>.Add (this, new _SetNode (item, Empty, Empty), 1);
+			return Contains(item) ? 
+				this :
+				Tree<Set<T>, T>.Add (this, new _SetNode (item, Empty, Empty), 1);
 		}
 
 		/// <summary>
@@ -91,27 +93,21 @@ namespace NOP.Collections
 		{
 			return Tree<Set<T>, T>.Search (this, item) != Empty;
 		}
-
+		
+		/// <summary>
+		/// Return the union of this and other set.
+		/// </summary>
+		public Set<T> Union (Set<T> other)
+		{
+			return Set<T>.Create(this.Concat(other));
+		}
+		
 		/// <summary>
 		/// Returns the number of items in the map.
 		/// </summary>
 		public int Count
 		{
 			get { return Weight; }
-		}
-
-		/// <summary>
-		/// Enumerates the values in the map in the order determined by the keys.
-		/// </summary>
-		public IEnumerable<T> Items
-		{
-			get
-			{
-				foreach (_SetNode node in Tree<Set<T>, T>.Enumerate(this))
-				{
-					yield return node.Key;
-				}
-			}
 		}
 
         #endregion

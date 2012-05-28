@@ -102,7 +102,7 @@ namespace NOP.Collections
         {
             return (T)tree.Right;
         }
-
+		
         /// <summary>
         /// Search for a given key in the tree.
         /// </summary>
@@ -143,7 +143,7 @@ namespace NOP.Collections
 
             bool rebalance = (height > 0) && (height > (10 * Math.Log(tree.Weight + 1, 2)));
             int nextHeight = (height > 0) && (!rebalance) ? height + 1 : 0; 
-
+			
             T result = item.Key.CompareTo(tree.Key) > 0 ?
                 (T)tree.Clone(tree.Left, Add(Right(tree), item, nextHeight), false) :
                 (T)tree.Clone(Add(Left(tree), item, nextHeight), tree.Right, false);
@@ -236,11 +236,26 @@ namespace NOP.Collections
         /// and the items are attached to the tree. This means that the callers should not use
         /// the list any more after this function returns.</param>
         /// <returns>A new tree that contains the items in the list.</returns>
-        public static T FromArray(T[] array)
+        public static T FromArray(T[] array, bool throwIfDuplicate)
         {
             Array.Sort(array, _comparer);
-            return RebalanceList(array, 0, array.Length - 1, true);
+			var last = RemoveDuplicates(array, throwIfDuplicate);
+            return RebalanceList(array, 0, last, true);
         }
+
+		public static int RemoveDuplicates (T[] array, bool throwIfDuplicate)
+		{
+			var res = 0;
+			
+			for (int i = 1; i < array.Length; i++)
+			{
+				if (array[res].Key.CompareTo(array[i].Key) != 0)
+					array[++res] = array[i];
+				else if (throwIfDuplicate) 
+					throw new ArgumentException("Duplicate key: " + array[i].Key);
+			}
+			return res;
+		}
 
         /// <summary>
         /// Rebalances the items in the tree.

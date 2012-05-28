@@ -57,7 +57,7 @@ namespace NOP.Collections
 			var array = pairs.Select<Tuple<K, V>, Map<K, V>> (
                 pair => new _MapNode (pair.Item1, pair.Item2, Empty, Empty)).ToArray ();
 
-			return Tree<Map<K, V>, K>.FromArray (array);
+			return Tree<Map<K, V>, K>.FromArray (array, true);
 		}
 
 		/// <summary>
@@ -79,6 +79,9 @@ namespace NOP.Collections
 		/// <returns>A new map that contains the new key and value.</returns>
 		public Map<K, V> Add (K key, V value)
 		{
+			if (Contains(key))
+				throw new ArgumentException("Duplicate key: " + key);
+			
 			return Tree<Map<K, V>, K>.Add (this, new _MapNode (key, value, Empty, Empty), 1);
 		}
 
