@@ -95,11 +95,19 @@ namespace NOP.Collections
 		}
 		
 		/// <summary>
-		/// Return the union of this and other set.
+		/// Return the union of this set and an IEnumerable.
 		/// </summary>
-		public Set<T> Union (Set<T> other)
+		public Set<T> Union (IEnumerable<T> e)
 		{
-			return Set<T>.Create(this.Concat(other));
+			return Set<T>.Create(this.Concat(e));
+		}
+		
+		/// <summary>
+		/// Return the intersection this set and an IEnumerable.
+		/// </summary>
+		public Set<T> Intersection (IEnumerable<T> e)
+		{
+			return Create (e.Where(i => Contains(i)));
 		}
 		
 		/// <summary>

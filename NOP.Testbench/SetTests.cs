@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NOP.Collections;
 
 namespace NOP.Testbench
@@ -8,7 +9,7 @@ namespace NOP.Testbench
 	{
 		private const int _itemCount = 10000;
 
-		private IEnumerable<int> Range (int max)
+		private IEnumerable<int> Range (int min, int max)
 		{
 			for (int i = 0; i < _itemCount; i++)
 			{
@@ -18,7 +19,7 @@ namespace NOP.Testbench
 
 		private Set<int> CreateTestSet ()
 		{
-			return Set<int>.Create (Range (_itemCount));
+			return Set<int>.Create (Range (0, _itemCount));
 		}
 
         [Test]
@@ -99,6 +100,38 @@ namespace NOP.Testbench
 			
 			s = s.Add("foo");
 			Check.AreEqual (3, s.Count);
+		}
+		
+		[Test]
+		public void TestUnion ()
+		{
+			var s1 = CreateTestSet();
+			var s2 = Set<int>.Create(-1, -2, -3);
+			s1 = s1.Union(s2);
+			Check.AreEqual(_itemCount + 3, s1.Count);
+			
+			for (int i = -3; i < _itemCount; i++)
+			{
+				Check.IsTrue(s1.Contains(i));
+			}
+		}
+		
+		[Test]
+		public void TestIntersection ()
+		{
+			var s1 = CreateTestSet();
+			var s2 = Set<int>.Create(1, 2, 3);
+			s1 = s1.Intersection(s2);
+			Check.AreEqual(3, s1.Count);
+			
+			for (int i = 1; i <= 3; i++)
+			{
+				Check.IsTrue(s1.Contains(i));
+			}
+			for (int i = 4; i < _itemCount; i++)
+			{
+				Check.IsFalse(s1.Contains(i));
+			}
 		}
 	}
 }
