@@ -119,19 +119,38 @@ namespace NOP.Testbench
 		[Test]
 		public void TestIntersection ()
 		{
-			var s1 = CreateTestSet();
-			var s2 = Set<int>.Create(1, 2, 3);
-			s1 = s1.Intersection(s2);
-			Check.AreEqual(3, s1.Count);
+			var s1 = CreateTestSet ();
+			var s2 = Set<int>.Create (1, 2, 3);
+			s1 = s1.Intersect (s2);
+			Check.AreEqual (3, s1.Count);
 			
 			for (int i = 1; i <= 3; i++)
 			{
-				Check.IsTrue(s1.Contains(i));
+				Check.IsTrue (s1.Contains (i));
 			}
 			for (int i = 4; i < _itemCount; i++)
 			{
-				Check.IsFalse(s1.Contains(i));
+				Check.IsFalse (s1.Contains (i));
 			}
+		}
+		
+		[Test]
+		public void TestSubtract ()
+		{
+			var s1 = CreateTestSet ();
+			var s2 = Set<int>.Create (1, 2, 3);
+			s1 = s1.Subtract (s2);
+			Check.AreEqual (_itemCount - 3, s1.Count);
+			
+			for (int i = 1; i <= 3; i++)
+			{
+				Check.IsFalse (s1.Contains (i));
+			}
+			for (int i = 4; i < _itemCount; i++)
+			{
+				Check.IsTrue (s1.Contains (i));
+			}
+			
 		}
 	}
 }
