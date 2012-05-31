@@ -149,6 +149,11 @@
 			public readonly ExprType Type;
 			public readonly Set<string> TypeVars;
 			
+			public Polytype (ExprType type, IEnumerable<string> tvars)
+			{
+				Type = type;
+				TypeVars = tvars;
+			}
 		}
 		
     }
