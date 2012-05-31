@@ -107,7 +107,7 @@ namespace NOP.Testbench
 		{
 			var s1 = CreateTestSet();
 			var s2 = Set<int>.Create(-1, -2, -3);
-			s1 = s1.Union(s2);
+			s1 = s1 + s2;
 			Check.AreEqual(_itemCount + 3, s1.Count);
 			
 			for (int i = -3; i < _itemCount; i++)
@@ -121,7 +121,7 @@ namespace NOP.Testbench
 		{
 			var s1 = CreateTestSet ();
 			var s2 = Set<int>.Create (1, 2, 3);
-			s1 = s1.Intersect (s2);
+			s1 = s1 * s2;
 			Check.AreEqual (3, s1.Count);
 			
 			for (int i = 1; i <= 3; i++)
@@ -139,7 +139,7 @@ namespace NOP.Testbench
 		{
 			var s1 = CreateTestSet ();
 			var s2 = Set<int>.Create (1, 2, 3);
-			s1 = s1.Subtract (s2);
+			s1 = s1 - s2;
 			Check.AreEqual (_itemCount - 3, s1.Count);
 			
 			for (int i = 1; i <= 3; i++)

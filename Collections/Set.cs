@@ -97,25 +97,25 @@ namespace NOP.Collections
 		/// <summary>
 		/// Return the union with another set.
 		/// </summary>
-		public Set<T> Union (Set<T> other)
+		public static Set<T> operator+ (Set<T> s1, Set<T> s2)
 		{
-			return Set<T>.Create(this.Concat (other));
+			return Set<T>.Create(s1.Concat (s2));
 		}
 		
 		/// <summary>
 		/// Return the intersection with another set.
 		/// </summary>
-		public Set<T> Intersect (Set<T> other)
+		public static Set<T> operator* (Set<T> s1, Set<T> s2)
 		{
-			return Create (other.Where(i => Contains (i)));
+			return Create (s1.Where(i => s2.Contains (i)));
 		}
 		
 		/// <summary>
 		/// Subtracts another set from this one.
 		/// </summary>
-		public Set<T> Subtract (Set<T> other)
+		public static Set<T> operator- (Set<T> s1, Set<T> s2)
 		{
-			return Create (this.Where(i => !other.Contains (i)));
+			return Create (s1.Where(i => !s2.Contains (i)));
 		}
 		
 		/// <summary>
