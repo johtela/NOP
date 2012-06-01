@@ -10,7 +10,7 @@
 		/// <summary>
 		/// Substitution of type variables is a map from strings to ExprType.
 		/// </summary>
-		protected class Substitution
+		public class Substitution
 		{
 			private readonly Map<string, ExprType> _map;
 			
@@ -33,7 +33,7 @@
 		/// <summary>
 		/// Apply the substitution to this type.
 		/// </summary>
-		protected abstract ExprType ApplySub (Substitution sub);
+		protected abstract ExprType ApplySubs (Substitution subs);
 		
 		/// <summary>
 		/// Gets the type variables of the type.
@@ -52,10 +52,10 @@
 				Name = name;
 			}
 			
-			protected override ExprType ApplySub (Substitution sub)
+			protected override ExprType ApplySubs (Substitution subs)
 			{
-				var t = sub.Lookup (Name);
-				return (t.Equals (this)) ? this : t.ApplySub (sub);
+				var t = subs.Lookup (Name);
+				return (t.Equals (this)) ? this : t.ApplySubs (subs);
 			}
 			
 			protected override Set<string> GetTypeVars ()
@@ -65,7 +65,8 @@
 			
 			public override bool Equals (object obj)
 			{
-				return Name.Equals (obj);
+				var other = obj as Var;
+				return other != null && Name.Equals (other.Name);
 			}
 			
 			public override int GetHashCode ()
@@ -92,9 +93,9 @@
                 Result = result;
             }
 			
-			protected override ExprType ApplySub (Substitution sub)
+			protected override ExprType ApplySubs (Substitution subs)
 			{
-				return new Lam(Argument.ApplySub(sub), Result.ApplySub(sub));
+				return new Lam (Argument.ApplySubs (subs), Result.ApplySubs (subs));
 			}
 			
 			protected override Set<string> GetTypeVars ()
@@ -134,9 +135,9 @@
                 TypeArgs = typeArgs;
             }
 			
-			protected override ExprType ApplySub (Substitution sub)
+			protected override ExprType ApplySubs (Substitution subs)
 			{
-				return new Con (Name, TypeArgs.Map (t => t.ApplySub (sub)));
+				return new Con (Name, TypeArgs.Map (t => t.ApplySubs (subs)));
 			}
 			
 			protected override Set<string> GetTypeVars ()
@@ -201,6 +202,49 @@
 			{
 				return _map.Values.Aggregate (Set<string>.Empty, (s, pt) => s + pt.GetTypeVars ());
 			}
+		}
+		
+		public class UnificationError : Exception
+		{
+			public readonly ExprType Type1;
+			public readonly ExprType Type2;
+			
+			public UnificationError (ExprType type1, ExprType type2) 
+				: base (string.Format ("Could not unify type {0} with {1}", type1, type2))
+			{
+				Type1 = type1;
+				Type2 = type2;
+			}
+		}
+		
+		public Substitution MostGeneralUnifier (ExprType type1, ExprType type2, Substitution subs)
+		{
+			var a = type1.ApplySubs (subs);
+			var b = type2.ApplySubs (subs);
+						
+			if (a is Var && b is Var && a.Equals (b))
+				return subs;
+			
+			var va = a as Var;
+			if (va != null && !b.GetTypeVars ().Contains (va.Name))
+				return subs.Extend (va.Name, b);
+			
+			var vb = b as Var;
+			if (vb != null && !a.GetTypeVars ().Contains (vb.Name))
+				return subs.Extend (vb.Name, a);
+			
+			var la = a as Lam;
+			var lb = b as Lam;
+			if (la != null && lb != null)
+				return MostGeneralUnifier (la.Argument, lb.Argument, 
+				                           MostGeneralUnifier (la.Result, lb.Result, subs));
+			
+			var ca = a as Con;
+			var cb = b as Con;
+			if (ca != null && cb != null && ca.Name == cb.Name)
+				return ca.TypeArgs.FoldWith (subs, (s, t1, t2) => MostGeneralUnifier (t1, t2, s), cb.TypeArgs);
+		
+			throw new UnificationError (a, b);
 		}
     }
 }

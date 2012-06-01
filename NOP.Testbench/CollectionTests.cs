@@ -162,5 +162,19 @@ namespace NOP.Testbench
 			Check.IsTrue (List<int>.Empty.Map (timesTwo).EqualTo (List<int>.Empty));
 			Check.IsTrue (List.Cons (1).Map (timesTwo).EqualTo (List.Create (2)));
 		}
+		
+		[Test]
+		public void TestFoldWith ()
+		{
+			var l1 = List.Create (1, 2, 3, 4);
+			var l2 = List.Create (2, 2, 2, 2);
+			
+			var sum = l1.FoldWith (0, (a, i1, i2) => a + i1 * i2, l2);
+			Check.AreEqual (20, sum);
+			
+			l2 = List.Create (2, 3);
+			sum = l1.FoldWith (0, (a, i1, i2) => a + i1 * i2, l2);
+			Check.AreEqual (8, sum);
+		}
 	}
 }

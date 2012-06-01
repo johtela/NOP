@@ -408,6 +408,22 @@
 				acc = func (acc, list.First);
 			return acc;
 		}
+		
+		/// <summary>
+		/// Folds the list with other list. The fold is terminated when
+		/// either of the lists are exhausted.
+		/// </summary>
+		/// <returns>The accumulated value.</returns>
+		/// <param name='acc'>Initial accumulator value.</param>
+		/// <param name='func'>The function applied to the lists' items.</param>
+		/// <param name='other'>The list to be folded with.</param>
+		public U FoldWith<U, V> (U acc, Func<U, T, V, U> func, List<V> other)
+		{
+			for (var list = this; !(list.IsEmpty || other.IsEmpty); 
+			     list = list.Rest, other = other.Rest)
+				acc = func (acc, list.First, other.First);
+			return acc;
+		}
 
 		/// <summary>
 		/// Map list to another list. 
