@@ -63,7 +63,7 @@ namespace NOP
 					}
 				}
 				// Otherwise do a function call.
-				return new FunctionExpression(slist);
+				return new ApplicationExpression(slist);
 			}
 			return new LiteralExpression (sexp as Literal);
 		}

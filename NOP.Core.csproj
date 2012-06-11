@@ -50,22 +50,8 @@
     <Compile Include="NOPException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Collections\TupleExtensions.cs" />
-    <Compile Include="Syntax\ExprType.cs" />
-    <Compile Include="Types\Definition.cs" />
-    <Compile Include="Types\Value.cs" />
-    <Compile Include="Types\Variable.cs" />
-    <Compile Include="Types\Function.cs" />
-    <Compile Include="Types\Property.cs" />
-    <Compile Include="Types\Member.cs" />
-    <Compile Include="Types\Method.cs" />
-    <Compile Include="Types\Class.cs" />
-    <Compile Include="Types\Namespace.cs" />
     <Compile Include="Collections\SubArray.cs" />
     <Compile Include="Collections\ArrayExtensions.cs" />
-    <Compile Include="Types\TypeDefinition.cs" />
-    <Compile Include="Types\Interface.cs" />
-    <Compile Include="Types\Struct.cs" />
-    <Compile Include="Types\Enum.cs" />
     <Compile Include="Visuals\Visual.cs" />
     <Compile Include="Interpreter\Environment.cs" />
     <Compile Include="Interpreter\InitialEnv.cs" />
@@ -89,8 +75,27 @@
     <Compile Include="Syntax\DefineExpression.cs" />
     <Compile Include="Syntax\LambdaExpression.cs" />
     <Compile Include="Syntax\SetExpression.cs" />
-    <Compile Include="Syntax\FunctionExpression.cs" />
     <Compile Include="Collections\Set.cs" />
+    <Compile Include="Syntax\ApplicationExpression.cs" />
+    <Compile Include="Types\Substitution.cs" />
+    <Compile Include="Types\PolyType.cs" />
+    <Compile Include="Types\TypeEnv.cs" />
+    <Compile Include="Types\Framework\Class.cs" />
+    <Compile Include="Types\Framework\Definition.cs" />
+    <Compile Include="Types\Framework\Enum.cs" />
+    <Compile Include="Types\Framework\Function.cs" />
+    <Compile Include="Types\Framework\Interface.cs" />
+    <Compile Include="Types\Framework\Member.cs" />
+    <Compile Include="Types\Framework\Method.cs" />
+    <Compile Include="Types\Framework\Namespace.cs" />
+    <Compile Include="Types\Framework\Struct.cs" />
+    <Compile Include="Types\Framework\TypeDefinition.cs" />
+    <Compile Include="Types\Framework\Value.cs" />
+    <Compile Include="Types\Framework\Variable.cs" />
+    <Compile Include="Types\UnificationError.cs" />
+    <Compile Include="Types\MonoType.cs" />
+    <Compile Include="Types\Framework\Property.cs" />
+    <Compile Include="Types\TypeExpr.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -103,5 +108,8 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="Grammar.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Types\Framework\" />
   </ItemGroup>
 </Project>
