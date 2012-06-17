@@ -32,5 +32,10 @@ namespace NOP
 		{
 			return _map.Values.Aggregate (Set<string>.Empty, (s, pt) => s + pt.GetTypeVars ());
 		}
+		
+		public static TypeEnv Empty
+		{
+			get { return new TypeEnv (Map<string, Polytype>.Empty); }
+		}
 	}
 }

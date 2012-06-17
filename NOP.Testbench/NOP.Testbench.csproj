@@ -41,6 +41,7 @@
     <Compile Include="TypeDefinitionTests.cs" />
     <Compile Include="Arithmetic.cs" />
     <Compile Include="SetTests.cs" />
+    <Compile Include="TypeCheckingTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

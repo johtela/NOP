@@ -25,7 +25,7 @@ namespace NOP
 			public override Substitution PrincipalType (TypeEnv env, MonoType baseType, 
 			                                            Substitution subs)
 			{
-				return MonoType.MostGeneralUnifier (GetMonoType(), baseType, subs);
+				return MonoType.MostGeneralUnifier (GetMonoType (), baseType, subs);
 			}
 		}
 		
@@ -91,15 +91,15 @@ namespace NOP
 			}
 		}
 		
-		public class Let : TypeExpr
+		public class LetIn : TypeExpr
 		{
-			public readonly string Var;
+			public readonly string VarName;
 			public readonly TypeExpr Value;
 			public readonly TypeExpr Body;
 			
-			public Let (string variable, TypeExpr value, TypeExpr body)
+			public LetIn (string variable, TypeExpr value, TypeExpr body)
 			{
-				Var = variable;
+				VarName = variable;
 				Value = value;
 				Body = body;
 			}
@@ -111,7 +111,7 @@ namespace NOP
 				Substitution s1 = Value.PrincipalType (env, a, subs);
 				MonoType t = a.ApplySubs (s1);
 				Polytype newPt = new Polytype (t, t.GetTypeVars () - env.GetTypeVars ());
-				return Body.PrincipalType (env.Add (Var, newPt), baseType, s1);
+				return Body.PrincipalType (env.Add (VarName, newPt), baseType, s1);
 			}
 		}
 						
@@ -121,6 +121,31 @@ namespace NOP
 			var emptySubs = Substitution.Empty;
 			var s1 = PrincipalType (env, a, emptySubs);
 			return a.ApplySubs (s1).RenameTypeVarsToLetters ();
+		}
+		
+		public static TypeExpr Lit (object value)
+		{
+			return new Literal (value);
+		}
+		
+		public static TypeExpr Var (string name)
+		{
+			return new Variable (name);
+		}
+		
+		public static TypeExpr Lam (string arg, TypeExpr body)
+		{
+			return new Lambda (arg, body);
+		}
+		
+		public static TypeExpr App (TypeExpr func, TypeExpr arg)
+		{
+			return new Application (func, arg);
+		}
+		
+		public static TypeExpr Let (string variable, TypeExpr value, TypeExpr body)
+		{
+			return new LetIn (variable, value, body);
 		}
 	}
 }

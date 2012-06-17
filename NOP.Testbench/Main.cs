@@ -13,7 +13,8 @@ namespace NOP.Testbench
 				new InterpreterTests (),
 				new MapTests (),
 				new SetTests (),
-				new TypeDefinitionTests ());
+				new TypeDefinitionTests (),
+				new TypeCheckingTests ());
 		}
 	}
 }
