@@ -22,6 +22,22 @@ namespace NOP
 			_path = new string[0];
 		}
 		
+		public override bool Equals (object obj)
+		{
+			var other = obj as Namespace;
+			return other != null && ToString () == other.ToString ();
+		}
+		
+		public override int GetHashCode ()
+		{
+			return ToString ().GetHashCode ();
+		}
+		
+		public override string ToString ()
+		{
+			return string.Join (".", _path);
+		}
+		
 		private static Namespace GetOrCreate (string path)
 		{
 			var ns = _root;

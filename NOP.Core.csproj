@@ -84,7 +84,6 @@
     <Compile Include="Types\Framework\Interface.cs" />
     <Compile Include="Types\Framework\Member.cs" />
     <Compile Include="Types\Framework\Method.cs" />
-    <Compile Include="Types\Framework\Namespace.cs" />
     <Compile Include="Types\Framework\Struct.cs" />
     <Compile Include="Types\Framework\TypeDefinition.cs" />
     <Compile Include="Types\Framework\Value.cs" />
@@ -93,6 +92,7 @@
     <Compile Include="Types\MonoType.cs" />
     <Compile Include="Types\Framework\Property.cs" />
     <Compile Include="Types\TypeExpr.cs" />
+    <Compile Include="Types\Namespace.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

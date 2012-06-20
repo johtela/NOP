@@ -33,18 +33,24 @@ namespace NOP
 		public class Symbol : SExpr
 		{
 			public readonly string Name;
+			public readonly Namespace Namespace;
 		
-			public Symbol (string name)
+			public Symbol (string name, Namespace ns)
 			{
 				Name = name;
+				Namespace = ns;
+			}
+			
+			public Symbol (string name) : this (name, Namespace.Root)
+			{
 			}
 		
 			public override bool Equals (object obj)
 			{
 				var other = obj as Symbol;
-				return other != null && other.Name == Name;
+				return other != null && other.Name == Name && Namespace.Equals (other.Namespace);
 			}
-		
+			
 			public override int GetHashCode ()
 			{
 				return Name.GetHashCode ();
