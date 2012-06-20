@@ -8,7 +8,7 @@ namespace NOP
 		public abstract Substitution PrincipalType (TypeEnv env, MonoType baseType, 
 		                                            Substitution subs);
 
-		public class Literal : TypeExpr
+		private class Literal : TypeExpr
 		{
 			public readonly object Value;
 			
@@ -29,7 +29,7 @@ namespace NOP
 			}
 		}
 		
-		public class Variable : TypeExpr
+		private class Variable : TypeExpr
 		{
 			public readonly string Name;
 			
@@ -48,7 +48,7 @@ namespace NOP
 			}
 		}
 		
-		public class Lambda : TypeExpr
+		private class Lambda : TypeExpr
 		{
 			public readonly string Argument;
 			public readonly TypeExpr Body;
@@ -71,7 +71,7 @@ namespace NOP
 			}
 		}
 		
-		public class Application : TypeExpr
+		private class Application : TypeExpr
 		{
 			public readonly TypeExpr Function;
 			public readonly TypeExpr Argument;
@@ -91,7 +91,7 @@ namespace NOP
 			}
 		}
 		
-		public class LetIn : TypeExpr
+		private class LetIn : TypeExpr
 		{
 			public readonly string VarName;
 			public readonly TypeExpr Value;
@@ -122,30 +122,33 @@ namespace NOP
 			var s1 = PrincipalType (env, a, emptySubs);
 			return a.ApplySubs (s1).RenameTypeVarsToLetters ();
 		}
-		
-		public static TypeExpr Lit (object value)
+	
+		public class Builder
 		{
-			return new Literal (value);
-		}
-		
-		public static TypeExpr Var (string name)
-		{
-			return new Variable (name);
-		}
-		
-		public static TypeExpr Lam (string arg, TypeExpr body)
-		{
-			return new Lambda (arg, body);
-		}
-		
-		public static TypeExpr App (TypeExpr func, TypeExpr arg)
-		{
-			return new Application (func, arg);
-		}
-		
-		public static TypeExpr Let (string variable, TypeExpr value, TypeExpr body)
-		{
-			return new LetIn (variable, value, body);
+			public static TypeExpr Lit (object value)
+			{
+				return new Literal (value);
+			}
+			
+			public static TypeExpr Var (string name)
+			{
+				return new Variable (name);
+			}
+			
+			public static TypeExpr Lam (string arg, TypeExpr body)
+			{
+				return new Lambda (arg, body);
+			}
+			
+			public static TypeExpr App (TypeExpr func, TypeExpr arg)
+			{
+				return new Application (func, arg);
+			}
+			
+			public static TypeExpr Let (string variable, TypeExpr value, TypeExpr body)
+			{
+				return new LetIn (variable, value, body);
+			}
 		}
 	}
 }

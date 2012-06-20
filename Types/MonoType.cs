@@ -12,9 +12,14 @@
 		
 		private static string GetTVarLetter (string tVarName)
 		{
-			return _tVarMap.Contains (tVarName) ?
-				_tVarMap[tVarName].ToString () :
-				(_nextTVarLetter++).ToString ();
+			if (_tVarMap.Contains (tVarName))
+				return _tVarMap [tVarName].ToString ();
+			else
+			{
+				var nextLetter = _nextTVarLetter++;
+				_tVarMap = _tVarMap.Add (tVarName, nextLetter);
+				return nextLetter.ToString ();
+			}
 		}
 		
 		public static MonoType NewTypeVar ()
@@ -119,7 +124,12 @@
 			
 			public override int GetHashCode ()
 			{
-				return Argument.GetHashCode() ^ Result.GetHashCode();
+				return Argument.GetHashCode () ^ Result.GetHashCode ();
+			}
+			
+			private string SurroundLambdas (MonoType type)
+			{
+				return type is Lam ? string.Format ("({0})", type) : type.ToString ();
 			}
 			
 			public override string ToString ()
@@ -136,11 +146,13 @@
             public readonly string Name;
             public readonly List<MonoType> TypeArgs;
 
-            public Con(string name, List<MonoType> typeArgs)
-            {
-                Name = name;
-                TypeArgs = typeArgs;
-            }
+            public Con (string name, List<MonoType> typeArgs)
+			{
+				Name = name;
+				TypeArgs = typeArgs;
+			}
+			
+			public Con (string name) : this (name, List<MonoType>.Empty) { }
 			
 			public override MonoType ApplySubs (Substitution subs)
 			{
@@ -160,12 +172,17 @@
 			public override bool Equals (object obj)
 			{
 				var other = obj as Con;
-				return other != null && other.Name == Name && other.TypeArgs.Equals(TypeArgs);
+				return other != null && other.Name == Name && other.TypeArgs.Equals (TypeArgs);
 			}
 			
 			public override int GetHashCode ()
 			{
 				return TypeArgs.Fold (Name.GetHashCode (), (h, t) => h ^ t.GetHashCode ());
+			}
+			
+			public override string ToString ()
+			{
+				return string.Format ("{0} {1}", Name, TypeArgs);
 			}
         }
 		

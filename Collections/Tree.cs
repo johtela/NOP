@@ -236,12 +236,15 @@ namespace NOP.Collections
         /// and the items are attached to the tree. This means that the callers should not use
         /// the list any more after this function returns.</param>
         /// <returns>A new tree that contains the items in the list.</returns>
-        public static T FromArray(T[] array, bool throwIfDuplicate)
-        {
-            Array.Sort(array, _comparer);
-			var last = RemoveDuplicates(array, throwIfDuplicate);
-            return RebalanceList(array, 0, last, true);
-        }
+        public static T FromArray (T[] array, bool throwIfDuplicate)
+		{
+			if (array.Length == 0)
+				return _empty;
+			    
+			Array.Sort (array, _comparer);
+			var last = RemoveDuplicates (array, throwIfDuplicate);
+			return RebalanceList (array, 0, last, true);
+		}
 
 		public static int RemoveDuplicates (T[] array, bool throwIfDuplicate)
 		{
