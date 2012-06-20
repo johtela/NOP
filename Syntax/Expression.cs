@@ -34,15 +34,15 @@ namespace NOP
 		/// </summary>
 		public static Expression Parse (SExpr sexp)
 		{
-			if (sexp is Symbol)
-				return new SymbolExpression (sexp as Symbol);
-			var slist = sexp as SList;
+			if (sexp is SExpr.Symbol)
+				return new SymbolExpression (sexp as SExpr.Symbol);
+			var slist = sexp as SExpr.List;
 			if (slist != null)
 			{
-				var list = (sexp as SList).Items;
+				var list = (sexp as SExpr.List).Items;
 				if (list.IsEmpty)
 					return new LiteralExpression (null);
-				var symbol = list.First as Symbol;
+				var symbol = list.First as SExpr.Symbol;
 				if (symbol != null)
 				{
 					// Check if we have any of the special forms as first item.
@@ -65,7 +65,7 @@ namespace NOP
 				// Otherwise do a function call.
 				return new ApplicationExpression(slist);
 			}
-			return new LiteralExpression (sexp as Literal);
+			return new LiteralExpression (sexp as SExpr.Literal);
 		}
 
 		protected static void ParseError (SExpr sexp, string message)

@@ -4,7 +4,7 @@ namespace NOP
 
 	public abstract class ListExpression : Expression
 	{
-		public ListExpression (SList list) : base (list)
+		public ListExpression (SExpr.List list) : base (list)
 		{
 		}
 	}

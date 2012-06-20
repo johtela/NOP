@@ -8,7 +8,7 @@ namespace NOP
 		public readonly Expression FuncName;
 		public readonly List<Expression> Parameters;
 		
-		public ApplicationExpression (SList funcExpr) : base (funcExpr)
+		public ApplicationExpression (SExpr.List funcExpr) : base (funcExpr)
 		{
 			var sexps = funcExpr.Items;
 			FuncName = Parse (Expect<SExpr> (ref sexps, "function name or lambda expression"));

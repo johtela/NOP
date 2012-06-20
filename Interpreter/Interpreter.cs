@@ -89,15 +89,15 @@ namespace NOP
 		static internal EvalResult Eval (Environment env, object expr)
 		{
 			// Is this a symbol?
-			if (expr is Symbol)
-				return new EvalResult (env, env.Lookup ((expr as Symbol).Name));
+			if (expr is SExpr.Symbol)
+				return new EvalResult (env, env.Lookup ((expr as SExpr.Symbol).Name));
 			// Or is it a list?
 			if (expr is ExprList)
 			{
 				var list = expr as ExprList;
 				if (list.IsEmpty)
 					return new EvalResult (env, ExprList.Empty);
-				var symbol = list.First as Symbol;
+				var symbol = list.First as SExpr.Symbol;
 				if (symbol != null)
 				{
 					// Check if we have any of the special forms as first item.
@@ -148,7 +148,7 @@ namespace NOP
 		/// </summary>
 		static internal EvalResult EvalDefine (Environment env, ExprList exprs)
 		{
-			var symbol = Expect<Symbol> (ref exprs, "symbol");
+			var symbol = Expect<SExpr.Symbol> (ref exprs, "symbol");
 			var val = Expect<object> (ref exprs, "right hand side of definition clause");
 			var res = Eval (env, val).Result;
 			return new EvalResult (env.Define (symbol.Name, res), res);
@@ -223,7 +223,7 @@ namespace NOP
 			var list = Expect<ExprList> (ref definition, "list of parameters");
 			var parameters = list.Map (expr =>
 			{
-				var sym = expr as Symbol;
+				var sym = expr as SExpr.Symbol;
 				if (sym == null)
 					Interpreter.Error (expr, "Expected a parameter name");
 				return sym.Name;
@@ -240,7 +240,7 @@ namespace NOP
 		/// <summary>
 		/// Invoke a function defined by locally and represented by symbol.
 		/// </summary>
-		private static EvalResult InvokeFunction (Environment env, Symbol fname, ExprList args)
+		private static EvalResult InvokeFunction (Environment env, SExpr.Symbol fname, ExprList args)
 		{
 			var func = env.Lookup (fname.Name) as Func;
 			if (func == null)

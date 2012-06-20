@@ -48,7 +48,7 @@ namespace NOP
 			
 			public override object Build ()
 			{
-				return new Symbol (_name);
+				return new SExpr.Symbol (_name);
 			}
 		}
 		

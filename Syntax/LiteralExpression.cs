@@ -4,9 +4,9 @@ namespace NOP
 
 	public class LiteralExpression : AtomExpression
 	{
-		public readonly Literal Literal;
+		public readonly SExpr.Literal Literal;
 		
-		public LiteralExpression (Literal literal) : base (literal)
+		public LiteralExpression (SExpr.Literal literal) : base (literal)
 		{
 			Literal = literal;
 		}

@@ -16,9 +16,9 @@
 	{
 		public static readonly ExprList NoArgs = ExprList.Empty;
 		
-		public static Symbol AsSymbol (this string name)
+		public static SExpr.Symbol AsSymbol (this string name)
 		{
-			return new Symbol (name);
+			return new SExpr.Symbol (name);
 		}
 
 		public static Func AsFunction<TResult> (this Func<TResult> func)

@@ -61,9 +61,6 @@
     <Compile Include="Visuals\VisualBox.cs" />
     <Compile Include="Interpreter\Wrappers.cs" />
     <Compile Include="Types\SExpr.cs" />
-    <Compile Include="Types\Symbol.cs" />
-    <Compile Include="Types\Literal.cs" />
-    <Compile Include="Types\SList.cs" />
     <Compile Include="Syntax\Expression.cs" />
     <Compile Include="Syntax\AtomExpression.cs" />
     <Compile Include="Syntax\SymbolExpression.cs" />

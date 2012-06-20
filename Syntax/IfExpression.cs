@@ -8,7 +8,7 @@ namespace NOP
 		public readonly Expression ThenExpression;
 		public readonly Expression ElseExpression;
 		
-		public IfExpression (SList ifExpr) : base (ifExpr)
+		public IfExpression (SExpr.List ifExpr) : base (ifExpr)
 		{
 			var sexps = ifExpr.Items.Rest;
 			Condition = Parse (Expect<SExpr> (ref sexps, "condition"));

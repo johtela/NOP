@@ -4,7 +4,7 @@ namespace NOP
 	{
 		public readonly Expression QuotedExpression;
 		
-		public QuoteExpression (SList quoteSExp) : base (quoteSExp)
+		public QuoteExpression (SExpr.List quoteSExp) : base (quoteSExp)
 		{
 			var sexps = quoteSExp.Items.Rest;
 			QuotedExpression = Parse (Expect<SExpr> (ref sexps, "quoted expression"));

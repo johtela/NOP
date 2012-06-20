@@ -7,7 +7,7 @@ namespace NOP
 	{
 		public readonly List<Expression> Expressions;
 		
-		public BeginExpression (SList beginExpr) : base (beginExpr)
+		public BeginExpression (SExpr.List beginExpr) : base (beginExpr)
 		{
 			var sexps = beginExpr.Items.Rest;
 			if (sexps.IsEmpty)

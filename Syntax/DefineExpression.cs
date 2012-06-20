@@ -7,10 +7,10 @@ namespace NOP
 		public readonly SymbolExpression Lhs;
 		public readonly Expression Rhs;
 		
-		public DefineExpression (SList defineExpr) : base (defineExpr)
+		public DefineExpression (SExpr.List defineExpr) : base (defineExpr)
 		{
 			var sexps = defineExpr.Items.Rest;
-			Lhs = new SymbolExpression (Expect<Symbol> (ref sexps, "symbol"));
+			Lhs = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "symbol"));
 			Rhs = Parse (Expect<SExpr> (ref sexps, "right hand side of definition clause"));
 		}
 	}

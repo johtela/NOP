@@ -4,9 +4,9 @@ namespace NOP
 
 	public class SymbolExpression : AtomExpression
 	{
-		public readonly Symbol Symbol;
+		public readonly SExpr.Symbol Symbol;
 		
-		public SymbolExpression (Symbol symbol) : base (symbol)
+		public SymbolExpression (SExpr.Symbol symbol) : base (symbol)
 		{
 			Symbol = symbol;
 		}
