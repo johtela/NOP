@@ -88,7 +88,6 @@
     <Compile Include="Types\Framework\TypeDefinition.cs" />
     <Compile Include="Types\Framework\Value.cs" />
     <Compile Include="Types\Framework\Variable.cs" />
-    <Compile Include="Types\UnificationError.cs" />
     <Compile Include="Types\MonoType.cs" />
     <Compile Include="Types\Framework\Property.cs" />
     <Compile Include="Types\TypeExpr.cs" />
