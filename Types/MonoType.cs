@@ -3,7 +3,11 @@
 	using System;
 	using System.Linq;
 	using NOP.Collections;
-
+	
+	/// <summary>
+	/// Unification error is thrown when two monotypes cannot be unified, i.e. when there
+	/// is a typing error in the expression.
+	/// </summary>
 	public class UnificationError : Exception
 	{
 		public readonly MonoType Type1;
@@ -16,13 +20,20 @@
 			Type2 = type2;
 		}
 	}
-
+	
+	/// <summary>
+	/// Monotype represents type of an expression. It might be a type variable, 
+	/// a function type or a constructed type (with or without type variables).
+	/// </summary>
 	public abstract class MonoType
     {
 		private static int _lastVar;
 		private static char _nextTVarLetter;
 		private static Map<string, char> _tVarMap;
 		
+		/// <summary>
+		/// Map a generated type variable name (T1, T2, T3...) to a single letter (a, b, c...)
+		/// </summary>
 		private static string GetTVarLetter (string tVarName)
 		{
 			if (_tVarMap.Contains (tVarName))
@@ -35,13 +46,16 @@
 			}
 		}
 		
+		/// <summary>
+		/// Generate a new unique type variable.
+		/// </summary>
 		public static MonoType NewTypeVar ()
 		{
 			return new Var("T" + (++_lastVar).ToString ());
 		}
 		
 		/// <summary>
-		/// Apply the substitution to this type.
+		/// Apply the substitutions to this type.
 		/// </summary>
 		public abstract MonoType ApplySubs (Substitution subs);
 		
@@ -152,7 +166,7 @@
         }
 		
 		/// <summary>
-		/// Constructed type that has generic arguments.
+		/// Constructed type that might have generic arguments.
 		/// </summary>
         public class Con : MonoType
         {
@@ -199,6 +213,13 @@
 			}
         }
 		
+		/// <summary>
+		/// Determine the mosts the general unifier of two monotypes.
+		/// </summary>
+		/// <returns>The substitution table that contains the reduced type variables.</returns>
+		/// <param name='type1'>The first monotype to be unified.</param>
+		/// <param name='type2'>the second monotype to be unified.</param>
+		/// <param name='subs'>The substitution table used.</param>
 		public static Substitution MostGeneralUnifier (MonoType type1, MonoType type2, 
 		                                               Substitution subs)
 		{
@@ -230,6 +251,9 @@
 			throw new UnificationError (a, b);
 		}
 		
+		/// <summary>
+		/// Renames the type variables of the monotype to letters.
+		/// </summary>
 		public MonoType RenameTypeVarsToLetters ()
 		{
 			_tVarMap = Map<string, char>.Empty;

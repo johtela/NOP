@@ -2,12 +2,28 @@ namespace NOP
 {
 	using System;
 	using Collections;
-
+	
+	/// <summary>
+	/// TypeExpr class defines a simple typed lambda calculus that is used
+	/// as an intermediate language for type checking. You can construct type
+	/// expressions and then infer the type of the expression using the
+	/// Hindley-Milner algorithm.
+	/// </summary>
 	public abstract class TypeExpr
 	{
+		/// <summary>
+		/// Infers the principal the type of the expression.
+		/// </summary>
+		/// <returns>The substitution table that contains the type variables inferred.</returns>
+		/// <param name='env'>The type environment used to determine the principal type.</param>
+		/// <param name='baseType'>The base type with which the expression type is unified.</param>
+		/// <param name='subs'>The substitution table that is constructed so far.</param>
 		public abstract Substitution PrincipalType (TypeEnv env, MonoType baseType, 
 		                                            Substitution subs);
-
+		
+		/// <summary>
+		/// Literal expression. Can be any literal object.
+		/// </summary>
 		private class Literal : TypeExpr
 		{
 			public readonly object Value;
@@ -17,9 +33,9 @@ namespace NOP
 				Value = value;
 			}
 			
-			private MonoType GetMonoType()
+			private MonoType GetMonoType ()
 			{
-				return new MonoType.Con (Value.GetType().ToString(), List<MonoType>.Empty);
+				return new MonoType.Con (Value.GetType ().ToString (), List<MonoType>.Empty);
 			}
 			
 			public override Substitution PrincipalType (TypeEnv env, MonoType baseType, 
@@ -28,7 +44,10 @@ namespace NOP
 				return MonoType.MostGeneralUnifier (GetMonoType (), baseType, subs);
 			}
 		}
-		
+
+		/// <summary>
+		/// Variables are symbols with type.
+		/// </summary>
 		private class Variable : TypeExpr
 		{
 			public readonly string Name;
@@ -48,6 +67,9 @@ namespace NOP
 			}
 		}
 		
+		/// <summary>
+		/// Lambda expression defines a function of one argument.
+		/// </summary>
 		private class Lambda : TypeExpr
 		{
 			public readonly string Argument;
@@ -71,6 +93,9 @@ namespace NOP
 			}
 		}
 		
+		/// <summary>
+		/// Function application invokes a lambda expression.
+		/// </summary>
 		private class Application : TypeExpr
 		{
 			public readonly TypeExpr Function;
@@ -91,6 +116,10 @@ namespace NOP
 			}
 		}
 		
+		/// <summary>
+		/// Let in expression defines a variable and an expression where the variable is
+		/// bound to a value.
+		/// </summary>
 		private class LetIn : TypeExpr
 		{
 			public readonly string VarName;
@@ -114,7 +143,10 @@ namespace NOP
 				return Body.PrincipalType (env.Add (VarName, newPt), baseType, s1);
 			}
 		}
-						
+		
+		/// <summary>
+		/// Returns the the type of this expression.
+		/// </summary>
 		public MonoType GetExprType (TypeEnv env)
 		{
 			var a = MonoType.NewTypeVar ();
@@ -123,28 +155,47 @@ namespace NOP
 			return a.ApplySubs (s1).RenameTypeVarsToLetters ();
 		}
 	
+		/// <summary>
+		/// Builder class can be inherited to bring in handy helper functions to the 
+		/// same lexical context.
+		/// </summary>
 		public class Builder
 		{
+			/// <summary>
+			/// Construct a literal.
+			/// </summary>
 			public static TypeExpr Lit (object value)
 			{
 				return new Literal (value);
 			}
 			
+			/// <summary>
+			/// Construct a variable with the specified name.
+			/// </summary>
 			public static TypeExpr Var (string name)
 			{
 				return new Variable (name);
 			}
 			
+			/// <summary>
+			/// Constuct a lambda expression.
+			/// </summary>
 			public static TypeExpr Lam (string arg, TypeExpr body)
 			{
 				return new Lambda (arg, body);
 			}
 			
+			/// <summary>
+			/// Construct an function application.
+			/// </summary>
 			public static TypeExpr App (TypeExpr func, TypeExpr arg)
 			{
 				return new Application (func, arg);
 			}
 			
+			/// <summary>
+			/// Construct a let-in expression.
+			/// </summary>
 			public static TypeExpr Let (string variable, TypeExpr value, TypeExpr body)
 			{
 				return new LetIn (variable, value, body);

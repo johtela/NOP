@@ -2,8 +2,16 @@ namespace NOP
 {
 	using System;
 	
+	/// <summary>
+	/// The definition of the LISP S-expression. The basic element from which 
+	/// the programs are constructed. Like text in the traditional programming
+	/// languages.
+	/// </summary>
 	public abstract class SExpr
 	{
+		/// <summary>
+		/// Literal value.
+		/// </summary>
 		public class Literal : SExpr
 		{
 			public readonly object Value;
@@ -29,7 +37,10 @@ namespace NOP
 				return Value.ToString ();
 			}
 		}
-
+		
+		/// <summary>
+		/// Symbol with given name.
+		/// </summary>
 		public class Symbol : SExpr
 		{
 			public readonly string Name;
@@ -62,6 +73,9 @@ namespace NOP
 			}
 		}
 	
+		/// <summary>
+		/// List of other S-expressions.
+		/// </summary>
 		public class List : SExpr
 		{
 			public readonly Collections.List<SExpr> Items;
