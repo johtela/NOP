@@ -12,7 +12,8 @@ namespace NOP
 	public abstract class TypeExpr
 	{
 		/// <summary>
-		/// Infers the principal the type of the expression.
+		/// Infers the principal the type of the expression. This function applies the rules 
+		/// used to infer the type of the specific expression. 
 		/// </summary>
 		/// <returns>The substitution table that contains the type variables inferred.</returns>
 		/// <param name='env'>The type environment used to determine the principal type.</param>
