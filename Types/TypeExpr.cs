@@ -19,8 +19,7 @@ namespace NOP
 		/// <param name='env'>The type environment used to determine the principal type.</param>
 		/// <param name='baseType'>The base type with which the expression type is unified.</param>
 		/// <param name='subs'>The substitution table that is constructed so far.</param>
-		public abstract Substitution PrincipalType (TypeEnv env, MonoType baseType, 
-		                                            Substitution subs);
+		public abstract void TypeCheck (TypeEnv env, MonoType baseType);
 		
 		/// <summary>
 		/// Literal expression. Can be any literal object.
@@ -39,10 +38,9 @@ namespace NOP
 				return new MonoType.Con (Value.GetType ().ToString (), List<MonoType>.Empty);
 			}
 			
-			public override Substitution PrincipalType (TypeEnv env, MonoType baseType, 
-			                                            Substitution subs)
+			public override void TypeCheck (TypeEnv env, MonoType baseType)
 			{
-				return MonoType.MostGeneralUnifier (GetMonoType (), baseType, subs);
+				MonoType.Unify (GetMonoType (), baseType);
 			}
 		}
 
@@ -58,13 +56,12 @@ namespace NOP
 				Name = name;
 			}
 			
-			public override Substitution PrincipalType (TypeEnv env, MonoType baseType, 
-			                                            Substitution subs)
+			public override void TypeCheck (TypeEnv env, MonoType baseType)
 			{
 				if (!env.Contains (Name)) 
 					throw new Exception (string.Format ("Name {0} not found", Name));
 				var pt = env.Find (Name);
-				return MonoType.MostGeneralUnifier (pt.Type.ApplySubs (subs), baseType, subs);
+				MonoType.Unify (pt.Type.ApplySubs (), baseType);
 			}
 		}
 		
@@ -82,15 +79,14 @@ namespace NOP
 				Body = body;
 			}
 			
-			public override Substitution PrincipalType (TypeEnv env, MonoType baseType, 
-			                                            Substitution subs)
+			public override void TypeCheck (TypeEnv env, MonoType baseType)
 			{
 				var a = MonoType.NewTypeVar ();
 				var b = MonoType.NewTypeVar ();
 				
-				var s1 = MonoType.MostGeneralUnifier (baseType, new MonoType.Lam (a, b), subs);
+				MonoType.Unify (baseType, new MonoType.Lam (a, b));
 				var newEnv = env.Add (Argument, new Polytype (a, null));
-				return Body.PrincipalType (newEnv, b, s1);
+				Body.TypeCheck (newEnv, b);
 			}
 		}
 		
@@ -108,12 +104,40 @@ namespace NOP
 				Argument = arg;
 			}
 			
-			public override Substitution PrincipalType (TypeEnv env, MonoType baseType, 
-			                                            Substitution subs)
+			public override void TypeCheck (TypeEnv env, MonoType baseType)
 			{
 				var a = MonoType.NewTypeVar ();
-				var s1 = Function.PrincipalType (env, new MonoType.Lam (a, baseType), subs);
-				return Argument.PrincipalType (env, a, s1);
+				Function.TypeCheck (env, new MonoType.Lam (a, baseType));
+				Argument.TypeCheck (env, a);
+			}
+		}
+		
+		private class IfElse : TypeExpr
+		{
+			public readonly TypeExpr Condition;
+			public readonly TypeExpr ThenExpr;
+			public readonly TypeExpr ElseExpr;
+			
+			public IfElse (TypeExpr cond, TypeExpr thenExpr, TypeExpr elseExpr)
+			{
+				Condition = cond;
+				ThenExpr = thenExpr;
+				ElseExpr = elseExpr;
+			}
+			
+			public override void TypeCheck (TypeEnv env, MonoType baseType)
+			{
+				var c = MonoType.NewTypeVar ();
+				Condition.TypeCheck (env, c);
+				MonoType.Unify (c, new MonoType.Con ("System.Boolean"));
+				
+				var t = MonoType.NewTypeVar ();
+				ThenExpr.TypeCheck (env, t);
+				
+				var e = MonoType.NewTypeVar ();
+				ThenExpr.TypeCheck (env, e);
+				
+				MonoType.Unify (t, e);
 			}
 		}
 		
@@ -134,14 +158,13 @@ namespace NOP
 				Body = body;
 			}
 			
-			public override Substitution PrincipalType (TypeEnv env, MonoType baseType, 
-			                                            Substitution subs)
+			public override void TypeCheck (TypeEnv env, MonoType baseType)
 			{
 				MonoType a = MonoType.NewTypeVar ();
-				Substitution s1 = Value.PrincipalType (env, a, subs);
-				MonoType t = a.ApplySubs (s1);
+				Value.TypeCheck (env, a);
+				MonoType t = a.ApplySubs ();
 				Polytype newPt = new Polytype (t, t.GetTypeVars () - env.GetTypeVars ());
-				return Body.PrincipalType (env.Add (VarName, newPt), baseType, s1);
+				Body.TypeCheck (env.Add (VarName, newPt), baseType);
 			}
 		}
 		
@@ -150,10 +173,10 @@ namespace NOP
 		/// </summary>
 		public MonoType GetExprType (TypeEnv env)
 		{
+			MonoType.ClearSubs ();
 			var a = MonoType.NewTypeVar ();
-			var emptySubs = Substitution.Empty;
-			var s1 = PrincipalType (env, a, emptySubs);
-			return a.ApplySubs (s1).RenameTypeVarsToLetters ();
+			TypeCheck (env, a);
+			return a.ApplySubs ().RenameTypeVarsToLetters ();
 		}
 	
 		/// <summary>

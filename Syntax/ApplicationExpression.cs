@@ -12,7 +12,12 @@ namespace NOP
 		{
 			var sexps = funcExpr.Items;
 			FuncName = Parse (Expect<SExpr> (ref sexps, "function name or lambda expression"));
-			Parameters = sexps.Map (sexp => Parse(sexp));
+			Parameters = sexps.Map (sexp => Parse (sexp));
+		}
+		
+		public override TypeExpr GetTypeExpr ()
+		{
+			throw new NotImplementedException ();
 		}
 	}
 }

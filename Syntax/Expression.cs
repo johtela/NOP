@@ -30,6 +30,11 @@ namespace NOP
 		}
 		
 		/// <summary>
+		/// Get the type expression that is used to type check this expression.
+		/// </summary>
+		public abstract TypeExpr GetTypeExpr();
+				
+		/// <summary>
 		/// Parse an S-expression and generate the AST.
 		/// </summary>
 		public static Expression Parse (SExpr sexp)
@@ -52,8 +57,6 @@ namespace NOP
 							return new QuoteExpression (slist);
 						case "if":
 							return new IfExpression (slist);
-						case "begin":
-							return new BeginExpression (slist);
 						case "define":
 							return new DefineExpression (slist);
 						case "lambda":

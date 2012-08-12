@@ -10,5 +10,10 @@ namespace NOP
 		{
 			Literal = literal;
 		}
+		
+		public override TypeExpr GetTypeExpr ()
+		{
+			return TypeExpr.Builder.Lit (Literal.Value);
+		}
 	}
 }

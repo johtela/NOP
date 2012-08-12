@@ -30,6 +30,13 @@
 		private static int _lastVar;
 		private static char _nextTVarLetter;
 		private static Map<string, char> _tVarMap;
+		private static Substitution _subs;
+		
+		public static void ClearSubs ()
+		{
+			_subs = Substitution.Empty;
+			_lastVar = 0;
+		}
 		
 		/// <summary>
 		/// Map a generated type variable name (T1, T2, T3...) to a single letter (a, b, c...)
@@ -57,7 +64,7 @@
 		/// <summary>
 		/// Apply the substitutions to this type.
 		/// </summary>
-		public abstract MonoType ApplySubs (Substitution subs);
+		public abstract MonoType ApplySubs ();
 		
 		/// <summary>
 		/// Gets the type variables of the type.
@@ -81,10 +88,10 @@
 				Name = name;
 			}
 			
-			public override MonoType ApplySubs (Substitution subs)
+			public override MonoType ApplySubs ()
 			{
-				var t = subs.Lookup (Name);
-				return (t.Equals (this)) ? this : t.ApplySubs (subs);
+				var t = _subs.Lookup (Name);
+				return (t.Equals (this)) ? this : t.ApplySubs ();
 			}
 			
 			public override Set<string> GetTypeVars ()
@@ -127,9 +134,9 @@
                 Result = result;
             }
 			
-			public override MonoType ApplySubs (Substitution subs)
+			public override MonoType ApplySubs ()
 			{
-				return new Lam (Argument.ApplySubs (subs), Result.ApplySubs (subs));
+				return new Lam (Argument.ApplySubs (), Result.ApplySubs ());
 			}
 			
 			public override Set<string> GetTypeVars ()
@@ -181,9 +188,9 @@
 			
 			public Con (string name) : this (name, List<MonoType>.Empty) { }
 			
-			public override MonoType ApplySubs (Substitution subs)
+			public override MonoType ApplySubs ()
 			{
-				return new Con (Name, TypeArgs.Map (t => t.ApplySubs (subs)));
+				return new Con (Name, TypeArgs.Map (t => t.ApplySubs ()));
 			}
 			
 			public override Set<string> GetTypeVars ()
@@ -220,34 +227,49 @@
 		/// <param name='type1'>The first monotype to be unified.</param>
 		/// <param name='type2'>the second monotype to be unified.</param>
 		/// <param name='subs'>The substitution table used.</param>
-		public static Substitution MostGeneralUnifier (MonoType type1, MonoType type2, 
-		                                               Substitution subs)
+		public static void Unify (MonoType type1, MonoType type2)
 		{
-			var a = type1.ApplySubs (subs);
-			var b = type2.ApplySubs (subs);
+			var a = type1.ApplySubs ();
+			var b = type2.ApplySubs ();
 						
 			if (a is Var && b is Var && a.Equals (b))
-				return subs;
+				return;
 			
 			var va = a as Var;
 			if (va != null && !b.GetTypeVars ().Contains (va.Name))
-				return subs.Extend (va.Name, b);
-			
+			{ 
+				_subs = _subs.Extend (va.Name, b);
+				return;
+			}
 			var vb = b as Var;
 			if (vb != null && !a.GetTypeVars ().Contains (vb.Name))
-				return subs.Extend (vb.Name, a);
-			
+			{
+				_subs = _subs.Extend (vb.Name, a);
+				return;
+			}
 			var la = a as Lam;
 			var lb = b as Lam;
 			if (la != null && lb != null)
-				return MostGeneralUnifier (la.Argument, lb.Argument, 
-				                           MostGeneralUnifier (la.Result, lb.Result, subs));
-			
+			{
+				Unify (la.Result, lb.Result);
+				Unify (la.Argument, lb.Argument);
+				return;
+			}
 			var ca = a as Con;
 			var cb = b as Con;
 			if (ca != null && cb != null && ca.Name == cb.Name)
-				return ca.TypeArgs.FoldWith (subs, (s, t1, t2) => MostGeneralUnifier (t1, t2, s), cb.TypeArgs);
-		
+			{
+				var taa = ca.TypeArgs;
+				var tab = cb.TypeArgs;
+				
+				while (!taa.IsEmpty && !tab.IsEmpty)
+				{
+					Unify (taa.First, tab.First);
+					taa = taa.Rest;
+					tab = tab.Rest;
+				}		
+				if (taa.IsEmpty && tab.IsEmpty)	return;
+			}
 			throw new UnificationError (a, b);
 		}
 		

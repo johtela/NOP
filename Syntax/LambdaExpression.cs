@@ -26,6 +26,11 @@ namespace NOP
 				ParseError (lambdaExpr, "Function body is missing");
 			FunctionBody = sexps.Map (sexp => Parse (sexp));
 		}
+		
+		public override TypeExpr GetTypeExpr ()
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }
 

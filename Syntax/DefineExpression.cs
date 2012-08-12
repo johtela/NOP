@@ -13,6 +13,11 @@ namespace NOP
 			Lhs = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "symbol"));
 			Rhs = Parse (Expect<SExpr> (ref sexps, "right hand side of definition clause"));
 		}
+		
+		public override TypeExpr GetTypeExpr ()
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }
 

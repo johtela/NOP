@@ -10,6 +10,11 @@ namespace NOP
 		{
 			Symbol = symbol;
 		}
+		
+		public override TypeExpr GetTypeExpr ()
+		{
+			return TypeExpr.Builder.Var (Symbol.Name);
+		}
 	}
 }
 

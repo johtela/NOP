@@ -68,7 +68,6 @@
     <Compile Include="Syntax\ListExpression.cs" />
     <Compile Include="Syntax\QuoteExpression.cs" />
     <Compile Include="Syntax\IfExpression.cs" />
-    <Compile Include="Syntax\BeginExpression.cs" />
     <Compile Include="Syntax\DefineExpression.cs" />
     <Compile Include="Syntax\LambdaExpression.cs" />
     <Compile Include="Syntax\SetExpression.cs" />

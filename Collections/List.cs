@@ -268,20 +268,33 @@
 		/// Check if two lists are equal, that is contain the same items in
 		/// the same order, and have equal lengths.
 		/// </summary>
-		/// <param name="obj">The other list that the list is compared with.</param>
+		/// <param name="other">The other list that the list is compared with.</param>
+		/// <param name="equals">The function that compares if two items are equal.</param>
 		/// <returns>True, if the two lists contain the same items in the same order, 
 		/// and have equal lengths.</returns>
-		public bool EqualTo (List<T> other)
+		public bool EqualTo (List<T> other, Func<T, T, bool> equals)
 		{
 			List<T > list = this;
 			
-			while (!list.IsEmpty && !other.IsEmpty && list.First.Equals (other.First))
+			while (!list.IsEmpty && !other.IsEmpty && equals (list.First, other.First))
 			{
 				list = list.Rest;
 				other = other.Rest;
 			}
 			return list.IsEmpty && other.IsEmpty;
 		}
+		
+		/// <summary>
+		/// Check if two lists are equal, that is contain the same items in
+		/// the same order, and have equal lengths.
+		/// </summary>
+		/// <param name="other">The other list that the list is compared with.</param>
+		/// <returns>True, if the two lists contain the same items in the same order, 
+		/// and have equal lengths.</returns>
+		public bool EqualTo (List<T> other)
+		{
+			return this.EqualTo (other, (i1, i2) => i1.Equals(i2));
+		}	
 
 		/// <summary>
 		/// Collect the list of lists into another list.

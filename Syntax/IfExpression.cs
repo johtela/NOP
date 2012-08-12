@@ -15,6 +15,11 @@ namespace NOP
 			ThenExpression = Parse (Expect<SExpr> (ref sexps, "then expression"));
 			ElseExpression = Parse (Expect<SExpr> (ref sexps, "else expression"));
 		}
+		
+		public override TypeExpr GetTypeExpr ()
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }
 

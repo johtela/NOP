@@ -9,6 +9,11 @@ namespace NOP
 			var sexps = quoteSExp.Items.Rest;
 			QuotedExpression = Parse (Expect<SExpr> (ref sexps, "quoted expression"));
 		}
+		
+		public override TypeExpr GetTypeExpr ()
+		{
+			return TypeExpr.Builder.Lit (SExp);
+		}
 	}
 }
 
