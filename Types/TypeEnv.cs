@@ -50,11 +50,28 @@ namespace NOP
 		}
 		
 		/// <summary>
-		/// Empty type environment.
+		/// Initial type environment.
 		/// </summary>
-		public static TypeEnv Empty
+		public static TypeEnv Initial
 		{
-			get { return new TypeEnv (Map<string, Polytype>.Empty); }
+			get
+			{ 
+				return InitialEnvironment.Value;
+			}
+		}
+		
+		/// <summary>
+		/// Private helper class for defining the initial environment.
+		/// </summary>
+		private class InitialEnvironment : MonoType.Builder
+		{
+			private static readonly Polytype setPt = 
+				new Polytype (
+					Lambda (List.Create (Variable ("a"), Variable ("a")), Constant ("System.Void")), 
+					"a");
+			public static readonly TypeEnv Value =
+				new TypeEnv (Map<string, Polytype>.FromPairs (
+					Tuple.Create ("set!", setPt)));
 		}
 	}
 }

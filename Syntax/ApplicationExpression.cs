@@ -17,8 +17,12 @@ namespace NOP
 		
 		public override TypeExpr GetTypeExpr ()
 		{
-			throw new NotImplementedException ();
+			var te = FuncName.GetTypeExpr ();
+			
+			for (var pars = Parameters; !pars.IsEmpty; pars = pars.Rest)
+				te = TypeExpr.Builder.App (te, pars.First.GetTypeExpr ());
+			
+			return te;
 		}
 	}
 }
-

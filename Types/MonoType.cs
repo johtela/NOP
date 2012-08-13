@@ -26,12 +26,15 @@
 	/// a function type or a constructed type (with or without type variables).
 	/// </summary>
 	public abstract class MonoType
-    {
+	{
 		private static int _lastVar;
 		private static char _nextTVarLetter;
 		private static Map<string, char> _tVarMap;
 		private static Substitution _subs;
 		
+		/// <summary>
+		/// Clears the substitution table.
+		/// </summary>
 		public static void ClearSubs ()
 		{
 			_subs = Substitution.Empty;
@@ -58,7 +61,7 @@
 		/// </summary>
 		public static MonoType NewTypeVar ()
 		{
-			return new Var("T" + (++_lastVar).ToString ());
+			return new Var ("T" + (++_lastVar).ToString ());
 		}
 		
 		/// <summary>
@@ -124,15 +127,15 @@
 		/// <summary>
 		/// Lambda type, Argument -> Result
 		/// </summary>
-        public class Lam : MonoType
-        {
-            public readonly MonoType Argument, Result;
+		public class Lam : MonoType
+		{
+			public readonly MonoType Argument, Result;
 
-            public Lam(MonoType argument, MonoType result)
-            {
-                Argument = argument;
-                Result = result;
-            }
+			public Lam (MonoType argument, MonoType result)
+			{
+				Argument = argument;
+				Result = result;
+			}
 			
 			public override MonoType ApplySubs ()
 			{
@@ -146,7 +149,7 @@
 			
 			protected override MonoType TypeVarsToLetters ()
 			{
-				return new Lam (Argument.TypeVarsToLetters(), Result.TypeVarsToLetters ());
+				return new Lam (Argument.TypeVarsToLetters (), Result.TypeVarsToLetters ());
 			}
 			
 			public override bool Equals (object obj)
@@ -170,23 +173,25 @@
 			{
 				return string.Format ("{0} -> {1}", Argument, Result);
 			}
-        }
+		}
 		
 		/// <summary>
-		/// Constructed type that might have generic arguments.
+		/// Constant type that might have type arguments.
 		/// </summary>
-        public class Con : MonoType
-        {
-            public readonly string Name;
-            public readonly List<MonoType> TypeArgs;
+		public class Con : MonoType
+		{
+			public readonly string Name;
+			public readonly List<MonoType> TypeArgs;
 
-            public Con (string name, List<MonoType> typeArgs)
+			public Con (string name, List<MonoType> typeArgs)
 			{
 				Name = name;
 				TypeArgs = typeArgs;
 			}
 			
-			public Con (string name) : this (name, List<MonoType>.Empty) { }
+			public Con (string name) : this (name, List<MonoType>.Empty)
+			{
+			}
 			
 			public override MonoType ApplySubs ()
 			{
@@ -200,7 +205,7 @@
 			
 			protected override MonoType TypeVarsToLetters ()
 			{
-				return new Con (Name, TypeArgs.Map(t => t.TypeVarsToLetters ()));
+				return new Con (Name, TypeArgs.Map (t => t.TypeVarsToLetters ()));
 			}
 			
 			public override bool Equals (object obj)
@@ -218,7 +223,7 @@
 			{
 				return string.Format ("{0} {1}", Name, TypeArgs);
 			}
-        }
+		}
 		
 		/// <summary>
 		/// Determine the mosts the general unifier of two monotypes.
@@ -268,7 +273,8 @@
 					taa = taa.Rest;
 					tab = tab.Rest;
 				}		
-				if (taa.IsEmpty && tab.IsEmpty)	return;
+				if (taa.IsEmpty && tab.IsEmpty)
+					return;
 			}
 			throw new UnificationError (a, b);
 		}
@@ -282,5 +288,34 @@
 			_nextTVarLetter = 'a';	
 			return TypeVarsToLetters ();
 		}
-    }
+	
+		public class Builder
+		{
+			/// <summary>
+			/// Builder method for creating a type constant.
+			/// </summary>
+			public static MonoType Constant (string name)
+			{
+				return new Con (name);
+			}
+		
+			/// <summary>
+			/// Builder method for creating a type variable.
+			/// </summary>
+			public static MonoType Variable (string name)
+			{
+				return new Var (name);
+			}
+		
+			/// <summary>
+			/// Builder method for creating lambdas with multiple parameters.
+			/// </summary>
+			public static MonoType Lambda (List<MonoType> parameters, MonoType result)
+			{
+				return  parameters.IsEmpty ? 
+				result : 
+				new Lam (parameters.First, Lambda (parameters.Rest, result));
+			}
+		}
+	}
 }

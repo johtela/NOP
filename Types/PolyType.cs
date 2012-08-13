@@ -5,9 +5,9 @@ namespace NOP
 	using StrSeq=System.Collections.Generic.IEnumerable<string>;
 	
 	/// <summary>
-	/// Polytype have a form "forall v1,v2... t" where v1,v2... are the free type
-	/// variables in monotype t. Polytypes are used to unify type variables that are not yet
-	/// bound to a monotype in the inference process.
+	/// Polytypes represent generic types, from which a set of MonoTypes can be generated. They
+	/// are also called type schemes. Polytypes have the form "forall v1,v2... t" where v1,v2... 
+	/// are the generic type variables in monotype t.
 	/// </summary>
 	public class Polytype
 	{
@@ -17,14 +17,26 @@ namespace NOP
 		public readonly MonoType Type;
 		
 		/// <summary>
-		/// The free type variables in mono type.
+		/// The generic (unbound) type variables in mono type.
 		/// </summary>
-		public readonly Set<string> TypeVars;
+		public readonly Set<string> GenericTypeVars;
 			
+		/// <summary>
+		/// Create a polytype.
+		/// </summary>
 		public Polytype (MonoType type, StrSeq tvars)
 		{
 			Type = type;
-			TypeVars = tvars != null ? Set<string>.Create (tvars) : Set<string>.Empty;
+			GenericTypeVars = tvars != null ? Set<string>.Create (tvars) : Set<string>.Empty;
+		}
+		
+		/// <summary>
+		/// Create a polytype.
+		/// </summary>
+		public Polytype (MonoType type, params string[] tvars)
+		{
+			Type = type;
+			GenericTypeVars = tvars != null ? Set<string>.Create (tvars) : Set<string>.Empty;
 		}
 			
 		/// <summary>
@@ -32,7 +44,7 @@ namespace NOP
 		/// </summary>
 		public Set<string> GetTypeVars ()
 		{
-			return Type.GetTypeVars () - TypeVars;
+			return Type.GetTypeVars () - GenericTypeVars;
 		}
 	}
 }

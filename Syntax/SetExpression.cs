@@ -4,19 +4,21 @@ namespace NOP
 
 	public class SetExpression : ListExpression
 	{
-		public readonly SymbolExpression Lhs;
-		public readonly Expression Rhs;
+		public readonly SymbolExpression Variable;
+		public readonly Expression Value;
 		
 		public SetExpression (SExpr.List setExpr) : base (setExpr)
 		{
 			var sexps = setExpr.Items.Rest;
-			Lhs = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "variable"));
-			Rhs = Parse (Expect<SExpr> (ref sexps, "right hand side of set! clause"));			
+			Variable = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "variable"));
+			Value = Parse (Expect<SExpr> (ref sexps, "right hand side of set! clause"));			
 		}
 		
 		public override TypeExpr GetTypeExpr ()
 		{
-			throw new NotImplementedException ();
+			return TypeExpr.Builder.App (
+				TypeExpr.Builder.App (TypeExpr.Builder.Var ("set!"), Variable.GetTypeExpr ()), 
+				Value.GetTypeExpr ());
 		}
 	}
 }

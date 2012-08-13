@@ -32,7 +32,7 @@ namespace NOP
 		/// <summary>
 		/// Get the type expression that is used to type check this expression.
 		/// </summary>
-		public abstract TypeExpr GetTypeExpr();
+		public abstract TypeExpr GetTypeExpr ();
 				
 		/// <summary>
 		/// Parse an S-expression and generate the AST.
@@ -57,8 +57,8 @@ namespace NOP
 							return new QuoteExpression (slist);
 						case "if":
 							return new IfExpression (slist);
-						case "define":
-							return new DefineExpression (slist);
+						case "let":
+							return new LetExpression (slist);
 						case "lambda":
 							return new LambdaExpression (slist);
 						case "set!":
@@ -66,7 +66,7 @@ namespace NOP
 					}
 				}
 				// Otherwise do a function call.
-				return new ApplicationExpression(slist);
+				return new ApplicationExpression (slist);
 			}
 			return new LiteralExpression (sexp as SExpr.Literal);
 		}
@@ -81,7 +81,7 @@ namespace NOP
 		/// is exhausted or the type of the token does not match, an error is raised. Advances 
 		/// the list of S-expressions to the next item.
 		/// </summary>
-		protected T Expect<T>(ref List<SExpr> sexps, string token) where T: SExpr
+		protected T Expect<T> (ref List<SExpr> sexps, string token) where T: SExpr
 		{
 			if (sexps.IsEmpty)
 				ParseError (SExp, string.Format ("Expected {0} but reached the end of list.", 
@@ -99,7 +99,7 @@ namespace NOP
 		/// Raises an error if the list is exhausted. If the specified S-expression is 
 		/// read the list is advanced to the next item. Otherwise the list remains the same.
 		/// </summary>
-		protected bool NextSExp<T>(ref List<SExpr> sexps, out T sexp) where T: SExpr
+		protected bool NextSExp<T> (ref List<SExpr> sexps, out T sexp) where T: SExpr
 		{
 			if (sexps.IsEmpty)
 				ParseError (SExp, string.Format ("Unexpected end of list."));

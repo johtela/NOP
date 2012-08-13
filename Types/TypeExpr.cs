@@ -112,6 +112,10 @@ namespace NOP
 			}
 		}
 		
+		/// <summary>
+		/// If expression checks that the condition evaluates to boolean type, and
+		/// that the then and else expressions have the same type.
+		/// </summary>
 		private class IfElse : TypeExpr
 		{
 			public readonly TypeExpr Condition;
@@ -215,6 +219,14 @@ namespace NOP
 			public static TypeExpr App (TypeExpr func, TypeExpr arg)
 			{
 				return new Application (func, arg);
+			}
+			
+			/// <summary>
+			/// Construct an if-then-else expression.
+			/// </summary>
+			public static TypeExpr If (TypeExpr cond, TypeExpr thenExpr, TypeExpr elseExpr)
+			{
+				return new IfElse (cond, thenExpr, elseExpr);
 			}
 			
 			/// <summary>

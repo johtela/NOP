@@ -18,8 +18,8 @@ namespace NOP
 		
 		public override TypeExpr GetTypeExpr ()
 		{
-			throw new NotImplementedException ();
+			return TypeExpr.Builder.If (Condition.GetTypeExpr (), ThenExpression.GetTypeExpr (),
+			                            ElseExpression.GetTypeExpr ());
 		}
 	}
 }
-
