@@ -10,7 +10,7 @@ namespace NOP.Testbench
 		public void TestLteral ()
 		{
 			var expr = Lit ("foo");
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "System.String []");
+			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "System.String");
 		}
 		
 		[Test]
@@ -41,14 +41,28 @@ namespace NOP.Testbench
 		public void SimpleLetTest ()
 		{
 			var expr = Lam ("x", Let ("y", Lit (1), Var ("y")));
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString(), "a -> System.Int32 []");
+			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "a -> System.Int32");
 		}
 		
 		[Test]
 		public void ComplexLetTest ()
 		{
 			var expr = Let ("f", Lam ("x", Var ("x")), App (Var ("f"), Lit (1)));
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "System.Int32 []");
+			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "System.Int32");
+		}
+		
+		[Test]
+		public void SetTest ()
+		{
+			var expr = Let ("a", Lit (1), Let ("b", Lit (2), App (App (Var ("set!"), Var ("a")), Lit (1))));
+			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "System.Void");
+		}
+		
+		[Test]
+		public void SetTestFail ()
+		{
+			var expr = Let ("a", Lit (1), Let ("b", Lit (2), App (App (Var ("set!"), Var ("a")), Lit ("foo"))));
+			Check.Throws<UnificationError> (() => expr.GetExprType (TypeEnv.Initial));
 		}
 	}
 }

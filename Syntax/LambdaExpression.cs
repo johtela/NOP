@@ -29,6 +29,8 @@ namespace NOP
 		
 		public override TypeExpr GetTypeExpr ()
 		{
+			base.GetTypeExpr ();
+			// TODO: Implement and remove the option to have variable length parameters.
 			throw new NotImplementedException ();
 		}
 	}

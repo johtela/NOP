@@ -18,6 +18,7 @@ namespace NOP
 		
 		public override TypeExpr GetTypeExpr ()
 		{
+			base.GetTypeExpr ();
 			return TypeExpr.Builder.Let (Variable.Symbol.Name, Value.GetTypeExpr (), 
 			                             Body.GetTypeExpr ());
 		}

@@ -32,7 +32,11 @@ namespace NOP
 		/// <summary>
 		/// Get the type expression that is used to type check this expression.
 		/// </summary>
-		public abstract TypeExpr GetTypeExpr ();
+		public virtual TypeExpr GetTypeExpr ()
+		{
+			TypeExpr.CurrentExpression = this;
+			return null;
+		}
 				
 		/// <summary>
 		/// Parse an S-expression and generate the AST.

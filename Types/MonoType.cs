@@ -12,12 +12,14 @@
 	{
 		public readonly MonoType Type1;
 		public readonly MonoType Type2;
+		public readonly Expression Expression;
 			
 		public UnificationError (MonoType type1, MonoType type2) 
 				: base (string.Format ("Could not unify type {0} with {1}", type1, type2))
 		{
 			Type1 = type1;
 			Type2 = type2;
+			Expression = TypeExpr.CurrentExpression;
 		}
 	}
 	
@@ -221,7 +223,7 @@
 			
 			public override string ToString ()
 			{
-				return string.Format ("{0} {1}", Name, TypeArgs);
+				return TypeArgs.IsEmpty ? Name : string.Format ("{0}{1}", Name, TypeArgs.ToString ("<", ">", ", "));
 			}
 		}
 		

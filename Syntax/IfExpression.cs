@@ -18,6 +18,7 @@ namespace NOP
 		
 		public override TypeExpr GetTypeExpr ()
 		{
+			base.GetTypeExpr ();
 			return TypeExpr.Builder.If (Condition.GetTypeExpr (), ThenExpression.GetTypeExpr (),
 			                            ElseExpression.GetTypeExpr ());
 		}

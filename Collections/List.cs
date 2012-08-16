@@ -9,7 +9,9 @@
 	/// </summary>
 	public class EmptyListException : Exception
 	{
-		public EmptyListException () : base("The list is empty") { }
+		public EmptyListException () : base("The list is empty")
+		{
+		}
 	}
 
 	/// <summary>
@@ -29,7 +31,8 @@
 		{ 
 			get
 			{
-				if (this == _empty) throw new EmptyListException ();
+				if (this == _empty)
+					throw new EmptyListException ();
 				return _first;
 			}
 		}
@@ -41,12 +44,14 @@
 		{ 
 			get
 			{
-				if (this == _empty) throw new EmptyListException ();
+				if (this == _empty)
+					throw new EmptyListException ();
 				return _rest;
 			}
 			private set
 			{
-				if (this != _empty) _rest =	value;
+				if (this != _empty)
+					_rest = value;
 			}
 		}
 		
@@ -209,7 +214,8 @@
 				prevLast = last;
 				last = Cons (list.First, Empty);
 				prevLast.Rest = last;
-				if (first.IsEmpty) first = last;
+				if (first.IsEmpty)
+					first = last;
 				list = list.Rest;
 			}
 			return new Tuple<List<T>, List<T>> (first, last);
@@ -293,7 +299,7 @@
 		/// and have equal lengths.</returns>
 		public bool EqualTo (List<T> other)
 		{
-			return this.EqualTo (other, (i1, i2) => i1.Equals(i2));
+			return this.EqualTo (other, (i1, i2) => i1.Equals (i2));
 		}	
 
 		/// <summary>
@@ -487,13 +493,18 @@
 		/// <summary>
 		/// Returns a string representing the list.
 		/// </summary>
-		/// <typeparam name="T">The item type of the list,</typeparam>
-		/// <param name="list">The list to be converted into string.</param>
-		/// <returns>A string that lists the items in the list separated by comma
-		/// and surrounded by square brackets. I.e. "[ item1, item2, ... ]"</returns>
 		public override string ToString ()
 		{
-			StringBuilder sb = new StringBuilder ("[");
+			return ToString ("[", "]", ", ");
+		}
+		
+		/// <summary>
+		/// Returns a string representing the list. Gets open, close bracket, and separtor as
+		/// an argument.
+		/// </summary>
+		public string ToString (string openBracket, string closeBracket, string separator)
+		{
+			StringBuilder sb = new StringBuilder (openBracket);
 			List<T > list = this;
 			
 			while (!list.IsEmpty)
@@ -502,13 +513,10 @@
 				list = list.Rest;
 				
 				if (list != Empty)
-				{
-					sb.Append (", ");
-				}
+					sb.Append (separator);
 			}
-			sb.Append ("]");
-			
-			return sb.ToString ();
+			sb.Append (closeBracket);
+			return sb.ToString ();			
 		}
 
 		#region IEnumerable<T> Members

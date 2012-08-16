@@ -12,6 +12,7 @@ namespace NOP
 		
 		public override TypeExpr GetTypeExpr ()
 		{
+			base.GetTypeExpr ();
 			return TypeExpr.Builder.Lit (SExp);
 		}
 	}

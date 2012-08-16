@@ -13,7 +13,9 @@ namespace NOP.Collections
 		/// <summary>
 		/// The default constructor.
 		/// </summary>
-		public EmptySetException () : base("Set is empty") { }
+		public EmptySetException () : base("Set is empty")
+		{
+		}
 	}
 
 	/// <summary>
@@ -69,7 +71,7 @@ namespace NOP.Collections
 		/// <returns>A new set that contains the given item.</returns>
 		public Set<T> Add (T item)
 		{
-			return Contains(item) ? 
+			return Contains (item) ? 
 				this :
 				Tree<Set<T>, T>.Add (this, new _SetNode (item, Empty, Empty), 1);
 		}
@@ -99,7 +101,7 @@ namespace NOP.Collections
 		/// </summary>
 		public static Set<T> operator+ (Set<T> s1, Set<T> s2)
 		{
-			return Set<T>.Create(s1.Concat (s2));
+			return Set<T>.Create (s1.Concat (s2));
 		}
 		
 		/// <summary>
@@ -107,7 +109,7 @@ namespace NOP.Collections
 		/// </summary>
 		public static Set<T> operator* (Set<T> s1, Set<T> s2)
 		{
-			return Create (s1.Where(i => s2.Contains (i)));
+			return Create (s1.Where (i => s2.Contains (i)));
 		}
 		
 		/// <summary>
@@ -115,7 +117,7 @@ namespace NOP.Collections
 		/// </summary>
 		public static Set<T> operator- (Set<T> s1, Set<T> s2)
 		{
-			return Create (s1.Where(i => !s2.Contains (i)));
+			return Create (s1.Where (i => !s2.Contains (i)));
 		}
 		
 		/// <summary>
@@ -247,5 +249,23 @@ namespace NOP.Collections
 		}
 
         #endregion
+		
+		public override string ToString ()
+		{
+			StringBuilder sb = new StringBuilder ("[");
+			bool outputted = false;
+			
+			foreach (var item in this)
+			{
+				if (outputted)
+					sb.Append (", ");
+				else
+					outputted = true;
+				sb.Append (item);
+			}
+			sb.Append ("]");
+			
+			return sb.ToString ();
+		}
 	}
 }

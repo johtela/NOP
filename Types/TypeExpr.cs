@@ -11,15 +11,23 @@ namespace NOP
 	/// </summary>
 	public abstract class TypeExpr
 	{
+		private Expression _expression;
+		public static Expression CurrentExpression;
+		
+		private TypeExpr ()
+		{
+			_expression = CurrentExpression;
+		}
+		
 		/// <summary>
 		/// Infers the principal the type of the expression. This function applies the rules 
 		/// used to infer the type of the specific expression. 
 		/// </summary>
 		/// <returns>The substitution table that contains the type variables inferred.</returns>
 		/// <param name='env'>The type environment used to determine the principal type.</param>
-		/// <param name='baseType'>The base type with which the expression type is unified.</param>
+		/// <param name='expected'>The base type with which the expression type is unified.</param>
 		/// <param name='subs'>The substitution table that is constructed so far.</param>
-		public abstract void TypeCheck (TypeEnv env, MonoType baseType);
+		public abstract void TypeCheck (TypeEnv env, MonoType expected);
 		
 		/// <summary>
 		/// Literal expression. Can be any literal object.
@@ -38,9 +46,10 @@ namespace NOP
 				return new MonoType.Con (Value.GetType ().ToString (), List<MonoType>.Empty);
 			}
 			
-			public override void TypeCheck (TypeEnv env, MonoType baseType)
+			public override void TypeCheck (TypeEnv env, MonoType expected)
 			{
-				MonoType.Unify (GetMonoType (), baseType);
+				CurrentExpression = _expression;
+				MonoType.Unify (GetMonoType (), expected);
 			}
 		}
 
@@ -56,12 +65,13 @@ namespace NOP
 				Name = name;
 			}
 			
-			public override void TypeCheck (TypeEnv env, MonoType baseType)
+			public override void TypeCheck (TypeEnv env, MonoType expected)
 			{
+				CurrentExpression = _expression;
 				if (!env.Contains (Name)) 
 					throw new Exception (string.Format ("Name {0} not found", Name));
 				var pt = env.Find (Name);
-				MonoType.Unify (pt.Type.ApplySubs (), baseType);
+				MonoType.Unify (pt.Type.ApplySubs (), expected);
 			}
 		}
 		
@@ -79,12 +89,13 @@ namespace NOP
 				Body = body;
 			}
 			
-			public override void TypeCheck (TypeEnv env, MonoType baseType)
+			public override void TypeCheck (TypeEnv env, MonoType expected)
 			{
+				CurrentExpression = _expression;
 				var a = MonoType.NewTypeVar ();
 				var b = MonoType.NewTypeVar ();
 				
-				MonoType.Unify (baseType, new MonoType.Lam (a, b));
+				MonoType.Unify (expected, new MonoType.Lam (a, b));
 				var newEnv = env.Add (Argument, new Polytype (a, null));
 				Body.TypeCheck (newEnv, b);
 			}
@@ -104,10 +115,11 @@ namespace NOP
 				Argument = arg;
 			}
 			
-			public override void TypeCheck (TypeEnv env, MonoType baseType)
+			public override void TypeCheck (TypeEnv env, MonoType expected)
 			{
+				CurrentExpression = _expression;
 				var a = MonoType.NewTypeVar ();
-				Function.TypeCheck (env, new MonoType.Lam (a, baseType));
+				Function.TypeCheck (env, new MonoType.Lam (a, expected));
 				Argument.TypeCheck (env, a);
 			}
 		}
@@ -129,8 +141,9 @@ namespace NOP
 				ElseExpr = elseExpr;
 			}
 			
-			public override void TypeCheck (TypeEnv env, MonoType baseType)
+			public override void TypeCheck (TypeEnv env, MonoType expected)
 			{
+				CurrentExpression = _expression;
 				var c = MonoType.NewTypeVar ();
 				Condition.TypeCheck (env, c);
 				MonoType.Unify (c, new MonoType.Con ("System.Boolean"));
@@ -162,13 +175,14 @@ namespace NOP
 				Body = body;
 			}
 			
-			public override void TypeCheck (TypeEnv env, MonoType baseType)
+			public override void TypeCheck (TypeEnv env, MonoType expected)
 			{
+				CurrentExpression = _expression;
 				MonoType a = MonoType.NewTypeVar ();
 				Value.TypeCheck (env, a);
 				MonoType t = a.ApplySubs ();
 				Polytype newPt = new Polytype (t, t.GetTypeVars () - env.GetTypeVars ());
-				Body.TypeCheck (env.Add (VarName, newPt), baseType);
+				Body.TypeCheck (env.Add (VarName, newPt), expected);
 			}
 		}
 		

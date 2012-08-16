@@ -17,6 +17,7 @@ namespace NOP
 		
 		public override TypeExpr GetTypeExpr ()
 		{
+			base.GetTypeExpr ();
 			var te = FuncName.GetTypeExpr ();
 			
 			for (var pars = Parameters; !pars.IsEmpty; pars = pars.Rest)
