@@ -56,7 +56,7 @@ namespace NOP
 		public static Namespace FromTypes (IEnumerable<Type> types)
 		{
 			foreach (var type in types)
-				if (type.Namespace != null)
+				if (type.Namespace != null && !type.IsNested)
 				{
 					var ns = GetOrCreate (type.Namespace);
 					TypeDefinition.CreateType (ns, type);
