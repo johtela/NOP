@@ -30,7 +30,9 @@ namespace NOP.UI
 				
 				visual.Draw (context, size);
 				
+#if __MonoCS__
 				context.Target.Dispose ();
+#endif
 			}
 		}
 		
