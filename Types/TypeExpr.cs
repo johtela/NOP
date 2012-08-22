@@ -76,7 +76,8 @@ namespace NOP
 		}
 		
 		/// <summary>
-		/// Lambda expression defines a function of one argument.
+		/// Lambda expression defines a function of one argument. The argument can
+		/// also be null, in which case the function is of type () -> 'a
 		/// </summary>
 		private class Lambda : TypeExpr
 		{
@@ -92,12 +93,15 @@ namespace NOP
 			public override void TypeCheck (TypeEnv env, MonoType expected)
 			{
 				CurrentExpression = _expression;
-				var a = MonoType.NewTypeVar ();
+				var a = Argument != null ? 
+					MonoType.NewTypeVar () : 
+					new MonoType.Con(typeof(void).Name);
 				var b = MonoType.NewTypeVar ();
 				
 				MonoType.Unify (expected, new MonoType.Lam (a, b));
-				var newEnv = env.Add (Argument, new Polytype (a, null));
-				Body.TypeCheck (newEnv, b);
+				if (Argument != null)
+					env = env.Add (Argument, new Polytype (a, null));
+				Body.TypeCheck (env, b);
 			}
 		}
 		
@@ -225,6 +229,16 @@ namespace NOP
 			public static TypeExpr Lam (string arg, TypeExpr body)
 			{
 				return new Lambda (arg, body);
+			}
+
+			/// <summary>
+			/// Construct a lambda expression that has zero or more arguments.
+			/// </summary>
+			public static TypeExpr MultiLam (List<string> args, TypeExpr body)
+			{
+				if (args.IsEmpty) return Lam (null, body);
+				else if (args.Rest.IsEmpty) return Lam (args.First, body);
+				else return Lam (args.First, MultiLam (args.Rest, body));
 			}
 			
 			/// <summary>
