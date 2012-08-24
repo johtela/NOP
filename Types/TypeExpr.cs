@@ -95,7 +95,7 @@ namespace NOP
 				CurrentExpression = _expression;
 				var a = Argument != null ? 
 					MonoType.NewTypeVar () : 
-					new MonoType.Con(typeof(void).Name);
+					new MonoType.Con("System.Void");
 				var b = MonoType.NewTypeVar ();
 				
 				MonoType.Unify (expected, new MonoType.Lam (a, b));
