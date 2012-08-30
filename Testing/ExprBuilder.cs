@@ -10,11 +10,13 @@ namespace NOP
 	/// </summary>
 	public abstract class ExprBuilder
 	{
+		#region Private case classes
+		
 		/// <summary>
 		/// Build the expression.
 		/// </summary>
 		/// <returns>The expression defined by the builder.</returns>
-		public abstract object Build ();
+		public abstract SExpr Build ();
 		
 		/// <summary>
 		/// Builder for atom expressions.
@@ -28,9 +30,9 @@ namespace NOP
 				_value = value;
 			}
 			
-			public override object Build ()
+			public override SExpr Build ()
 			{
-				return (object)_value;
+				return new SExpr.Literal (_value);
 			}
 		}
 		
@@ -46,7 +48,7 @@ namespace NOP
 				_name = name;
 			}
 			
-			public override object Build ()
+			public override SExpr Build ()
 			{
 				return new SExpr.Symbol (_name);
 			}
@@ -69,11 +71,13 @@ namespace NOP
 				_items = items;
 			}
 
-			public override object Build ()
+			public override SExpr Build ()
 			{
-				return _items.Map (eb => eb.Build ());
+				return new SExpr.List (_items.Map (eb => eb.Build ()));
 			}
 		}
+		
+		#endregion
 		
 		/// <summary>
 		/// Create an atom expression builder.
@@ -140,6 +144,14 @@ namespace NOP
 		}
 		
 		/// <summary>
+		/// Create a builder for the "let" expression.
+		/// </summary>
+		public static ExprBuilder Let (string symbol, ExprBuilder value, ExprBuilder inExpr)
+		{
+			return new ListBuilder (List.Create (S ("let"), S (symbol), value, inExpr));
+		}
+		
+		/// <summary>
 		/// Create a list of parameter names.
 		/// </summary>
 		public static List<string> P (params string[] args)
@@ -163,21 +175,23 @@ namespace NOP
 			return new ListBuilder (S (function) | List.Create (args));
 		}
 		
+		#region Obsolete stuff
+		
 		public static ExprBuilder Call (Function function, params ExprBuilder[] args)
 		{
 			return new ListBuilder (A (function) | List.Create (args));
 		}
-		
+
 		public static ExprBuilder Call (object obj, Method method, params ExprBuilder[] args)
 		{
 			return new ListBuilder (A (obj) | (A (method) | List.Create (args)));
 		}
-		
+
 		public static ExprBuilder Prop (object obj, Property prop)
 		{
 			return new ListBuilder (List.Create (A (obj), A (prop)));
 		}
-		
+
 		public static ExprBuilder Set (Variable variable, ExprBuilder value)
 		{
 			return new ListBuilder (List.Create (S ("set!"), A (variable), value));
@@ -187,6 +201,8 @@ namespace NOP
 		{
 			return new ListBuilder (List.Create (S ("set!"), A (obj), A (property), value));
 		}
+		
+		#endregion
 	}
 	
 	/// <summary>
@@ -196,7 +212,7 @@ namespace NOP
 	{
 		#region implemented abstract members of NOP.ExprBuilder
 		
-		public override object Build ()
+		public override SExpr Build ()
 		{
 			return null;
 		}

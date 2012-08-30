@@ -20,9 +20,11 @@ namespace NOP
 			base.GetTypeExpr ();
 			var te = FuncName.GetTypeExpr ();
 			
+			if (Parameters.IsEmpty)
+				return TypeExpr.Builder.App (te, null);
+			
 			for (var pars = Parameters; !pars.IsEmpty; pars = pars.Rest)
 				te = TypeExpr.Builder.App (te, pars.First.GetTypeExpr ());
-			
 			return te;
 		}
 	}

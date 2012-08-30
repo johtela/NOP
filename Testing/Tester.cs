@@ -37,9 +37,7 @@ namespace NOP
 		public static void IsTrue (bool condition)
 		{
 			if (!condition)
-			{
 				throw new TestFailed ("Expected condition to be true.");
-			}
 		}
 		
 		/// <summary>
@@ -48,9 +46,7 @@ namespace NOP
 		public static void IsFalse (bool condition)
 		{
 			if (condition)
-			{
 				throw new TestFailed ("Expected condition to be false.");
-			}
 		}
 		
 		/// <summary>
@@ -59,9 +55,7 @@ namespace NOP
 		public static void AreEqual<T> (T x, T y)
 		{
 			if (!x.Equals (y))
-			{
 				throw new TestFailed (string.Format ("'{0}' and '{1}' should be equal.", x, y));
-			}
 		}
 		
 		/// <summary>
@@ -70,9 +64,13 @@ namespace NOP
 		public static void AreNotEqual<T> (T x, T y)
 		{
 			if (x.Equals (y))
-			{
 				throw new TestFailed (string.Format ("'{0}' and '{1}' should not be equal.", x, y));
-			}
+		}
+		
+		public static void IsOfType<T> (object x)
+		{
+			if (!(x is T))
+				throw new TestFailed (string.Format ("'{0}' should be of type '{1}'.", x, typeof(T)));
 		}
 		
 		/// <summary>
@@ -128,9 +126,8 @@ namespace NOP
 			int failed = 0;
 			
 			foreach (object fixture in fixtures)
-			{
 				TestFixture (fixture, timed, ref run, ref failed);	
-			}
+			
 			if (failed > 0)
 			{
 				Console.ForegroundColor = ConsoleColor.DarkRed;

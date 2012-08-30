@@ -6,63 +6,67 @@ namespace NOP.Testbench
 	
 	public class TypeCheckingTests : TypeExpr.Builder
 	{
+		private void CheckType (TypeExpr expr, string type)
+		{
+			Check.AreEqual (expr.InferType (TypeEnv.Initial).ToString (), type);
+		}
+		
 		[Test]
 		public void TestLteral ()
 		{
-			var expr = Lit ("foo");
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "System.String");
+			CheckType (Lit ("foo"), "System.String");
 		}
 		
 		[Test]
 		public void TestIdentityLambda ()
 		{
-			var expr = Lam ("x", Var ("x"));
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "a -> a");
+			CheckType (Lam ("x", Var ("x")), "a -> a");
 		}
 		
 		[Test]
 		public void TestFirstAndSecondLambda ()
 		{
-			var expr = Lam ("x", Lam ("y", Var ("x")));
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "a -> b -> a");		
-
-			var expr2 = Lam ("x", Lam ("y", Var ("y")));
-			Check.AreEqual (expr2.GetExprType (TypeEnv.Initial).ToString (), "a -> b -> b");		
+			CheckType (Lam ("x", Lam ("y", Var ("x"))), "a -> b -> a");		
+			CheckType (Lam ("x", Lam ("y", Var ("y"))), "a -> b -> b");		
 		}
 		
 		[Test]
 		public void TestFlipLambda ()
 		{
-			var expr = Lam ("f", Lam ("a", Lam ("b", App (App (Var ("f"), Var ("b")), Var ("a")))));
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "a -> b -> c -> b -> a -> c");		
+			CheckType (Lam ("f", Lam ("a", Lam ("b", App (App (Var ("f"), Var ("b")), Var ("a"))))), 
+			           "a -> b -> c -> b -> a -> c");		
 		}
 		
 		[Test]
 		public void SimpleLetTest ()
 		{
-			var expr = Lam ("x", Let ("y", Lit (1), Var ("y")));
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "a -> System.Int32");
+			CheckType (Lam ("x", Let ("y", Lit (1), Var ("y"))), "a -> System.Int32");
 		}
 		
 		[Test]
 		public void ComplexLetTest ()
 		{
-			var expr = Let ("f", Lam ("x", Var ("x")), App (Var ("f"), Lit (1)));
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "System.Int32");
+			CheckType (Let ("f", Lam ("x", Var ("x")), App (Var ("f"), Lit (1))), "System.Int32");
 		}
 		
 		[Test]
 		public void SetTest ()
 		{
-			var expr = Let ("a", Lit (1), Let ("b", Lit (2), App (App (Var ("set!"), Var ("a")), Lit (1))));
-			Check.AreEqual (expr.GetExprType (TypeEnv.Initial).ToString (), "System.Void");
+			CheckType (Let ("a", Lit (1), Let ("b", Lit (2), App (App (Var ("set!"), Var ("a")), Lit (1)))), 
+			           "System.Void");
 		}
 		
 		[Test]
 		public void SetTestFail ()
 		{
 			var expr = Let ("a", Lit (1), Let ("b", Lit (2), App (App (Var ("set!"), Var ("a")), Lit ("foo"))));
-			Check.Throws<UnificationError> (() => expr.GetExprType (TypeEnv.Initial));
+			Check.Throws<UnificationError> (() => expr.InferType (TypeEnv.Initial));
+		}
+		
+		[Test]
+		public void IfTest ()
+		{
+			CheckType (If (Lit (false), Lit ("foo"), Lit ("bar")), "System.String");
 		}
 	}
 }

@@ -10,11 +10,12 @@ namespace NOP.Testbench
 		{
 			Tester.RunTests (
 				new CollectionTests (),
-				new InterpreterTests (),
+//				new InterpreterTests (),
 				new MapTests (),
 				new SetTests (),
 				new TypeDefinitionTests (),
-				new TypeCheckingTests ());
+				new TypeCheckingTests (),
+				new ParserTests ());
 		}
 	}
 }

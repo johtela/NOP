@@ -95,7 +95,7 @@ namespace NOP
 				CurrentExpression = _expression;
 				var a = Argument != null ? 
 					MonoType.NewTypeVar () : 
-					new MonoType.Con("System.Void");
+					new MonoType.Con ("System.Void");
 				var b = MonoType.NewTypeVar ();
 				
 				MonoType.Unify (expected, new MonoType.Lam (a, b));
@@ -122,9 +122,12 @@ namespace NOP
 			public override void TypeCheck (TypeEnv env, MonoType expected)
 			{
 				CurrentExpression = _expression;
-				var a = MonoType.NewTypeVar ();
+				var a = Argument != null ? 
+					MonoType.NewTypeVar () : 
+					new MonoType.Con ("System.Void");
 				Function.TypeCheck (env, new MonoType.Lam (a, expected));
-				Argument.TypeCheck (env, a);
+				if (Argument != null)
+					Argument.TypeCheck (env, a);
 			}
 		}
 		
@@ -159,6 +162,7 @@ namespace NOP
 				ThenExpr.TypeCheck (env, e);
 				
 				MonoType.Unify (t, e);
+				MonoType.Unify (t, expected);
 			}
 		}
 		
@@ -191,9 +195,9 @@ namespace NOP
 		}
 		
 		/// <summary>
-		/// Returns the the type of this expression.
+		/// Infers the the type of this expression using the specified type environment.
 		/// </summary>
-		public MonoType GetExprType (TypeEnv env)
+		public MonoType InferType (TypeEnv env)
 		{
 			MonoType.ClearSubs ();
 			var a = MonoType.NewTypeVar ();
@@ -236,9 +240,13 @@ namespace NOP
 			/// </summary>
 			public static TypeExpr MultiLam (List<string> args, TypeExpr body)
 			{
-				if (args.IsEmpty) return Lam (null, body);
-				else if (args.Rest.IsEmpty) return Lam (args.First, body);
-				else return Lam (args.First, MultiLam (args.Rest, body));
+				if (args.IsEmpty)
+					return Lam (null, body);
+				else
+				if (args.Rest.IsEmpty)
+					return Lam (args.First, body);
+				else
+					return Lam (args.First, MultiLam (args.Rest, body));
 			}
 			
 			/// <summary>
