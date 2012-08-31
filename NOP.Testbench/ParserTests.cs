@@ -11,7 +11,7 @@ namespace NOP.Testbench
 		{
 			var expr = Expression.Parse (eb.Build ());
 			Check.IsOfType<T> (expr);
-			Check.AreEqual (type, expr.GetTypeExpr (). InferType (TypeEnv.Initial).ToString ());
+			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
 		}
 		
 		[Test]
@@ -40,6 +40,37 @@ namespace NOP.Testbench
 			AssertParsesTo<IfExpression> ("System.String",
 				If (A (false), A ("foo"), A ("bar")));
 		}
+
+		[Test]
+		public void TestComplexIf ()
+		{
+			AssertParsesTo<LetExpression> ("System.String",
+				Let ("foo", Lambda (P ("i"), 
+				If (Call ("eq?", S ("i"), A (3)), 
+					A ("It's numberwang!"), 
+					A ("It's a number"))),
+				Call ("foo", A (3)))
+			);
+		}
+
+		[Test]
+		public void TestNestedLets ()
+		{
+			AssertParsesTo<LetExpression> ("System.Boolean",
+				Let ("foo", A (42),
+				Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
+				Call ("bar", S ("foo"), A (3))))
+			);
+		}
+
+		[Test]
+		public void TestNestedLambdas ()
+		{
+			AssertParsesTo<ApplicationExpression> ("System.Boolean",
+				Call (Lambda (P ("foo"),
+					Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
+					Call ("bar", S ("foo"), A (3)))), A(4))
+			);
+		}
 	}
 }
-

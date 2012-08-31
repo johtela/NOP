@@ -166,6 +166,14 @@ namespace NOP
 		{
 			return new ListBuilder (S ("lambda") | (L (args.Map (arg => S (arg))) | List.Cons (body)));
 		}
+
+		/// <summary>
+		/// Create a builder for the function call expression.
+		/// </summary>
+		public static ExprBuilder Call (ExprBuilder function, params ExprBuilder[] args)
+		{
+			return new ListBuilder (function | List.Create (args));
+		}
 		
 		/// <summary>
 		/// Create a builder for the function call expression.

@@ -3,6 +3,7 @@ namespace NOP
 	using System;
 	using System.Linq;
 	using Collections;
+	using StrSeq=System.Collections.Generic.IEnumerable<string>;
 	
 	/// <summary>
 	/// The type environment maps expression variables (NOT type variables) to polytupes.
@@ -65,13 +66,27 @@ namespace NOP
 		/// </summary>
 		private class InitialEnvironment : MonoType.Builder
 		{
-			private static readonly Polytype setPt = 
-				new Polytype (
-					Lambda (List.Create (Variable ("a"), Variable ("a")), Constant ("System.Void")), 
-					"a");
+			private static StrSeq GetTypeVars (MonoType[] parameters)
+			{
+				foreach (var par in parameters)
+					if (par is MonoType.Var) yield return (par as MonoType.Var).Name;
+			}
+
+			private static Polytype Pt (MonoType result, params MonoType[] parameters)
+			{
+				return new Polytype (Lambda (List.Create (parameters), result), GetTypeVars (parameters));
+			}
+
+			private static Tuple<string, Polytype> Ft(string funcName, Polytype pt)
+			{
+				return Tuple.Create (funcName, pt);
+			}
+
 			public static readonly TypeEnv Value =
 				new TypeEnv (Map<string, Polytype>.FromPairs (
-					Tuple.Create ("set!", setPt)));
+					Ft ("set!", Pt (Constant ("System.Void"), Variable ("a"), Variable ("a"))),
+					Ft ("eq?", Pt (Constant ("System.Boolean"), Variable ("a"), Variable ("a")))
+				));
 		}
 	}
 }
