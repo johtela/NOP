@@ -43,7 +43,7 @@ namespace NOP.Testbench
 			Namespace.FromTypes (assy.GetTypes ());
 		}
 		
-		[Test]
+//		[Test]
 		public void OutputAllNamespaces ()
 		{
 			tabs = 0;
