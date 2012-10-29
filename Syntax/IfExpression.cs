@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 
-	public class IfExpression : ListExpression
+	public class IfExpression : Expression
 	{
 		public readonly Expression Condition;
 		public readonly Expression ThenExpression;

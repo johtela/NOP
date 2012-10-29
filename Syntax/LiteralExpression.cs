@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 
-	public class LiteralExpression : AtomExpression
+	public class LiteralExpression : Expression
 	{
 		public readonly SExpr.Literal Literal;
 		

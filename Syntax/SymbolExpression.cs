@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 
-	public class SymbolExpression : AtomExpression
+	public class SymbolExpression : Expression
 	{
 		public readonly SExpr.Symbol Symbol;
 		

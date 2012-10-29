@@ -3,7 +3,7 @@ namespace NOP
 	using System;
 	using Collections;
 	
-	public class ApplicationExpression : ListExpression
+	public class ApplicationExpression : Expression
 	{
 		public readonly Expression FuncName;
 		public readonly List<Expression> Parameters;

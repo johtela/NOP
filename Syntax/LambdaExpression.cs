@@ -3,7 +3,7 @@ namespace NOP
 	using System;
 	using Collections;
 
-	public class LambdaExpression : ListExpression
+	public class LambdaExpression : Expression
 	{
 		public readonly List<SymbolExpression> Parameters;
 		public readonly Expression FunctionBody;
@@ -18,7 +18,8 @@ namespace NOP
 				if (par == null)
 					ParseError (sexp, "Expected a symbol");
 				return new SymbolExpression (par);
-			});
+			}
+			);
 			if (sexps.IsEmpty)
 				ParseError (lambdaExpr, "Function body is missing");
 			FunctionBody = Parse (sexps.First);

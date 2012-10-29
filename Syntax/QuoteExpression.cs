@@ -1,6 +1,6 @@
 namespace NOP
 {
-	public class QuoteExpression : ListExpression
+	public class QuoteExpression : Expression
 	{
 		public readonly Expression QuotedExpression;
 		

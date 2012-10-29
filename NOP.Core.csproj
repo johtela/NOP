@@ -63,10 +63,8 @@
     <Compile Include="Interpreter\Wrappers.cs" />
     <Compile Include="Types\SExpr.cs" />
     <Compile Include="Syntax\Expression.cs" />
-    <Compile Include="Syntax\AtomExpression.cs" />
     <Compile Include="Syntax\SymbolExpression.cs" />
     <Compile Include="Syntax\LiteralExpression.cs" />
-    <Compile Include="Syntax\ListExpression.cs" />
     <Compile Include="Syntax\QuoteExpression.cs" />
     <Compile Include="Syntax\IfExpression.cs" />
     <Compile Include="Syntax\LambdaExpression.cs" />

@@ -3,7 +3,7 @@ namespace NOP
 	using System;
 	using NOP.Collections;
 
-	public class ModuleExpression : ListExpression
+	public class ModuleExpression : Expression
 	{
 		public readonly SymbolExpression Name;
 		public readonly List<DefinitionExpression> Members;

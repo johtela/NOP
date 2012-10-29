@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 
-	public class SetExpression : ListExpression
+	public class SetExpression : Expression
 	{
 		public readonly SymbolExpression Variable;
 		public readonly Expression Value;
