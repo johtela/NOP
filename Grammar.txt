@@ -1,35 +1,34 @@
 The NOP grammar is expression-based, like in all Lisps. Below is the formal
 definition of the grammar.
 
-SExp:			Literal | Symbol | Value | Variable | Function | Method | Property | 
-				List ( SExp* )
+SExp:			Literal | Symbol | List ( SExp* )
 			 	
 Expression:		AtomExpression | ListExpression
 
-AtomExpression: SymbolExpression | ValueExpression | LiteralExpression | FunctionExpression
+AtomExpression: SymbolExpression | LiteralExpression
 				
 LiteralExpression:		Literal
 SymbolExpression: 		Symbol
-ValueExpression:  		Value
-VariableExpresssion: 	Variable
-FunctionExpression:		Function
 
 ListExpression:	QuoteExpression |
 				IfExpression |
-				BeginExpression |
 				DefineExpression |
 				LambdaExpression |
 				SetExpression |
-				MethodCallExpression |
-				PropertyExpression |
 				FunctionCallExpression
 				
 QuoteExpression: 		List ( Symbol("quote") Expression )
 IfExpression:			List ( Symbol("if") Expression Expression Expression )
-BeginExpression: 		List ( Symbol("begin") Expression+ )
-DefineExpression:		List ( Symbol("define") Symbol Expression )
-LambdaExpression:		List ( Symbol("lambda") List ( Symbol* ) Expression+ )
+DefineExpression:		List ( Symbol("let") VariableExpression Expression )
+LambdaExpression:		List ( Symbol("lambda") List ( VariableExpression* ) Expression+ )
 SetExpression:			List ( Symbol("set!") VariableExpression Expression )
-MethodCallExpression: 	List ( Expression Method Expression* )
-PropertyExpression:		List ( Expression Property+ )
 FunctionCallExpression: List ( Expression+ )
+VariableExpresson:		Symbol [ Symbol(":") TypeExpression ]
+TypeExpression:			Symbol [ List ( TypeExpression ) | Symbol("->") TypeExpression ]
+ClassExpression:		List ( Symbol("module") Symbol MemberExpression* )
+DefinitionExpression:	List ( Symbol("def") VariableExpression Expression )
+
+(module <Symbol>
+	(def <Symbol> <Expr>)
+	(def <Symbol> : <Type> <Expr>)
+)

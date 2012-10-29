@@ -37,29 +37,23 @@ namespace NOP
 				return Value.ToString ();
 			}
 		}
-		
+
 		/// <summary>
 		/// Symbol with given name.
 		/// </summary>
 		public class Symbol : SExpr
 		{
 			public readonly string Name;
-			public readonly Namespace Namespace;
 		
-			public Symbol (string name, Namespace ns)
+			public Symbol (string name)
 			{
 				Name = name;
-				Namespace = ns;
 			}
 			
-			public Symbol (string name) : this (name, Namespace.Root)
-			{
-			}
-		
 			public override bool Equals (object obj)
 			{
 				var other = obj as Symbol;
-				return other != null && other.Name == Name && Namespace.Equals (other.Namespace);
+				return other != null && other.Name == Name;
 			}
 			
 			public override int GetHashCode ()
@@ -72,7 +66,7 @@ namespace NOP
 				return Name;
 			}
 		}
-	
+
 		/// <summary>
 		/// List of other S-expressions.
 		/// </summary>
