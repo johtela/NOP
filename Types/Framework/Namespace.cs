@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NOP.Collections;
 
-namespace NOP
+namespace NOP.Framework
 {
 	public class Namespace
 	{
@@ -72,8 +72,7 @@ namespace NOP
 				foreach (var name in path.Split ('.'))
 					ns = ns._namespaces [name];
 				return ns;
-			}
-			catch (KeyNotFoundException)
+			} catch (KeyNotFoundException)
 			{
 				return null;
 			}

@@ -4,6 +4,7 @@ namespace NOP
 	// TODO: Transform the special forms (lists starting with symbols "if", "lambda", etc.)
 	// 		 to their own classes.
 	using System;
+	using NOP.Framework;
 	using NOP.Collections;
 	using ExprList = NOP.Collections.List<object>;
 
@@ -103,20 +104,20 @@ namespace NOP
 					// Check if we have any of the special forms as first item.
 					switch (symbol.Name)
 					{
-						case "quote":
-							return new EvalResult (env, list.Rest);
-						case "if":
-							return EvalIf (env, list.Rest);
-						case "begin":
-							return EvalBegin (env, list.Rest);
-						case "define":
-							return EvalDefine (env, list.Rest);
-						case "lambda":
-							return MakeFunction (env, list.Rest);
-						case "set!":
-							return EvalSet (env, list.Rest);
-						default:
-							return InvokeFunction (env, symbol, list.Rest);
+					case "quote":
+						return new EvalResult (env, list.Rest);
+					case "if":
+						return EvalIf (env, list.Rest);
+					case "begin":
+						return EvalBegin (env, list.Rest);
+					case "define":
+						return EvalDefine (env, list.Rest);
+					case "lambda":
+						return MakeFunction (env, list.Rest);
+					case "set!":
+						return EvalSet (env, list.Rest);
+					default:
+						return InvokeFunction (env, symbol, list.Rest);
 					}
 				}
 				// Is this an external function call?
@@ -181,8 +182,7 @@ namespace NOP
 			{
 				res = Eval (res.Env, exprs.First);
 				exprs = exprs.Rest;
-			}
-			while (!exprs.IsEmpty);
+			} while (!exprs.IsEmpty);
 			return new EvalResult (env, res.Result);
 		}
 
@@ -227,14 +227,16 @@ namespace NOP
 				if (sym == null)
 					Interpreter.Error (expr, "Expected a parameter name");
 				return sym.Name;
-			});
+			}
+			);
 			var dot = parameters.FindNext (".");
 			if (!dot.IsEmpty && dot.Length != 2)
 				Interpreter.Error ("There should be only one parameter after '.'");
 			if (definition.IsEmpty)
 				Interpreter.Error (definition, "Function body is missing");
 			return new EvalResult (env, new Func (
-				args => EvalBegin (BindParams (env, parameters, args), definition).Result));
+				args => EvalBegin (BindParams (env, parameters, args), definition).Result)
+			);
 		}
 
 		/// <summary>
@@ -300,8 +302,10 @@ namespace NOP
 				CheckIsMember (prop, obj); 
 			}
 			var val = Expect<object> (ref exprs, "right hand side of assignment clause");
-			if (prop != null) prop.Set (obj, val);
-			else variable.Set (val);
+			if (prop != null)
+				prop.Set (obj, val);
+			else
+				variable.Set (val);
 			return new EvalResult (env, val);
 		}
 		
@@ -346,7 +350,8 @@ namespace NOP
 		{
 			if (!member.Info.DeclaringType.IsAssignableFrom (obj.GetType ()))
 				Error (obj, string.Format ("Object of type {0} does have member {1}", 
-					obj.GetType (), member));
+					obj.GetType (), member)
+				);
 		}
 	}
 }

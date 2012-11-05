@@ -4,7 +4,7 @@ using System.Reflection;
 using NOP.Collections;
 using ExprList = NOP.Collections.List;
 
-namespace NOP
+namespace NOP.Framework
 {
 	/// <summary>
 	/// Classes are by reference types that can contain all kind of definitions.
@@ -18,7 +18,8 @@ namespace NOP
 				.Concat (Values ())
 				.Concat (Variables ())
 				.Concat (Methods ())
-				.Concat (Properties ()));
+				.Concat (Properties ())
+			);
 			AddNestedTypes ();
 		}
 		

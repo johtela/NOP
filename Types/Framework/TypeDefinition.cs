@@ -1,12 +1,12 @@
-namespace NOP
+namespace NOP.Framework
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
 	using NOP.Collections;
-	using NameDef = System.Tuple<string, NOP.Definition>;
-	using NameType = System.Tuple<string, NOP.TypeDefinition>;
+	using NameDef = System.Tuple<string, NOP.Framework.Definition>;
+	using NameType = System.Tuple<string, NOP.Framework.TypeDefinition>;
 
 	/// <summary>
 	/// Type definition class represents a type that is defined inside a namespace.
@@ -51,7 +51,8 @@ namespace NOP
 			return (from ci in _type.GetConstructors (_bfInstance)
 				   select NewDef (new Function (ci))).Concat (
 				   from mi in _type.GetMethods (_bfStatic)
-				   select NewDef (new Function (mi)));
+				   select NewDef (new Function (mi))
+			);
 		}
 		
 		protected IEnumerable<NameDef> Values ()
@@ -67,7 +68,8 @@ namespace NOP
 				   where pi.CanWrite
 				   select NewDef (new Variable (pi))).Concat (
 				   from fi in _type.GetFields (_bfStatic)
-				   select NewDef (new Variable (fi)));
+				   select NewDef (new Variable (fi))
+			);
 		}
 				
 		protected IEnumerable<NameDef> Methods ()

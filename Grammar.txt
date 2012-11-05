@@ -3,8 +3,10 @@ definition of the grammar.
 
 SExp:			Literal | Symbol | List ( SExp* )
 		
-Module:			List ( Symbol("module") Symbol Definition* )
-Definition:		List ( Symbol("def") VariableExpression Expression )
+Definition			ModuleDefinition | TypeDefinition | MemberDefinition
+ModuleDefinition:	List ( Symbol("module") Symbol Definition* )
+TypeDefinition:		List ( Symbol("type") Symbol Definition* )
+MemberDefinition:	List ( Symbol("def") VariableExpression Expression )
 
 Expression:		SymbolExpression | 
 				LiteralExpression |

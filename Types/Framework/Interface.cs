@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using NOP.Collections;
 
-namespace NOP
+namespace NOP.Framework
 {
 	/// <summary>
 	/// Interface contains just abstract members, and no static definitions.

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using NOP.Collections;
 
-namespace NOP
+namespace NOP.Framework
 {
 	/// <summary>
 	/// Struct is similar to class, but a value type.
@@ -16,7 +16,8 @@ namespace NOP
 				.Concat (Values ())
 				.Concat (Variables ())
 				.Concat (Methods ())
-				.Concat (Properties ()));
+				.Concat (Properties ())
+			);
 			AddNestedTypes ();
 		}
 	}

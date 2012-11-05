@@ -88,10 +88,10 @@
     <Compile Include="Types\MonoType.cs" />
     <Compile Include="Types\Framework\Property.cs" />
     <Compile Include="Types\TypeExpr.cs" />
-    <Compile Include="Types\Namespace.cs" />
     <Compile Include="Syntax\LetExpression.cs" />
-    <Compile Include="Syntax\ModuleExpression.cs" />
-    <Compile Include="Syntax\DefinitionExpression.cs" />
+    <Compile Include="Syntax\Definition.cs" />
+    <Compile Include="Types\Framework\Namespace.cs" />
+    <Compile Include="Syntax\ModuleDefinition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

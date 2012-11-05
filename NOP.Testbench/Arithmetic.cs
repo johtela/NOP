@@ -33,7 +33,23 @@ namespace NOP.Testbench
 			get { return Value * Value; }
 		}
 	}
-	
+
+	public class Bingo
+	{
+		public class Bango : NOPFunc<int, int, int>
+		{
+			public override int Invoke (int arg1, int arg2)
+			{
+				return Call (arg1, arg2);
+			}
+
+			public static int Call (int x, int y)
+			{
+				return x + y;
+			}
+		}
+	}
+
 	public class MutableNumber
 	{
 		private int _value;
@@ -50,4 +66,3 @@ namespace NOP.Testbench
 		}
 	}
 }
-

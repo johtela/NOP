@@ -1,4 +1,4 @@
-namespace NOP
+namespace NOP.Framework
 {
 	using System;
 	using System.Reflection;
@@ -42,7 +42,7 @@ namespace NOP
 				{
 					_call = _methodBase is ConstructorInfo ?
 						(_methodBase as ConstructorInfo).AsFunction () :
-						(_methodBase as MethodInfo).AsFunction();
+						(_methodBase as MethodInfo).AsFunction ();
 				}
 				return _call;
 			}

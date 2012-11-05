@@ -3,6 +3,7 @@ namespace NOP.Testbench
 	using System;
 	using System.Linq;
 	using NOP;
+	using NOP.Framework;
 	using NOP.Collections;
 
 	public class InterpreterTests : ExprUser
@@ -48,7 +49,8 @@ namespace NOP.Testbench
 				Begin (
 					Define ("x", A (33)),
 					S ("x")
-				));
+			)
+			);
 		}
 		
 		[Test]
@@ -57,62 +59,8 @@ namespace NOP.Testbench
 			AssertEvaluatesTo ("bar",
 				If (A (false), 
 					A ("foo"),
-					A ("bar")
-				));
-		}
-		
-		[Test]
-		public void TestFunctionCall ()
-		{
-			AssertEvaluatesTo (3,
-				Call (Definition.Get<Arithmetic, Function> ("Add(Int32, Int32)"), A (1), A (2)));
-		}
-		
-		[Test]
-		public void TestValue ()
-		{
-			AssertEvaluatesTo (Math.PI, A (Definition.Get<Arithmetic, Value> ("Pi"))); 
-		}
-		
-		[Test]
-		public void TestVariable ()
-		{
-			var baseVar = Definition.Get<Arithmetic, Variable> ("Base");
-			
-			AssertEvaluatesTo (16,
-				Set (baseVar, A (16)),
-				A (baseVar));
-		}
-
-		[Test]
-		public void TestMethod ()
-		{
-			var method = Definition.Get<Number, Method> ("Add(NOP.Testbench.Number)");
-			var num1 = new Number (3);
-			var num2 = new Number (4);
-			
-			AssertEvaluatesTo (7,
-				Call (num1, method, A (num2)));
-		}
-		
-		[Test]
-		public void TestPropertyRead ()
-		{
-			var prop = Definition.Get<Number, Property> ("ValueSquared");
-			var num1 = new Number (3);
-			
-			AssertEvaluatesTo(9, Prop (num1, prop));
-		}
-		
-		[Test]
-		public void TestPropertyWrite ()
-		{
-			var prop = Definition.Get<MutableNumber, Property> ("Value");
-			var num = new MutableNumber (3);
-			
-			AssertEvaluatesTo(6,
-				Set(num, prop, A (6)),
-				Prop (num, prop));
+					A ("bar"))
+			);
 		}
 	}
 }

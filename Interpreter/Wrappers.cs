@@ -8,6 +8,7 @@
 	using SysColl = System.Collections.Generic;
 	using ExprList = NOP.Collections.List<object>;
 	using NOP.Collections;
+	using NOP.Framework;
 	
 	/// <summary>
 	/// Method and field wrappers.
@@ -39,7 +40,8 @@
 				args = args.Rest;
 				T2 arg2 = (T2)args.First;
 				return func (arg1, arg2);
-			});
+			}
+			);
 		}
 		
 		public static Func AsFunction (this ConstructorInfo ci)
@@ -53,8 +55,7 @@
 				var block = EvalParams (par, pis, vars);
 				block.Add (LExpr.New (ci, vars));
 				return new Func (LExpr.Lambda<Func> (LExpr.Block (vars, block), par).Compile ());
-			}
-			else
+			} else
 				return new Func (LExpr.Lambda<Func> (LExpr.New (ci), par).Compile ());
 		}
 		
@@ -74,8 +75,7 @@
 			{
 				block.Add (call);
 				block.Add (LExpr.Constant (null, typeof(object)));
-			}
-			else
+			} else
 				block.Add (LExpr.Convert (call, typeof(object)));
 			return new Func (LExpr.Lambda<Func> (LExpr.Block (vars, block), par).Compile ());			
 		}
@@ -84,13 +84,15 @@
 		{
 			CheckNoIndexers (pi);
 			return new Func<object> (LExpr.Lambda<Func<object>> 
-				(LExpr.Convert (LExpr.Property (null, pi), typeof(object))).Compile ());
+				(LExpr.Convert (LExpr.Property (null, pi), typeof(object))).Compile ()
+			);
 		}
 		
 		public static Func<object> AsValueGetter (this FieldInfo fi)
 		{
 			return new Func<object> (LExpr.Lambda<Func<object>> 
-				(LExpr.Convert (LExpr.Field (null, fi), typeof(object))).Compile ());
+				(LExpr.Convert (LExpr.Field (null, fi), typeof(object))).Compile ()
+			);
 		}
 		
 		public static Action<object> AsVariableSetter (this PropertyInfo pi)
@@ -99,7 +101,8 @@
 			var value = LExpr.Parameter (typeof(object), "value");
 			return new Action<object> (LExpr.Lambda<Action<object>> 
 				(LExpr.Assign (LExpr.Property (null, pi), 
-				LExpr.Convert (value, pi.PropertyType)), value).Compile ());
+				LExpr.Convert (value, pi.PropertyType)), value).Compile ()
+			);
 		}
 		
 		public static Action<object> AsVariableSetter (this FieldInfo fi)
@@ -107,7 +110,8 @@
 			var value = LExpr.Parameter (typeof(object), "value");
 			return new Action<object> (LExpr.Lambda<Action<object>>
 				(LExpr.Assign (LExpr.Field (null, fi), 
-				LExpr.Convert (value, fi.FieldType)), value).Compile ());
+				LExpr.Convert (value, fi.FieldType)), value).Compile ()
+			);
 		}
 
 		public static Func<object, object> AsPropertyGetter (this PropertyInfo pi)
@@ -116,7 +120,8 @@
 			var obj = LExpr.Parameter (typeof(object), "obj");
 			var target = LExpr.Convert (obj, pi.DeclaringType);
 			return new Func<object, object> (LExpr.Lambda<Func<object, object>> 
-				(LExpr.Convert (LExpr.Property (target, pi), typeof(object)), obj).Compile ());
+				(LExpr.Convert (LExpr.Property (target, pi), typeof(object)), obj).Compile ()
+			);
 		}
 		
 		public static Action<object, object> AsPropertySetter (this PropertyInfo pi)
@@ -127,7 +132,8 @@
 			var target = LExpr.Convert (obj, pi.DeclaringType);
 			return new Action<object, object> (LExpr.Lambda<Action<object, object>> 
 				(LExpr.Assign (LExpr.Property (target, pi), 
-				LExpr.Convert (value, pi.PropertyType)), obj, value).Compile ());
+				LExpr.Convert (value, pi.PropertyType)), obj, value).Compile ()
+			);
 		}
 		
 		public static Meth AsMethod (this MethodInfo mi)
@@ -147,8 +153,7 @@
 			{
 				block.Add (call);
 				block.Add (LExpr.Constant (null, typeof(object)));
-			}
-			else 
+			} else 
 				block.Add (LExpr.Convert (call, typeof(object)));
 			return new Meth (LExpr.Lambda<Meth> (LExpr.Block (vars, block), obj, args).Compile ());			
 		}

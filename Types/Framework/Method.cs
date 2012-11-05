@@ -3,7 +3,7 @@ using System.Reflection;
 using NOP.Collections;
 using ExprList = NOP.Collections.List;
 
-namespace NOP
+namespace NOP.Framework
 {
 	/// <summary>
 	/// Method of a class.

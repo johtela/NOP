@@ -182,35 +182,6 @@ namespace NOP
 		{
 			return new ListBuilder (S (function) | List.Create (args));
 		}
-		
-		#region Obsolete stuff
-		
-		public static ExprBuilder Call (Function function, params ExprBuilder[] args)
-		{
-			return new ListBuilder (A (function) | List.Create (args));
-		}
-
-		public static ExprBuilder Call (object obj, Method method, params ExprBuilder[] args)
-		{
-			return new ListBuilder (A (obj) | (A (method) | List.Create (args)));
-		}
-
-		public static ExprBuilder Prop (object obj, Property prop)
-		{
-			return new ListBuilder (List.Create (A (obj), A (prop)));
-		}
-
-		public static ExprBuilder Set (Variable variable, ExprBuilder value)
-		{
-			return new ListBuilder (List.Create (S ("set!"), A (variable), value));
-		}
-
-		public static ExprBuilder Set (object obj, Property property, ExprBuilder value)
-		{
-			return new ListBuilder (List.Create (S ("set!"), A (obj), A (property), value));
-		}
-		
-		#endregion
 	}
 	
 	/// <summary>

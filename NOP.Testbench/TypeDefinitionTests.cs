@@ -4,6 +4,7 @@ namespace NOP.Testbench
 	using System.Linq;
 	using System.Reflection;
 	using NOP;
+	using NOP.Framework;
 	using NOP.Collections;
 
 	public class Foo

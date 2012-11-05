@@ -1,4 +1,4 @@
-namespace NOP
+namespace NOP.Framework
 {
 	using System.Reflection;
 	using ExprList = NOP.Collections.List<object>;

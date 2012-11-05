@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NOP.Collections;
-using NameDef = System.Tuple<string, NOP.Definition>;
+using NameDef = System.Tuple<string, NOP.Framework.Definition>;
 
-namespace NOP
+namespace NOP.Framework
 {
 	/// <summary>
 	/// Enumurations just contain integer values.
@@ -24,7 +24,7 @@ namespace NOP
 			
 			for (int i = 0; i < names.Length; i++)
 			{
-				yield return new NameDef(names[i], new Value(() => values.GetValue(i)));
+				yield return new NameDef (names [i], new Value (() => values.GetValue (i)));
 			}
 		}
 	}

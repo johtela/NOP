@@ -3,7 +3,7 @@ using System.Reflection;
 using NOP.Collections;
 using ExprList = NOP.Collections.List;
 
-namespace NOP
+namespace NOP.Framework
 {
 	/// <summary>
 	/// Immutable value that is set only once at the creation time.
