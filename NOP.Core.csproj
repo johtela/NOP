@@ -92,6 +92,7 @@
     <Compile Include="Syntax\Definition.cs" />
     <Compile Include="Types\Framework\Namespace.cs" />
     <Compile Include="Syntax\ModuleDefinition.cs" />
+    <Compile Include="Syntax\AstNode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

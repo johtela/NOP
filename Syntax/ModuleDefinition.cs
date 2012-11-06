@@ -5,7 +5,6 @@ namespace NOP
 
 	public class ModuleDefinition
 	{
-		public readonly SymbolExpression Name;
 		public readonly List<Definition> Members;
 		
 //		public LetExpression (SExpr.List letExpr) : base (letExpr)
@@ -16,7 +15,7 @@ namespace NOP
 //			Body = Parse (Expect<SExpr> (ref sexps, "body of let expression"));		
 //		}
 		
-		public ModuleDefinition (SExpr.List classExpr)
+		public ModuleDefinition (SExpr.List moduleDef)
 		{
 
 		}
