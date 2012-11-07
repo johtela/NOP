@@ -39,11 +39,13 @@ namespace NOP
 		{
 			if (sexps.IsEmpty)
 				ParseError (SExp, string.Format ("Expected {0} but reached the end of list.", 
-					token));
+					token)
+				);
 			var sexp = sexps.First as T;
 			if (sexp == null)
 				ParseError (sexps.First, string.Format ("Expected {0} but got {1}.", 
-					token, sexps.First));
+					token, sexps.First)
+				);
 			sexps = sexps.Rest;
 			return sexp;
 		}
