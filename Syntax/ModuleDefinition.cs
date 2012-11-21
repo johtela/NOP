@@ -9,7 +9,7 @@ namespace NOP
 		
 		public ModuleDefinition (List<SExpr> moduleDef) : base (moduleDef)
 		{
-			var sexps = moduleDef.Rest.Rest;
+			var sexps = moduleDef.Rest;
 		}
 	}
 }
