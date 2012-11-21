@@ -5,14 +5,10 @@ namespace NOP
 
 	public abstract class Definition : AstNode
 	{
-		public readonly SymbolExpression Name;
-
-		public Definition (List<SExpr> definition) : base (definition.First)
+		public Definition (SExpr sexp) : base (sexp)
 		{
-			var sexps = definition.Rest;
-			Name = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "definition name"));
 		}
-
+		
 		public static Definition Parse (SExpr sexp)
 		{
 			var lst = sexp as SExpr.List;
@@ -26,11 +22,13 @@ namespace NOP
 
 			// Check if we have any of the special forms as first item.
 			switch (keyword.Name)
-			{
-				case "module":
-					return new ModuleDefinition (sexps);
+			{ 
+				case "type": 
+					return new TypeDefinition (lst);
+				case "def": 
+					return new MemberDefinition (lst);
 			}
-			// TODO: Left here!
+			ParseError (keyword, "Expected keyword 'type' or 'def'");
 			return null;
 		}
 	}

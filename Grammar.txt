@@ -3,8 +3,7 @@ definition of the grammar.
 
 SExp:			Literal | Symbol | List ( SExp* )
 		
-Definition			ModuleDefinition | TypeDefinition | MemberDefinition
-ModuleDefinition:	List ( Symbol("module") Symbol Definition* )
+Definition			TypeDefinition | MemberDefinition
 TypeDefinition:		List ( Symbol("type") Symbol Definition* )
 MemberDefinition:	List ( Symbol("def") VariableExpression Expression )
 
@@ -27,6 +26,9 @@ SetExpression:			List ( Symbol("set!") VariableExpression Expression )
 FunctionCallExpression: List ( Expression+ )
 VariableExpresson:		SymbolExpression | 
 						List ( SymbolExpression TypeExpression )
-TypeExpression:			SymbolExpression | 
-						List ( SymbolExpression TypeExpression+ ) | 
-						List ( Symbol("->") TypeExpression TypeExpression )
+TypeExpression:			BasicTypeExpression | 
+						GenericTypeExpression | 
+						LambdaTypeExpression 
+BasicTypeExpression:	SymbolExpression
+GenericTypeExpression:	List ( SymbolExpression TypeExpression+ )
+LambdaTypeExpression:	List ( Symbol("->") TypeExpression TypeExpression )

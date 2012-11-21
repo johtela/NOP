@@ -91,8 +91,14 @@
     <Compile Include="Syntax\LetExpression.cs" />
     <Compile Include="Syntax\Definition.cs" />
     <Compile Include="Types\Framework\Namespace.cs" />
-    <Compile Include="Syntax\ModuleDefinition.cs" />
     <Compile Include="Syntax\AstNode.cs" />
+    <Compile Include="Syntax\TypeDefinition.cs" />
+    <Compile Include="Syntax\MemberDefinition.cs" />
+    <Compile Include="Syntax\TypeExpression.cs" />
+    <Compile Include="Syntax\BasicTypeExpression.cs" />
+    <Compile Include="Syntax\GenericTypeExpression.cs" />
+    <Compile Include="Syntax\LambdaTypeExpression.cs" />
+    <Compile Include="Syntax\VariableExpression.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
