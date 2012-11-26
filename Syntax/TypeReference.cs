@@ -3,13 +3,13 @@ namespace NOP
 	using System;
 	using NOP.Collections;
 
-	public abstract class TypeExpression : Expression
+	public abstract class TypeReference : AstNode
 	{
-		public TypeExpression (SExpr sexp) : base (sexp)
+		public TypeReference (SExpr sexp) : base (sexp)
 		{
 		}
 
-		public static TypeExpression ParseTypeExpression (SExpr sexp)
+		public static TypeReference ParseTypeExpression (SExpr sexp)
 		{
 			var lst = sexp as SExpr.List;
 
@@ -21,13 +21,13 @@ namespace NOP
 				var typeName = sexps.First as SExpr.Symbol;
 
 				return typeName.Name == "->" ? 
-					(TypeExpression)new LambdaTypeExpression (lst) : 
-					(TypeExpression)new GenericTypeExpression (lst);
+					(TypeReference)new LambdaTypeReference (lst) : 
+					(TypeReference)new GenericTypeReference (lst);
 			}
 			var sym = sexp as SExpr.Symbol;
 			if (sym == null)
 				ParseError (sexp, "Expected a type expression");
-			return new BasicTypeExpression (sym);
+			return new BasicTypeReference (sym);
 		}
 	}
 }

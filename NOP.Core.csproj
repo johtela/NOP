@@ -94,11 +94,11 @@
     <Compile Include="Syntax\AstNode.cs" />
     <Compile Include="Syntax\TypeDefinition.cs" />
     <Compile Include="Syntax\MemberDefinition.cs" />
-    <Compile Include="Syntax\TypeExpression.cs" />
-    <Compile Include="Syntax\BasicTypeExpression.cs" />
-    <Compile Include="Syntax\GenericTypeExpression.cs" />
-    <Compile Include="Syntax\LambdaTypeExpression.cs" />
-    <Compile Include="Syntax\VariableExpression.cs" />
+    <Compile Include="Syntax\TypeReference.cs" />
+    <Compile Include="Syntax\BasicTypeReference.cs" />
+    <Compile Include="Syntax\GenericTypeReference.cs" />
+    <Compile Include="Syntax\LambdaTypeReference.cs" />
+    <Compile Include="Syntax\VariableDefinition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2,11 +2,11 @@ namespace NOP
 {
 	using System;
 
-	public class BasicTypeExpression : TypeExpression
+	public class BasicTypeReference : TypeReference
 	{
 		public readonly SymbolExpression TypeName;
 
-		public BasicTypeExpression (SExpr.Symbol typeName) : base (typeName)
+		public BasicTypeReference (SExpr.Symbol typeName) : base (typeName)
 		{
 			TypeName = new SymbolExpression (typeName);
 		}

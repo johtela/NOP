@@ -2,12 +2,12 @@ namespace NOP
 {
 	using System;
 
-	public class VariableExpression : Expression
+	public class VariableDefinition : AstNode
 	{
 		public readonly SymbolExpression Name;
-		public readonly TypeExpression Type;
+		public readonly TypeReference Type;
 
-		public VariableExpression (SExpr sexp) : base (sexp)
+		public VariableDefinition (SExpr sexp) : base (sexp)
 		{
 			Type = null;
 			var sym = sexp as SExpr.Symbol;
@@ -22,7 +22,7 @@ namespace NOP
 				{
 					var sexps = lst.Items;
 					Name = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "variable name"));
-					Type = TypeExpression.ParseTypeExpression (Expect<SExpr> (ref sexps, "type expression"));
+					Type = TypeReference.ParseTypeExpression (Expect<SExpr> (ref sexps, "type expression"));
 				}
 			}
 		}

@@ -5,13 +5,13 @@ SExp:			Literal | Symbol | List ( SExp* )
 		
 Definition			TypeDefinition | MemberDefinition
 TypeDefinition:		List ( Symbol("type") Symbol Definition* )
-MemberDefinition:	List ( Symbol("def") VariableExpression Expression )
+MemberDefinition:	List ( Symbol("def") VariableDefinition Expression )
 
 Expression:		SymbolExpression | 
 				LiteralExpression |
 				QuoteExpression |
 				IfExpression |
-				DefineExpression |
+				LetExpression |
 				LambdaExpression |
 				SetExpression |
 				FunctionCallExpression
@@ -20,15 +20,15 @@ LiteralExpression:		Literal
 SymbolExpression: 		Symbol
 QuoteExpression: 		List ( Symbol("quote") Expression )
 IfExpression:			List ( Symbol("if") Expression Expression Expression )
-DefineExpression:		List ( Symbol("let") VariableExpression Expression )
-LambdaExpression:		List ( Symbol("lambda") List ( VariableExpression* ) Expression+ )
-SetExpression:			List ( Symbol("set!") VariableExpression Expression )
+LetExpression:			List ( Symbol("let") VariableDefinition Expression )
+LambdaExpression:		List ( Symbol("lambda") List ( VariableDefinition* ) Expression+ )
+SetExpression:			List ( Symbol("set!") VariableDefinition Expression )
 FunctionCallExpression: List ( Expression+ )
-VariableExpresson:		SymbolExpression | 
+VariableDefinition:		SymbolExpression | 
 						List ( SymbolExpression TypeExpression )
-TypeExpression:			BasicTypeExpression | 
-						GenericTypeExpression | 
-						LambdaTypeExpression 
-BasicTypeExpression:	SymbolExpression
-GenericTypeExpression:	List ( SymbolExpression TypeExpression+ )
-LambdaTypeExpression:	List ( Symbol("->") TypeExpression TypeExpression )
+TypeReference:			BasicTypeRefence | 
+						GenericTypeReference | 
+						LambdaTypeReference 
+BasicTypeReference:		SymbolExpression
+GenericTypeReference:	List ( SymbolExpression TypeReference+ )
+LambdaTypeReference:	List ( Symbol("->") TypeReference TypeReference )

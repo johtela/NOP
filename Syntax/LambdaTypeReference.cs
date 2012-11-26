@@ -3,11 +3,11 @@ namespace NOP
 	using System;
 	using NOP.Collections;
 
-	public class LambdaTypeExpression : TypeExpression
+	public class LambdaTypeReference : TypeReference
 	{
-		public readonly TypeExpression ArgumentType, ResultType;
+		public readonly TypeReference ArgumentType, ResultType;
 
-		public LambdaTypeExpression (SExpr.List typeExpr) : base (typeExpr)
+		public LambdaTypeReference (SExpr.List typeExpr) : base (typeExpr)
 		{
 			var sexps = typeExpr.Items.Rest;
 			ArgumentType = ParseTypeExpression (Expect<SExpr> (ref sexps, "type"));

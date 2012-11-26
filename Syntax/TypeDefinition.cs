@@ -10,7 +10,7 @@ namespace NOP
 		
 		public TypeDefinition (SExpr.List typeDef) : base (typeDef)
 		{
-			var sexps = typeDef.Items.Rest.Rest;
+			var sexps = typeDef.Items.Rest;
 			Name = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "type name"));
 			Members = sexps.Map (sexp => Parse (sexp));
 		}
