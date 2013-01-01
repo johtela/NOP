@@ -221,6 +221,21 @@
 			return new Tuple<List<T>, List<T>> (first, last);
 		}
 
+        /// <summary>
+        /// Append an item at the end of the list.
+        /// </summary>
+        /// <param name="item">Item to be appended.</param>
+        /// <returns>A new list with <paramref name="item"/> as its last element.</returns>
+        public List<T> Append(T item)
+        {
+            return CopyUpTo (Empty).Bind ((prefixFirst, prefixLast) =>
+            {
+                var cons = Cons (item, Empty);
+                prefixLast.Rest = cons;
+                return prefixFirst.IsEmpty ? cons : prefixFirst;
+            });
+        }
+
 		/// <summary>
 		/// Return a list with a new item inserted before the specified item.
 		/// </summary>

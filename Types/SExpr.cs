@@ -9,6 +9,8 @@ namespace NOP
 	/// </summary>
 	public abstract class SExpr
 	{
+        public Func<SExpr, Visual> GenerateVisual { get; set; }
+
 		/// <summary>
 		/// Literal value.
 		/// </summary>

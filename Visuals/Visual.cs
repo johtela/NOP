@@ -83,7 +83,7 @@
 		/// Stack of visuals that are laid out either horizontally (left to right) or
 		/// vertically (top to bottom).
 		/// </summary>
-		private class _Stack : Visual
+		private sealed class _Stack : Visual
 		{
 			/// <summary>
 			/// The visuals in the stack.

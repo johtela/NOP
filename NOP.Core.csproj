@@ -53,6 +53,7 @@
     <Compile Include="Collections\TupleExtensions.cs" />
     <Compile Include="Collections\SubArray.cs" />
     <Compile Include="Collections\ArrayExtensions.cs" />
+    <Compile Include="Visuals\DefaultVisualGenerator.cs" />
     <Compile Include="Visuals\Visual.cs" />
     <Compile Include="Interpreter\Environment.cs" />
     <Compile Include="Interpreter\InitialEnv.cs" />
