@@ -3,8 +3,8 @@
 	using System;
 	using SeqVisual=System.Collections.Generic.IEnumerable<Visual>;
 	using System.Linq;
-	using Cairo;
 	using NOP.Collections;
+    using System.Drawing;
 	
 	/// <summary>
 	/// Enumeration for defining the stack direction.
@@ -26,6 +26,9 @@
 	/// </summary>
 	public abstract class Visual
 	{
+        private static Font _defaultFont = new Font ("Consolas", 12);
+        private static Brush _defaultBrush = Brushes.Black;
+
 		/// <summary>
 		/// An abstract method that calculates the size of a visual once it is constructed.
 		/// </summary>
@@ -33,7 +36,7 @@
 		/// drawn to.</param>
 		/// <returns>The desired size of the visual that should alwasys be smaller than 
 		/// the available space.</returns>
-		public abstract VisualBox CalculateSize (Context context);
+		public abstract VisualBox CalculateSize (Graphics gr);
 		
 		/// <summary>
 		/// Draw the visual into specified context using the available size.
@@ -41,7 +44,7 @@
 		/// <param name="context">The Cairo context to which the visual is drawn to.</param>
 		/// <param name='availableSize'>The available size into which the visual should
 		/// fit.</param>
-		public abstract void Draw (Context context, VisualBox availableSize);
+		public abstract void Draw (Graphics gr, VisualBox availableSize);
 		
 		/// <summary>
 		/// A label that renders some static text into the output.
@@ -64,19 +67,19 @@
 			/// <summary>
 			/// Calculates the size of the label.
 			/// </summary>
-			public override VisualBox CalculateSize (Context context)
+			public override VisualBox CalculateSize (Graphics gr)
 			{
-				return new VisualBox (context.TextExtents (Text).XAdvance, context.FontExtents.Height);
+				return new VisualBox (gr.MeasureString(Text, _defaultFont).Width, _defaultFont.Height);
 			}
 			
 			/// <summary>
 			/// Draw the label into the specified context.
 			/// </summary>
-			public override void Draw (Context context, VisualBox availableSize)
-			{
-				context.MoveTo (0, availableSize.Height);
-				context.ShowText (Text);
-			}
+            public override void Draw (Graphics gr, VisualBox availableSize)
+            {
+                var pos = new PointF (0, 0);
+                gr.DrawString (Text, _defaultFont, _defaultBrush, pos);
+            }
 		}
 		
 		/// <summary>
@@ -132,11 +135,11 @@
 			/// heights of the visuals in it. The width of the stack is the with of 
 			/// the widest item.
 			/// </description>
-			public override VisualBox CalculateSize (Context context)
+			public override VisualBox CalculateSize (Graphics gr)
 			{
 				return Items.Fold (VisualBox.Empty, (acc, v) => 
 				{
-					var box = v.CalculateSize (context);
+					var box = v.CalculateSize (gr);
 					return Direction == StackDirection.Horizontal ?
 						acc.VMax (box).HAdd (box) :
 						acc.HMax (box).VAdd (box);
@@ -146,7 +149,7 @@
 			/// <summary>
 			/// Calulate the horizontal offset of a visual based on the alignment.
 			/// </summary>
-			private double DeltaX (double outerWidth, double innerWidth)
+			private float DeltaX (float outerWidth, float innerWidth)
 			{
 				switch (HorizAlign)
 				{
@@ -157,9 +160,9 @@
 			}
 			
 			/// <summary>
-			/// Calulate the vertival offset of a visual based on the alignment.
+			/// Calulate the vertical offset of a visual based on the alignment.
 			/// </summary>
-			private double DeltaY (double outerHeight, double innerHeight)
+			private float DeltaY (float outerHeight, float innerHeight)
 			{
 				switch (VertAlign)
 				{
@@ -172,32 +175,32 @@
 			/// <summary>
 			/// Draw the stack into the specified context.
 			/// </summary>
-			public override void Draw (Context context, VisualBox availableSize)
+			public override void Draw (Graphics gr, VisualBox availableSize)
 			{
-				var stack = CalculateSize (context);
+				var stack = CalculateSize (gr);
 				
 				foreach (Visual visual in Items)
 				{
 					if (availableSize.IsEmpty) break;
 					
-					var inner = visual.CalculateSize (context);
+					var inner = visual.CalculateSize (gr);
 					var outer = Direction == StackDirection.Horizontal ?
 						new VisualBox (inner.Width, stack.Height) :
 						new VisualBox (stack.Width, inner.Height);
-					context.Save ();
-					context.Translate (DeltaX (outer.Width, inner.Width), 
+					var st = gr.Save ();
+					gr.TranslateTransform (DeltaX (outer.Width, inner.Width), 
 						DeltaY (outer.Height, inner.Height));
-					visual.Draw (context, inner);
-					context.Restore ();
+					visual.Draw (gr, inner);
+					gr.Restore (st);
 					
 					if (Direction == StackDirection.Horizontal)
 					{
-						context.Translate (outer.Width, 0);
+						gr.TranslateTransform (outer.Width, 0);
 						availableSize = availableSize.HSub (outer);
 					}
 					else
 					{
-						context.Translate (0, outer.Height);
+						gr.TranslateTransform (0, outer.Height);
 						availableSize = availableSize.VSub (outer);
 					}
 				}

@@ -40,7 +40,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="Mono.Cairo" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\Map.cs" />
@@ -53,6 +54,9 @@
     <Compile Include="Collections\TupleExtensions.cs" />
     <Compile Include="Collections\SubArray.cs" />
     <Compile Include="Collections\ArrayExtensions.cs" />
+    <Compile Include="Testing\VisualTestWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Visuals\DefaultVisualGenerator.cs" />
     <Compile Include="Visuals\Visual.cs" />
     <Compile Include="Interpreter\Environment.cs" />

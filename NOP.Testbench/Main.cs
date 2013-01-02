@@ -3,6 +3,7 @@ namespace NOP.Testbench
 	using System;
 	using System.Collections.Generic;
 	using NOP;
+    using NOP.Testing;
 	
 	class Runner
 	{
@@ -16,6 +17,11 @@ namespace NOP.Testbench
 				new TypeDefinitionTests (),
 				new TypeCheckingTests (),
 				new ParserTests ());
-		}
+
+            using (var tf = new VisualTestWindow (null))
+            {
+                tf.ShowDialog ();
+            }
+        }
 	}
 }

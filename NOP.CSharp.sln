@@ -5,31 +5,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NOP.Core", "NOP.Core.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NOP.Testbench", "NOP.Testbench\NOP.Testbench.csproj", "{38209F25-6A1F-4AD2-A0B7-123E63687CFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NOP.UI", "NOP.UI\NOP.UI.csproj", "{DC4C44C3-27A9-434A-BAE9-AD02AFB118E3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
 		Default|Any CPU = Default|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{38209F25-6A1F-4AD2-A0B7-123E63687CFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{38209F25-6A1F-4AD2-A0B7-123E63687CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38209F25-6A1F-4AD2-A0B7-123E63687CFC}.Default|Any CPU.ActiveCfg = Debug|Any CPU
 		{38209F25-6A1F-4AD2-A0B7-123E63687CFC}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{38209F25-6A1F-4AD2-A0B7-123E63687CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38209F25-6A1F-4AD2-A0B7-123E63687CFC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC4C44C3-27A9-434A-BAE9-AD02AFB118E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC4C44C3-27A9-434A-BAE9-AD02AFB118E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC4C44C3-27A9-434A-BAE9-AD02AFB118E3}.Default|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC4C44C3-27A9-434A-BAE9-AD02AFB118E3}.Default|Any CPU.Build.0 = Debug|Any CPU
-		{DC4C44C3-27A9-434A-BAE9-AD02AFB118E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC4C44C3-27A9-434A-BAE9-AD02AFB118E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = NOP.Testbench\NOP.Testbench.csproj

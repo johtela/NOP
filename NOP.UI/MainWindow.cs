@@ -24,7 +24,7 @@ namespace NOP.UI
 			{
 				var size = new VisualBox (args.Event.Area.Width, args.Event.Area.Height);
 				
-				context.SelectFontFace ("Monospace", FontSlant.Normal, FontWeight.Normal);
+				context.SelectFontFace ("Consolas", FontSlant.Normal, FontWeight.Normal);
 				context.SetFontSize (12);
 				var visual = TestVisual ();
 				

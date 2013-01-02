@@ -1,6 +1,7 @@
 namespace NOP
 {
 	using System;
+    using Visuals;
 	
 	/// <summary>
 	/// The definition of the LISP S-expression. The basic element from which 
@@ -21,6 +22,7 @@ namespace NOP
 			public Literal (object value)
 			{
 				Value = value;
+                GenerateVisual = DefaultVisualGenerator.Literal;
 			}
 			
 			public override bool Equals (object obj)
@@ -50,6 +52,7 @@ namespace NOP
 			public Symbol (string name)
 			{
 				Name = name;
+                GenerateVisual = DefaultVisualGenerator.Symbol;
 			}
 			
 			public override bool Equals (object obj)
@@ -79,6 +82,7 @@ namespace NOP
 			public List (Collections.List<SExpr> items)
 			{
 				Items = items;
+                GenerateVisual = DefaultVisualGenerator.HList;
 			}
 			
 			public override bool Equals (object obj)

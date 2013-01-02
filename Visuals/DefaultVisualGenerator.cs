@@ -5,7 +5,10 @@ using System.Text;
 
 namespace NOP.Visuals
 {
-    class DefaultVisualGenerator
+    /// <summary>
+    /// Default generator functions for s-expressions.
+    /// </summary>
+    public class DefaultVisualGenerator
     {
         public static Visual Literal(SExpr sexp)
         {

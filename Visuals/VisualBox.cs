@@ -10,12 +10,12 @@ namespace NOP
 		/// <summary>
 		/// The width of the box.
 		/// </summary>
-		public readonly double Width;
+		public readonly float Width;
 		
 		/// <summary>
 		/// The height of the box.
 		/// </summary>
-		public readonly double Height;
+		public readonly float Height;
 		
 		/// <summary>
 		/// Empty box.
@@ -27,7 +27,7 @@ namespace NOP
 		/// </summary>
 		/// <param name='width'>The width of the box.</param>
 		/// <param name='height'>The height of the box.</param>
-		public VisualBox (double width, double height)
+		public VisualBox (float width, float height)
 		{
 			Width = width;
 			Height = height;
