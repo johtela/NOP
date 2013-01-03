@@ -28,10 +28,11 @@ namespace NOP.Visuals
         private static IEnumerable<Visual> FormatHList (SExpr.List list)
         {
             yield return Visual.Label ("(");
-            foreach (SExpr se in list.Items)
+            for (var l = list.Items; !l.IsEmpty; l = l.Rest)
             {
-                yield return se.GenerateVisual (se);
-                yield return Visual.Label (" ");
+                yield return l.First.GenerateVisual (l.First);
+                if (!l.Rest.IsEmpty)
+                    yield return Visual.Label (" ");
             }
             yield return Visual.Label (")");
         }

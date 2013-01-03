@@ -40,8 +40,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\Map.cs" />
@@ -54,7 +56,7 @@
     <Compile Include="Collections\TupleExtensions.cs" />
     <Compile Include="Collections\SubArray.cs" />
     <Compile Include="Collections\ArrayExtensions.cs" />
-    <Compile Include="Testing\VisualTestWindow.cs">
+    <Compile Include="Testing\VisualConsole.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Visuals\DefaultVisualGenerator.cs" />
@@ -64,7 +66,7 @@
     <Compile Include="Interpreter\Interpreter.cs" />
     <Compile Include="Testing\ExprBuilder.cs" />
     <Compile Include="Testing\Tester.cs" />
-    <Compile Include="Visuals\VisualBox.cs" />
+    <Compile Include="Visuals\VBox.cs" />
     <Compile Include="Interpreter\Wrappers.cs" />
     <Compile Include="Types\SExpr.cs" />
     <Compile Include="Syntax\Expression.cs" />
@@ -104,6 +106,9 @@
     <Compile Include="Syntax\GenericTypeReference.cs" />
     <Compile Include="Syntax\LambdaTypeReference.cs" />
     <Compile Include="Syntax\VariableDefinition.cs" />
+    <Compile Include="Visuals\VisualControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -113,7 +118,6 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup />
   <ItemGroup>
     <None Include="Grammar.txt" />
   </ItemGroup>

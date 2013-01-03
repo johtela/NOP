@@ -26,7 +26,7 @@
 	/// </summary>
 	public abstract class Visual
 	{
-        private static Font _defaultFont = new Font ("Consolas", 12);
+        private static Font _defaultFont = new Font ("Consolas", 11);
         private static Brush _defaultBrush = Brushes.Black;
 
 		/// <summary>
@@ -36,7 +36,7 @@
 		/// drawn to.</param>
 		/// <returns>The desired size of the visual that should alwasys be smaller than 
 		/// the available space.</returns>
-		public abstract VisualBox CalculateSize (Graphics gr);
+		public abstract VBox CalculateSize (Graphics gr);
 		
 		/// <summary>
 		/// Draw the visual into specified context using the available size.
@@ -44,7 +44,7 @@
 		/// <param name="context">The Cairo context to which the visual is drawn to.</param>
 		/// <param name='availableSize'>The available size into which the visual should
 		/// fit.</param>
-		public abstract void Draw (Graphics gr, VisualBox availableSize);
+		public abstract void Draw (Graphics gr, VBox availableSize);
 		
 		/// <summary>
 		/// A label that renders some static text into the output.
@@ -67,15 +67,15 @@
 			/// <summary>
 			/// Calculates the size of the label.
 			/// </summary>
-			public override VisualBox CalculateSize (Graphics gr)
+			public override VBox CalculateSize (Graphics gr)
 			{
-				return new VisualBox (gr.MeasureString(Text, _defaultFont).Width, _defaultFont.Height);
+				return new VBox (gr.MeasureString(Text, _defaultFont).Width, _defaultFont.Height);
 			}
 			
 			/// <summary>
 			/// Draw the label into the specified context.
 			/// </summary>
-            public override void Draw (Graphics gr, VisualBox availableSize)
+            public override void Draw (Graphics gr, VBox availableSize)
             {
                 var pos = new PointF (0, 0);
                 gr.DrawString (Text, _defaultFont, _defaultBrush, pos);
@@ -135,9 +135,9 @@
 			/// heights of the visuals in it. The width of the stack is the with of 
 			/// the widest item.
 			/// </description>
-			public override VisualBox CalculateSize (Graphics gr)
+			public override VBox CalculateSize (Graphics gr)
 			{
-				return Items.Fold (VisualBox.Empty, (acc, v) => 
+				return Items.Fold (VBox.Empty, (acc, v) => 
 				{
 					var box = v.CalculateSize (gr);
 					return Direction == StackDirection.Horizontal ?
@@ -175,7 +175,7 @@
 			/// <summary>
 			/// Draw the stack into the specified context.
 			/// </summary>
-			public override void Draw (Graphics gr, VisualBox availableSize)
+			public override void Draw (Graphics gr, VBox availableSize)
 			{
 				var stack = CalculateSize (gr);
 				
@@ -185,8 +185,8 @@
 					
 					var inner = visual.CalculateSize (gr);
 					var outer = Direction == StackDirection.Horizontal ?
-						new VisualBox (inner.Width, stack.Height) :
-						new VisualBox (stack.Width, inner.Height);
+						new VBox (inner.Width, stack.Height) :
+						new VBox (stack.Width, inner.Height);
 					var st = gr.Save ();
 					gr.TranslateTransform (DeltaX (outer.Width, inner.Width), 
 						DeltaY (outer.Height, inner.Height));

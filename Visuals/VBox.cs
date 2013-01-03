@@ -5,7 +5,7 @@ namespace NOP
 	/// <summary>
 	/// Structure that is used to layout visuals.
 	/// </summary>
-	public struct VisualBox
+	public struct VBox
 	{
 		/// <summary>
 		/// The width of the box.
@@ -20,14 +20,14 @@ namespace NOP
 		/// <summary>
 		/// Empty box.
 		/// </summary>
-		public static readonly VisualBox Empty = new VisualBox (0, 0);
+		public static readonly VBox Empty = new VBox (0, 0);
 		
 		/// <summary>
-		/// Initializes a new instance of the <see cref="NOP.VisualBox"/> struct.
+		/// Initializes a new instance of the <see cref="NOP.VBox"/> struct.
 		/// </summary>
 		/// <param name='width'>The width of the box.</param>
 		/// <param name='height'>The height of the box.</param>
-		public VisualBox (float width, float height)
+		public VBox (float width, float height)
 		{
 			Width = width;
 			Height = height;
@@ -36,69 +36,69 @@ namespace NOP
 		/// <summary>
 		/// Add another box to horizontally to this one.
 		/// </summary>
-		public VisualBox HAdd (VisualBox other)
+		public VBox HAdd (VBox other)
 		{
-			return new VisualBox (Width + other.Width, Height);
+			return new VBox (Width + other.Width, Height);
 		}
 		
 		/// <summary>
 		/// Subtract another box from this one horizontally.
 		/// </summary>
-		public VisualBox HSub (VisualBox other)
+		public VBox HSub (VBox other)
 		{
-			return new VisualBox (Width - other.Width, Height);
+			return new VBox (Width - other.Width, Height);
 		}
 		
 		/// <summary>
 		/// Returns the horizontal union with another box. This means that the
 		/// width of the result is the maximum of the box widths.
 		/// </summary>
-		public VisualBox HMax (VisualBox other)
+		public VBox HMax (VBox other)
 		{
-			return new VisualBox (Math.Max (Width, other.Width), Height);
+			return new VBox (Math.Max (Width, other.Width), Height);
 		}
 		
 		/// <summary>
 		/// Returns the horizontal intersection with another box. This means that the
 		/// width of the result is the minimum of the box widths.
 		/// </summary>
-		public VisualBox HMin (VisualBox other)
+		public VBox HMin (VBox other)
 		{
-			return new VisualBox (Math.Min (Width, other.Width), Height);
+			return new VBox (Math.Min (Width, other.Width), Height);
 		}
 
 		/// <summary>
 		/// Add another box to vertically to this one.
 		/// </summary>
-		public VisualBox VAdd (VisualBox other)
+		public VBox VAdd (VBox other)
 		{
-			return new VisualBox (Width, Height + other.Height);
+			return new VBox (Width, Height + other.Height);
 		}
 		
 		/// <summary>
 		/// Subtract another box from this one vertically.
 		/// </summary>
-		public VisualBox VSub (VisualBox other)
+		public VBox VSub (VBox other)
 		{
-			return new VisualBox (Width, Height - other.Height);
+			return new VBox (Width, Height - other.Height);
 		}
 		
 		/// <summary>
 		/// Returns the vertical union with another box. This means that the
 		/// height of the result is the maximum of the box heights.
 		/// </summary>
-		public VisualBox VMax (VisualBox other)
+		public VBox VMax (VBox other)
 		{
-			return new VisualBox (Width, Math.Max (Height, other.Height));
+			return new VBox (Width, Math.Max (Height, other.Height));
 		}
 		
 		/// <summary>
 		/// Returns the vertical intersection with another box. This means that the
 		/// height of the result is the minimum of the box heights.
 		/// </summary>
-		public VisualBox VMin (VisualBox other)
+		public VBox VMin (VBox other)
 		{
-			return new VisualBox (Width, Math.Min (Height, other.Height));
+			return new VBox (Width, Math.Min (Height, other.Height));
 		}
 		
 		/// <summary>

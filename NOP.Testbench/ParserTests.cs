@@ -4,12 +4,15 @@ namespace NOP.Testbench
 	using System.Linq;
 	using NOP;
 	using NOP.Collections;
+    using NOP.Testing;
 
 	public class ParserTests : ExprUser
 	{
 		private void AssertParsesTo<T> (string type, ExprBuilder eb) where T : Expression
 		{
-			var expr = Expression.Parse (eb.Build ());
+            var sexp = eb.Build ();
+            Runner.VConsole.ShowVisual (sexp.GenerateVisual (sexp));
+			var expr = Expression.Parse (sexp);
 			Check.IsOfType<T> (expr);
 			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
 		}
