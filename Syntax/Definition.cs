@@ -22,7 +22,7 @@ namespace NOP
 
 			// Check if we have any of the special forms as first item.
 			switch (keyword.Name)
-			{ 
+			{
 				case "type": 
 					return new TypeDefinition (lst);
 				case "def": 

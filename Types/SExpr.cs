@@ -10,7 +10,7 @@ namespace NOP
 	/// </summary>
 	public abstract class SExpr
 	{
-        public Func<SExpr, Visual> GenerateVisual { get; set; }
+        public Visual Depiction { get; set; }
 
 		/// <summary>
 		/// Literal value.
@@ -18,12 +18,12 @@ namespace NOP
 		public class Literal : SExpr
 		{
 			public readonly object Value;
-		
-			public Literal (object value)
-			{
-				Value = value;
-                GenerateVisual = DefaultVisualGenerator.Literal;
-			}
+
+            public Literal (object value)
+            {
+                Value = value;
+                Depiction = Visual.Literal (this);
+            }
 			
 			public override bool Equals (object obj)
 			{
@@ -48,12 +48,12 @@ namespace NOP
 		public class Symbol : SExpr
 		{
 			public readonly string Name;
-		
-			public Symbol (string name)
-			{
-				Name = name;
-                GenerateVisual = DefaultVisualGenerator.Symbol;
-			}
+
+            public Symbol (string name)
+            {
+                Name = name;
+                Depiction = Visual.Symbol (this);
+            }
 			
 			public override bool Equals (object obj)
 			{
@@ -82,7 +82,7 @@ namespace NOP
 			public List (Collections.List<SExpr> items)
 			{
 				Items = items;
-                GenerateVisual = DefaultVisualGenerator.HList;
+                Depiction = Visual.HList (this);
 			}
 			
 			public override bool Equals (object obj)

@@ -207,6 +207,29 @@
 			}
 		}
 
+        /// <summary>
+        /// Use the visual inside a S-expression.
+        /// </summary>
+        class _Indirect : Visual
+        {
+            public readonly SExpr SExpr;
+
+            public _Indirect (SExpr sexp)
+            {
+                SExpr = sexp;
+            }
+
+            public override VBox CalculateSize (Graphics gr)
+            {
+                return SExpr.Depiction.CalculateSize (gr);
+            }
+
+            public override void Draw (Graphics gr, VBox availableSize)
+            {
+                SExpr.Depiction.Draw (gr, availableSize);
+            }
+        }
+
 		/// <summary>
 		/// Create a new label.
 		/// </summary>
@@ -246,5 +269,58 @@
 		{
 			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
 		}
+
+        /// <summary>
+        /// Create an indirect visual.
+        /// </summary>
+        public static Visual Indirect(SExpr sexp)
+        {
+            return new _Indirect (sexp);
+        }
+
+        /// <summary>
+        /// Create a visual for a symbol S-expression.
+        /// </summary>
+        public static Visual Symbol (SExpr sexp)
+        {
+            return Label (((SExpr.Symbol)sexp).Name);
+        }
+
+        /// <summary>
+        /// Create a visual for a literal S-expression.
+        /// </summary>
+        public static Visual Literal (SExpr sexp)
+        {
+            return Label (((SExpr.Literal)sexp).Value.ToString ());
+        }
+
+        /// <summary>
+        /// Create a horizontal list of S-expressions.
+        /// </summary>
+        public static Visual HList (SExpr sexp)
+        {
+            return HorizontalStack (VAlign.Bottom, FormatHList ((SExpr.List)sexp));
+        }
+
+        /// <summary>
+        /// Return a vertical list of S-expressions.
+        /// </summary>
+        public static Visual VList (SExpr sexp)
+        {
+            return VerticalStack (HAlign.Left,
+                ((SExpr.List)sexp).Items.Map (se => Indirect (se)));
+        }
+
+        private static SeqVisual FormatHList (SExpr.List list)
+        {
+            yield return Visual.Label ("(");
+            for (var l = list.Items; !l.IsEmpty; l = l.Rest)
+            {
+                yield return Indirect(l.First);
+                if (!l.Rest.IsEmpty)
+                    yield return Visual.Label (" ");
+            }
+            yield return Visual.Label (")");
+        }
 	}
 }

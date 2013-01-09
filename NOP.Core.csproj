@@ -59,7 +59,6 @@
     <Compile Include="Testing\VisualConsole.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Visuals\DefaultVisualGenerator.cs" />
     <Compile Include="Visuals\Visual.cs" />
     <Compile Include="Interpreter\Environment.cs" />
     <Compile Include="Interpreter\InitialEnv.cs" />

@@ -11,11 +11,11 @@ namespace NOP.Testbench
 		private void AssertParsesTo<T> (string type, ExprBuilder eb) where T : Expression
 		{
             var sexp = eb.Build ();
-            Runner.VConsole.ShowVisual (sexp.GenerateVisual (sexp));
 			var expr = Expression.Parse (sexp);
-			Check.IsOfType<T> (expr);
+            Check.IsOfType<T> (expr);
 			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
-		}
+            Runner.VConsole.ShowVisual (sexp.Depiction);
+        }
 		
 		[Test]
 		public void TestAtom ()

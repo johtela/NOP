@@ -1,6 +1,8 @@
 namespace NOP
 {
 	using System;
+    using Collections;
+    using Visuals;
 
 	public class IfExpression : Expression
 	{
@@ -15,6 +17,14 @@ namespace NOP
 			ThenExpression = Parse (Expect<SExpr> (ref sexps, "then expression"));
 			ElseExpression = Parse (Expect<SExpr> (ref sexps, "else expression"));
 		}
+
+        public void ChangeVisualGenerators()
+        {
+            var skeyword = ((SExpr.List)SExp).Items.First;
+            var scond = Condition.SExp;
+            var sthen = ThenExpression.SExp;
+            var selse = ElseExpression.SExp;
+        }
 		
 		public override TypeExpr GetTypeExpr ()
 		{
