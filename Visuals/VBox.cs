@@ -1,6 +1,7 @@
 namespace NOP
 {
 	using System;
+    using System.Drawing;
 	
 	/// <summary>
 	/// Structure that is used to layout visuals.
@@ -109,7 +110,12 @@ namespace NOP
 		{
 			get { return Width <= 0 || Height <= 0; }
 		}
-		
+	
+	    public SizeF AsSizeF
+        {
+            get { return new SizeF (Width, Height); }
+        }
+
 		public override string ToString ()
 		{
 			return string.Format ("({0}, {1})", Width, Height);

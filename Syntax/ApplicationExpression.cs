@@ -1,6 +1,7 @@
 namespace NOP
 {
 	using System;
+    using System.Linq;
 	using Collections;
 	
 	public class ApplicationExpression : Expression
@@ -27,5 +28,10 @@ namespace NOP
 				te = TypeExpr.Builder.App (te, pars.First.GetTypeExpr ());
 			return te;
 		}
+
+        protected override System.Collections.Generic.IEnumerable<AstNode> GetChildNodes ()
+        {
+            return FuncName | Parameters;
+        }
 	}
 }

@@ -5,6 +5,7 @@
 	using System.Linq;
 	using NOP.Collections;
     using System.Drawing;
+    using System.Drawing.Drawing2D;
 	
 	/// <summary>
 	/// Enumeration for defining the stack direction.
@@ -28,6 +29,7 @@
 	{
         private static Font _defaultFont = new Font ("Consolas", 11);
         private static Brush _defaultBrush = Brushes.Black;
+        private static Pen _rectPen = new Pen (Color.Gray, 1) { DashStyle = DashStyle.Dot };
 
 		/// <summary>
 		/// An abstract method that calculates the size of a visual once it is constructed.
@@ -36,7 +38,7 @@
 		/// drawn to.</param>
 		/// <returns>The desired size of the visual that should alwasys be smaller than 
 		/// the available space.</returns>
-		public abstract VBox CalculateSize (Graphics gr);
+		protected abstract VBox CalculateSize (Graphics gr);
 		
 		/// <summary>
 		/// Draw the visual into specified context using the available size.
@@ -44,8 +46,18 @@
 		/// <param name="context">The Cairo context to which the visual is drawn to.</param>
 		/// <param name='availableSize'>The available size into which the visual should
 		/// fit.</param>
-		public abstract void Draw (Graphics gr, VBox availableSize);
+		protected abstract void Draw (Graphics gr, VBox availableSize);
 		
+        public void Render (Graphics gr, VBox availableSize)
+        {
+            Draw (gr, availableSize);
+        }
+
+        public VBox GetSize (Graphics gr)
+        {
+            return CalculateSize (gr);
+        }
+
 		/// <summary>
 		/// A label that renders some static text into the output.
 		/// </summary>
@@ -67,18 +79,19 @@
 			/// <summary>
 			/// Calculates the size of the label.
 			/// </summary>
-			public override VBox CalculateSize (Graphics gr)
+			protected override VBox CalculateSize (Graphics gr)
 			{
-				return new VBox (gr.MeasureString(Text, _defaultFont).Width, _defaultFont.Height);
+				return new VBox (gr.MeasureString(Text, _defaultFont).Width , _defaultFont.Height);
 			}
 			
 			/// <summary>
 			/// Draw the label into the specified context.
 			/// </summary>
-            public override void Draw (Graphics gr, VBox availableSize)
+            protected override void Draw (Graphics gr, VBox availableSize)
             {
                 var pos = new PointF (0, 0);
                 gr.DrawString (Text, _defaultFont, _defaultBrush, pos);
+                //gr.DrawRectangle (_rectPen, 0, 0, availableSize.Width, availableSize.Height);
             }
 		}
 		
@@ -135,7 +148,7 @@
 			/// heights of the visuals in it. The width of the stack is the with of 
 			/// the widest item.
 			/// </description>
-			public override VBox CalculateSize (Graphics gr)
+            protected override VBox CalculateSize (Graphics gr)
 			{
 				return Items.Fold (VBox.Empty, (acc, v) => 
 				{
@@ -175,7 +188,7 @@
 			/// <summary>
 			/// Draw the stack into the specified context.
 			/// </summary>
-			public override void Draw (Graphics gr, VBox availableSize)
+            protected override void Draw (Graphics gr, VBox availableSize)
 			{
 				var stack = CalculateSize (gr);
 				
@@ -190,7 +203,7 @@
 					var st = gr.Save ();
 					gr.TranslateTransform (DeltaX (outer.Width, inner.Width), 
 						DeltaY (outer.Height, inner.Height));
-					visual.Draw (gr, inner);
+					visual.Render (gr, inner);
 					gr.Restore (st);
 					
 					if (Direction == StackDirection.Horizontal)
@@ -219,12 +232,12 @@
                 SExpr = sexp;
             }
 
-            public override VBox CalculateSize (Graphics gr)
+            protected override VBox CalculateSize (Graphics gr)
             {
                 return SExpr.Depiction.CalculateSize (gr);
             }
 
-            public override void Draw (Graphics gr, VBox availableSize)
+            protected override void Draw (Graphics gr, VBox availableSize)
             {
                 SExpr.Depiction.Draw (gr, availableSize);
             }
@@ -299,7 +312,7 @@
         /// </summary>
         public static Visual HList (SExpr sexp)
         {
-            return HorizontalStack (VAlign.Bottom, FormatHList ((SExpr.List)sexp));
+            return HorizontalStack (VAlign.Bottom, FromSExpList ((SExpr.List)sexp));
         }
 
         /// <summary>
@@ -307,20 +320,25 @@
         /// </summary>
         public static Visual VList (SExpr sexp)
         {
-            return VerticalStack (HAlign.Left,
-                ((SExpr.List)sexp).Items.Map (se => Indirect (se)));
+            return VerticalStack (HAlign.Left, FromSExpList ((SExpr.List)sexp));
         }
 
-        private static SeqVisual FormatHList (SExpr.List list)
+        /// <summary>
+        /// Surrond a visual horizontally by parentheses.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Visual Parenthesize (Visual v)
         {
-            yield return Visual.Label ("(");
-            for (var l = list.Items; !l.IsEmpty; l = l.Rest)
-            {
-                yield return Indirect(l.First);
-                if (!l.Rest.IsEmpty)
-                    yield return Visual.Label (" ");
-            }
-            yield return Visual.Label (")");
+            return HorizontalStack (VAlign.Center, Label ("("), v, Label (")"));
+        }
+
+        /// <summary>
+        /// Map a list of S-expressions to a sequence of visuals.
+        /// </summary>
+        private static SeqVisual FromSExpList (SExpr.List list)
+        {
+            return list.Items.Map (se => Indirect (se));
         }
 	}
 }

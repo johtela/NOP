@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace NOP
+﻿namespace NOP
 {
 	/// <summary>
 	/// The runtime type corresponding to a function type. 

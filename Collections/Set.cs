@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace NOP.Collections
 {
-	/// <summary>
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
+    /// <summary>
 	/// Exception that is thrown if an empty set is accessed.
 	/// </summary>
 	public class EmptySetException : Exception

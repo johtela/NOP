@@ -66,7 +66,16 @@ namespace NOP
 				return true;
 			}
 			return false;
-		}		
+		}
+	
+        /// <summary>
+        /// Return the list of abstract syntax tree nodes under this node.
+        /// Must be overridden by AST nodes that have children.
+        /// </summary>
+        protected virtual System.Collections.Generic.IEnumerable<AstNode> GetChildNodes()
+        {
+            return List<AstNode>.Empty;
+        }
 	}
 }
 

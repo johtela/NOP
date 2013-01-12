@@ -29,7 +29,7 @@
         {
             if (_visual != null)
             {
-                _size = _visual.CalculateSize (Graphics.FromHwnd (Handle));
+                _size = _visual.GetSize (Graphics.FromHwnd (Handle));
                 Width = Convert.ToInt32 (_size.Width);
                 Height = Convert.ToInt32 (_size.Height);
             }
@@ -42,7 +42,7 @@
 
             if (_visual != null)
             {
-                _visual.Draw (pe.Graphics, _size);
+                _visual.Render (pe.Graphics, _size);
             }
         }
     }

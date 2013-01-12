@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-
 namespace NOP.Collections
 {
-	public struct SubArray<T> : IEnumerable<T>
+    using System;
+    using System.Collections.Generic;
+
+    public struct SubArray<T> : IEnumerable<T>
 	{
 		private readonly T[] _array;
 		private readonly int _first, _count;

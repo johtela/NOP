@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace NOP.Collections
 {
-	/// <summary>
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
+    /// <summary>
 	/// Exception that is thrown if an empty map is accessed.
 	/// </summary>
 	public class EmptyMapException : Exception

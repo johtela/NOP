@@ -78,12 +78,12 @@ namespace NOP
 		public class List : SExpr
 		{
 			public readonly Collections.List<SExpr> Items;
-		
-			public List (Collections.List<SExpr> items)
-			{
-				Items = items;
-                Depiction = Visual.HList (this);
-			}
+
+            public List (Collections.List<SExpr> items)
+            {
+                Items = items;
+                Depiction = Visual.Parenthesize (Visual.HList (this));
+            }
 			
 			public override bool Equals (object obj)
 			{
