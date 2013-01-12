@@ -6,11 +6,12 @@
 	using NOP.Collections;
     using System.Drawing;
     using System.Drawing.Drawing2D;
+    using System.Text;
 	
 	/// <summary>
 	/// Enumeration for defining the stack direction.
 	/// </summary>
-	public enum StackDirection { Horizontal, Vertical };
+	public enum VisualDirection { Horizontal, Vertical };
 	
 	/// <summary>
 	/// Horizontal alignment of the items in a stack.
@@ -27,7 +28,7 @@
 	/// </summary>
 	public abstract class Visual
 	{
-        private static Font _defaultFont = new Font ("Consolas", 11);
+        private static Font _defaultFont = new Font ("DejaVu Sans Mono", 11);
         private static Brush _defaultBrush = Brushes.Black;
         private static Pen _rectPen = new Pen (Color.Gray, 1) { DashStyle = DashStyle.Dot };
 
@@ -109,7 +110,7 @@
 			/// <summary>
 			/// The direction of the stack (horizontal or vertical)
 			/// </summary>
-			public readonly StackDirection Direction;
+			public readonly VisualDirection Direction;
 			
 			/// <summary>
 			/// This setting controls how the items in stack are aligned horizontally,
@@ -128,7 +129,7 @@
 			/// <summary>
 			/// Initializes a new stack.
 			/// </summary>
-			public _Stack (NOPList<Visual> items, StackDirection direction, HAlign horizAlign,
+			public _Stack (NOPList<Visual> items, VisualDirection direction, HAlign horizAlign,
 				VAlign vertAlign)
 			{
 				Items = items;
@@ -153,7 +154,7 @@
 				return Items.Fold (VBox.Empty, (acc, v) => 
 				{
 					var box = v.CalculateSize (gr);
-					return Direction == StackDirection.Horizontal ?
+					return Direction == VisualDirection.Horizontal ?
 						acc.VMax (box).HAdd (box) :
 						acc.HMax (box).VAdd (box);
 				});
@@ -197,16 +198,16 @@
 					if (availableSize.IsEmpty) break;
 					
 					var inner = visual.CalculateSize (gr);
-					var outer = Direction == StackDirection.Horizontal ?
+					var outer = Direction == VisualDirection.Horizontal ?
 						new VBox (inner.Width, stack.Height) :
 						new VBox (stack.Width, inner.Height);
 					var st = gr.Save ();
 					gr.TranslateTransform (DeltaX (outer.Width, inner.Width), 
 						DeltaY (outer.Height, inner.Height));
-					visual.Render (gr, inner);
+					visual.Render (gr, outer);
 					gr.Restore (st);
 					
-					if (Direction == StackDirection.Horizontal)
+					if (Direction == VisualDirection.Horizontal)
 					{
 						gr.TranslateTransform (outer.Width, 0);
 						availableSize = availableSize.HSub (outer);
@@ -217,17 +218,17 @@
 						availableSize = availableSize.VSub (outer);
 					}
 				}
-			}
+            }
 		}
 
         /// <summary>
-        /// Use the visual inside a S-expression.
+        /// Use the depiction of a S-expression.
         /// </summary>
-        class _Indirect : Visual
+        class _Depiction : Visual
         {
             public readonly SExpr SExpr;
 
-            public _Indirect (SExpr sexp)
+            public _Depiction (SExpr sexp)
             {
                 SExpr = sexp;
             }
@@ -243,6 +244,60 @@
             }
         }
 
+        /// <summary>
+        /// Hidden visual that has the same size as the undelying visual.
+        /// </summary>
+        private sealed class _Hidden : Visual
+        {
+            public readonly Visual Visual;
+
+            public _Hidden (Visual visual)
+            {
+                Visual = visual;
+            }
+
+            protected override VBox CalculateSize (Graphics gr)
+            {
+                return Visual.CalculateSize (gr);
+            }
+
+            protected override void Draw (Graphics gr, VBox availableSize)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Horizontal of vertical ruler.
+        /// </summary>
+        private sealed class _Ruler : Visual
+        {
+            private readonly VisualDirection Direction;
+
+            public _Ruler (VisualDirection direction)
+            {
+                Direction = direction;
+            }
+
+            protected override VBox CalculateSize (Graphics gr)
+            {
+                return new VBox(8, 8);
+            }
+
+            protected override void Draw (Graphics gr, VBox availableSize)
+            {
+                if (Direction == VisualDirection.Horizontal)
+                {
+                    var y = availableSize.Height / 2;
+                    gr.DrawLine (_rectPen, 0, y, availableSize.Width, y);
+                }
+                else
+                {
+                    var x = availableSize.Width / 2;
+                    gr.DrawLine (_rectPen, x, 0, x, availableSize.Height);
+                }
+            }
+        }
+
 		/// <summary>
 		/// Create a new label.
 		/// </summary>
@@ -254,41 +309,49 @@
 		/// <summary>
 		/// Create a horizontal stack.
 		/// </summary>
-		public static Visual HorizontalStack (VAlign alignment, IEnumerable<Visual> visuals)
+		public static Visual HStack (VAlign alignment, IEnumerable<Visual> visuals)
 		{
-			return new _Stack (List.Create (visuals), StackDirection.Horizontal, HAlign.Left, alignment);
+			return new _Stack (List.Create (visuals), VisualDirection.Horizontal, HAlign.Left, alignment);
 		}
 		
 		/// <summary>
 		/// Create a horizontal stack.
 		/// </summary>
-		public static Visual HorizontalStack (VAlign alignment, params Visual[] visuals)
+		public static Visual HStack (VAlign alignment, params Visual[] visuals)
 		{
-			return new _Stack (List.Create (visuals), StackDirection.Horizontal, HAlign.Left, alignment);
+			return new _Stack (List.Create (visuals), VisualDirection.Horizontal, HAlign.Left, alignment);
 		}
 		
 		/// <summary>
 		/// Create a vertical stack.
 		/// </summary>
-		public static Visual VerticalStack (HAlign alignment, IEnumerable<Visual> visuals)
+		public static Visual VStack (HAlign alignment, IEnumerable<Visual> visuals)
 		{
-			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
+			return new _Stack (List.Create (visuals), VisualDirection.Vertical, alignment, VAlign.Top);
 		}
 		
 		/// <summary>
 		/// Create a vertical stack.
 		/// </summary>
-		public static Visual VerticalStack (HAlign alignment, params Visual[] visuals)
+		public static Visual VStack (HAlign alignment, params Visual[] visuals)
 		{
-			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
+			return new _Stack (List.Create (visuals), VisualDirection.Vertical, alignment, VAlign.Top);
 		}
 
         /// <summary>
         /// Create an indirect visual.
         /// </summary>
-        public static Visual Indirect(SExpr sexp)
+        public static Visual Depiction (SExpr sexp)
         {
-            return new _Indirect (sexp);
+            return new _Depiction (sexp);
+        }
+
+        /// <summary>
+        /// Hide a visual.
+        /// </summary>
+        public static Visual Hidden (Visual visual)
+        {
+            return new _Hidden (visual);
         }
 
         /// <summary>
@@ -310,17 +373,17 @@
         /// <summary>
         /// Create a horizontal list of S-expressions.
         /// </summary>
-        public static Visual HList (SExpr sexp)
+        public static Visual HList (NOPList<SExpr> sexps)
         {
-            return HorizontalStack (VAlign.Bottom, FromSExpList ((SExpr.List)sexp));
+            return HStack (VAlign.Top, FromSExpList (sexps));
         }
 
         /// <summary>
         /// Return a vertical list of S-expressions.
         /// </summary>
-        public static Visual VList (SExpr sexp)
+        public static Visual VList (NOPList<SExpr> sexps)
         {
-            return VerticalStack (HAlign.Left, FromSExpList ((SExpr.List)sexp));
+            return VStack (HAlign.Left, FromSExpList (sexps));
         }
 
         /// <summary>
@@ -330,15 +393,39 @@
         /// <returns></returns>
         public static Visual Parenthesize (Visual v)
         {
-            return HorizontalStack (VAlign.Center, Label ("("), v, Label (")"));
+            return HStack (VAlign.Top, Label ("("), v, Label (")"));
+        }
+
+        /// <summary>
+        /// Create a margin with a width of n X characters.
+        /// </summary>
+        public static Visual Margin (int n)
+        {
+            return Hidden (Label ("X".Times (n)));
+        }
+
+        /// <summary>
+        /// Create a horizontal ruler.
+        /// </summary>
+        public static Visual HRuler ()
+        {
+            return new _Ruler (VisualDirection.Horizontal);
+        }
+
+        /// <summary>
+        /// Create a vertical ruler.
+        /// </summary>
+        public static Visual VRuler ()
+        {
+            return new _Ruler (VisualDirection.Vertical);
         }
 
         /// <summary>
         /// Map a list of S-expressions to a sequence of visuals.
         /// </summary>
-        private static IEnumerable<Visual> FromSExpList (SExpr.List list)
+        private static IEnumerable<Visual> FromSExpList (NOPList<SExpr> sexps)
         {
-            return list.Items.Map (se => Indirect (se));
+            return sexps.Map (se => Depiction (se));
         }
 	}
 }

@@ -16,5 +16,12 @@ namespace NOP
 			base.GetTypeExpr ();
 			return TypeExpr.Builder.Lit (Literal.Value);
 		}
+
+        protected override void ChangeVisual ()
+        {
+            if (Literal.Value is string)
+                SExp.Depiction = Visual.Label (string.Format ("\"{0}\"", Literal.Value));
+            else base.ChangeVisual ();
+        }
 	}
 }

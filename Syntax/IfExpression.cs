@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
     using Collections;
-    using Visuals;
+    using V = NOP.Visual;
     using System.Collections.Generic;
 
 	public class IfExpression : Expression
@@ -19,12 +19,17 @@ namespace NOP
 			ElseExpression = Parse (Expect<SExpr> (ref sexps, "else expression"));
 		}
 
-        public void ChangeVisualGenerators()
+        protected override void ChangeVisual()
         {
             var skeyword = ((SExpr.List)SExp).Items.First;
             var scond = Condition.SExp;
             var sthen = ThenExpression.SExp;
             var selse = ElseExpression.SExp;
+
+            SExp.Depiction = V.HStack (VAlign.Top,
+                V.Depiction (skeyword), V.Depiction (scond), V.VStack (HAlign.Left,
+                    V.HStack (VAlign.Top, V.Label ("then"), V.Depiction (sthen)),
+                    V.HStack (VAlign.Top, V.Label ("else"), V.Depiction (selse))));
         }
 		
 		public override TypeExpr GetTypeExpr ()

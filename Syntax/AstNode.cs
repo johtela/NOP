@@ -77,6 +77,29 @@ namespace NOP
         {
             return NOPList<AstNode>.Empty;
         }
+
+        /// <summary>
+        /// Change the visual depiction of the AST node.
+        /// </summary>
+        protected virtual void ChangeVisual()
+        {
+        }
+
+        /// <summary>
+        /// Walk through the AST tree depth first performing a given
+        /// action for each node traversed.
+        /// </summary>
+        public void WalkTreeDepthFirst (Action<AstNode> action)
+        {
+            foreach (var child in GetChildNodes ())
+                child.WalkTreeDepthFirst (action);
+            action (this);
+        }
+
+        public void ChangeVisualDepictions()
+        {
+            WalkTreeDepthFirst (node => node.ChangeVisual ());
+        }
 	}
 }
 

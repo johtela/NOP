@@ -22,12 +22,13 @@
             _control.Parent = this;
         }
 
-        public void ShowVisual(Visual v)
+        public void ShowVisual(Visual visual)
         {
             lock (_visuals)
             {
-                _visuals = v | _visuals;
-                _control.Visual = Visual.VerticalStack (HAlign.Left, _visuals);
+                _visuals = visual | _visuals;
+                _control.Visual = Visual.VStack (HAlign.Left,
+                    _visuals.Collect (v => List.Create (v, Visual.HRuler ())));
                 Invalidate ();
             }
         }

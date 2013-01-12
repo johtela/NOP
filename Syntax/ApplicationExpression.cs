@@ -4,6 +4,7 @@ namespace NOP
     using System.Linq;
 	using Collections;
     using System.Collections.Generic;
+    using V = NOP.Visual;
 	
 	public class ApplicationExpression : Expression
 	{
@@ -33,6 +34,14 @@ namespace NOP
         protected override IEnumerable<AstNode> GetChildNodes ()
         {
             return FuncName | Parameters;
+        }
+
+        protected override void ChangeVisual ()
+        {
+            var sexps = ((SExpr.List)SExp).Items;
+
+            SExp.Depiction = V.HStack (VAlign.Top, V.Depiction (sexps.First),
+                V.Parenthesize (V.HList (sexps.Rest)));
         }
 	}
 }

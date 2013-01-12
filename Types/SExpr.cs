@@ -82,7 +82,7 @@ namespace NOP
             public List (Collections.NOPList<SExpr> items)
             {
                 Items = items;
-                Depiction = Visual.Parenthesize (Visual.HList (this));
+                Depiction = Visual.Parenthesize (Visual.HList (Items));
             }
 			
 			public override bool Equals (object obj)
