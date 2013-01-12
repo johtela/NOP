@@ -2,11 +2,12 @@ namespace NOP
 {
 	using System;
 	using NOP.Collections;
+    using System.Collections.Generic;
 
 	public class TypeDefinition : Definition
 	{
 		public readonly SymbolExpression Name;
-		public readonly List<Definition> Members;
+		public readonly NOPList<Definition> Members;
 		
 		public TypeDefinition (SExpr.List typeDef) : base (typeDef)
 		{
@@ -14,6 +15,11 @@ namespace NOP
 			Name = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "type name"));
 			Members = sexps.Map (sexp => Parse (sexp));
 		}
+
+        protected override IEnumerable<AstNode> GetChildNodes ()
+        {
+            return Members.Prepend<AstNode> (Name);
+        }
 	}
 }
 

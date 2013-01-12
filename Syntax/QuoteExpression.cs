@@ -1,6 +1,9 @@
 namespace NOP
 {
-	public class QuoteExpression : Expression
+    using System.Collections.Generic;
+    using Collections;
+    
+    public class QuoteExpression : Expression
 	{
 		public readonly Expression QuotedExpression;
 		
@@ -15,6 +18,11 @@ namespace NOP
 			base.GetTypeExpr ();
 			return TypeExpr.Builder.Lit (SExp);
 		}
+
+        protected override IEnumerable<AstNode> GetChildNodes ()
+        {
+            return List.Cons (QuotedExpression);
+        }
 	}
 }
 

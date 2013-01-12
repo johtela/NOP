@@ -46,10 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\Enumerable.cs" />
     <Compile Include="Collections\Map.cs" />
     <Compile Include="Collections\Option.cs" />
     <Compile Include="Collections\Tree.cs" />
-    <Compile Include="Collections\List.cs" />
+    <Compile Include="Collections\NOPList.cs" />
     <Compile Include="NOPException.cs" />
     <Compile Include="NOPFunc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

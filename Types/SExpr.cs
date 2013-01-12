@@ -77,9 +77,9 @@ namespace NOP
 		/// </summary>
 		public class List : SExpr
 		{
-			public readonly Collections.List<SExpr> Items;
+			public readonly Collections.NOPList<SExpr> Items;
 
-            public List (Collections.List<SExpr> items)
+            public List (Collections.NOPList<SExpr> items)
             {
                 Items = items;
                 Depiction = Visual.Parenthesize (Visual.HList (this));

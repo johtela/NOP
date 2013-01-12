@@ -18,11 +18,11 @@
 	/// An immutable linked list.
 	/// </summary>
 	/// <typeparam name="T">The item type of the list.</typeparam>
-	public class List<T> : IEnumerable<T>
+	public class NOPList<T> : IEnumerable<T>
 	{
-		private static readonly List<T> _empty = new List<T> (default(T), null);
+		private static readonly NOPList<T> _empty = new NOPList<T> (default(T), null);
 		private T _first;
-		private List<T> _rest;
+		private NOPList<T> _rest;
 		
 		/// <summary>
 		/// The first item in the list.
@@ -40,7 +40,7 @@
 		/// <summary>
 		/// The rest of the list.
 		/// </summary>
-		public List<T> Rest
+		public NOPList<T> Rest
 		{ 
 			get
 			{
@@ -55,7 +55,7 @@
 			}
 		}
 		
-		private List (T first, List<T> rest)
+		private NOPList (T first, NOPList<T> rest)
 		{
 			_first = first;
 			_rest = rest;
@@ -66,16 +66,16 @@
 		/// </summary>
 		/// <param name="head">The new head item.</param>
 		/// <param name="tail">The tail of the list.</param>
-		public static List<T> Cons (T first, List<T> rest)
+		public static NOPList<T> Cons (T first, NOPList<T> rest)
 		{
-			return new List<T> (first, rest);
+			return new NOPList<T> (first, rest);
 		}
 		
 		/// <summary>
 		/// Construct a list from an enumerable.
 		/// </summary>
 		/// <param name='values'>The enumeration of values.</param>
-		public static List<T> FromEnumerable (IEnumerable<T> values)
+		public static NOPList<T> FromEnumerable (IEnumerable<T> values)
 		{
 			var result = Empty;
 			var last = result;
@@ -95,7 +95,7 @@
 		/// <summary>
 		/// Return an empty list, i.e. null.
 		/// </summary>
-		public static List<T> Empty
+		public static NOPList<T> Empty
 		{
 			get { return _empty; }
 		}
@@ -116,7 +116,7 @@
 			get
 			{
 				int result = 0;
-				List<T > list = this;
+				NOPList<T > list = this;
 				
 				while (!list.IsEmpty)
 				{
@@ -130,7 +130,7 @@
 		/// <summary>
 		/// The last cons cell of the list. 
 		/// </summary>
-		public List<T> End
+		public NOPList<T> End
 		{
 			get
 			{
@@ -155,9 +155,9 @@
 		/// <param name="item">The item searched for.</param>
 		/// <returns>The tail of the list from the point where the item is found, 
 		/// or an empty list if the item is not found.</returns>
-		public List<T> FindNext (T item)
+		public NOPList<T> FindNext (T item)
 		{
-			List<T> list = this;
+			NOPList<T> list = this;
 			
 			while (!list.IsEmpty && !list.First.Equals (item))
 				list = list.Rest;
@@ -170,9 +170,9 @@
 		/// <param name="predicate">The predicate that defines what to look for.</param>
 		/// <returns>The tail of the list from the point where the predicate returned true, 
 		/// or an empty list if none of the items matched the predicate.</returns>
-		public List<T> FindNext (Predicate<T> predicate)
+		public NOPList<T> FindNext (Predicate<T> predicate)
 		{
-			List<T > list = this;
+			NOPList<T> list = this;
 			
 			while (!list.IsEmpty && !predicate (list.First))
 				list = list.Rest;
@@ -189,7 +189,7 @@
 		/// </exception>
 		public T Nth (int n)
 		{
-			List<T > list = this;
+			NOPList<T> list = this;
 			
 			while (!list.IsEmpty && n-- > 0)
 				list = list.Rest;
@@ -205,9 +205,9 @@
 		/// stop the copying. If that tail is not found, the entire list is copied.</param>
 		/// <returns>The copied list upto the given tail; or the entire source
 		/// list, if the tail is not found.</returns>
-		public Tuple<List<T>, List<T>> CopyUpTo (List<T> stop)
+		public Tuple<NOPList<T>, NOPList<T>> CopyUpTo (NOPList<T> stop)
 		{
-			List<T > list = this, last = Empty, first = Empty, prevLast;
+			NOPList<T> list = this, last = Empty, first = Empty, prevLast;
 			
 			while (!list.IsEmpty && list != stop)
 			{
@@ -218,7 +218,7 @@
 					first = last;
 				list = list.Rest;
 			}
-			return new Tuple<List<T>, List<T>> (first, last);
+			return new Tuple<NOPList<T>, NOPList<T>> (first, last);
 		}
 
         /// <summary>
@@ -226,7 +226,7 @@
         /// </summary>
         /// <param name="item">Item to be appended.</param>
         /// <returns>A new list with <paramref name="item"/> as its last element.</returns>
-        public List<T> Append(T item)
+        public NOPList<T> Append(T item)
         {
             return CopyUpTo (Empty).Bind ((prefixFirst, prefixLast) =>
             {
@@ -243,7 +243,7 @@
 		/// <param name="before">The item before which the new item is inserted.</param>
 		/// <returns>A new list with the item inserted before the specified item. If the before item
 		/// is not found; the new item is added at the end of the list.</returns>
-		public List<T> InsertBefore (T item, T before)
+		public NOPList<T> InsertBefore (T item, T before)
 		{
 			var tail = FindNext (before);
 			
@@ -260,7 +260,7 @@
 		/// </summary>
 		/// <param name="item">The item to be removed.</param>
 		/// <returns>A new list without the given item.</returns>
-		public List<T> Remove (T item)
+		public NOPList<T> Remove (T item)
 		{
 			var tail = FindNext (item);
 			
@@ -276,7 +276,7 @@
 		/// Reverses the list making the first item the last one, and vice versa. 
 		/// </summary>
 		/// <returns>This list in reverse order.</returns>
-		public List<T> Reverse ()
+		public NOPList<T> Reverse ()
 		{
 			var result = Empty;
 			
@@ -293,9 +293,9 @@
 		/// <param name="equals">The function that compares if two items are equal.</param>
 		/// <returns>True, if the two lists contain the same items in the same order, 
 		/// and have equal lengths.</returns>
-		public bool EqualTo (List<T> other, Func<T, T, bool> equals)
+		public bool EqualTo (NOPList<T> other, Func<T, T, bool> equals)
 		{
-			List<T > list = this;
+			NOPList<T > list = this;
 			
 			while (!list.IsEmpty && !other.IsEmpty && equals (list.First, other.First))
 			{
@@ -312,7 +312,7 @@
 		/// <param name="other">The other list that the list is compared with.</param>
 		/// <returns>True, if the two lists contain the same items in the same order, 
 		/// and have equal lengths.</returns>
-		public bool EqualTo (List<T> other)
+		public bool EqualTo (NOPList<T> other)
 		{
 			return this.EqualTo (other, (i1, i2) => i1.Equals (i2));
 		}	
@@ -320,9 +320,9 @@
 		/// <summary>
 		/// Collect the list of lists into another list.
 		/// </summary>
-		public List<U> Collect<U> (Func<T, List<U>> func)
+		public NOPList<U> Collect<U> (Func<T, NOPList<U>> func)
 		{
-			var result = List<U>.Empty;
+			var result = NOPList<U>.Empty;
 			var resultLast = result;
 			
 			for (var list = this; !list.IsEmpty; list = list.Rest)
@@ -356,14 +356,14 @@
 		/// <summary>
 		/// Zip two lists together. 
 		/// </summary>
-		public List<Tuple<T, U>> ZipWith<U> (List<U> other)
+		public NOPList<Tuple<T, U>> ZipWith<U> (NOPList<U> other)
 		{
-			var result = List<Tuple<T, U>>.Empty;
+			var result = NOPList<Tuple<T, U>>.Empty;
 			var resultLast = result;
 			
 			for (var list = this; !(list.IsEmpty || other.IsEmpty); list = list.Rest,other = other.Rest)
 			{
-				var cons = List<Tuple<T, U>>.Cons (Tuple.Create (list.First, other.First), List<Tuple<T, U>>.Empty);
+				var cons = NOPList<Tuple<T, U>>.Cons (Tuple.Create (list.First, other.First), NOPList<Tuple<T, U>>.Empty);
 				if (result.IsEmpty)
 				{
 					result = cons;
@@ -381,9 +381,9 @@
 		/// <summary>
 		/// Zip two lists together extending the shorter one with default values.
 		/// </summary>
-		public List<Tuple<T, U>> ZipExtendingWith<U> (List<U> other)
+		public NOPList<Tuple<T, U>> ZipExtendingWith<U> (NOPList<U> other)
 		{
-			var result = List<Tuple<T, U>>.Empty;
+			var result = NOPList<Tuple<T, U>>.Empty;
 			var resultLast = result;
 			var list = this;
 			
@@ -402,7 +402,7 @@
 					otherItem = other.First;
 					other = other.Rest;
 				}
-				var cons = List<Tuple<T, U>>.Cons (Tuple.Create (listItem, otherItem), List<Tuple<T, U>>.Empty);
+				var cons = NOPList<Tuple<T, U>>.Cons (Tuple.Create (listItem, otherItem), NOPList<Tuple<T, U>>.Empty);
 				if (result.IsEmpty)
 				{
 					result = cons;
@@ -451,7 +451,7 @@
 		/// <param name='acc'>Initial accumulator value.</param>
 		/// <param name='func'>The function applied to the lists' items.</param>
 		/// <param name='other'>The list to be folded with.</param>
-		public U FoldWith<U, V> (U acc, Func<U, T, V, U> func, List<V> other)
+		public U FoldWith<U, V> (U acc, Func<U, T, V, U> func, NOPList<V> other)
 		{
 			for (var list = this; !(list.IsEmpty || other.IsEmpty); 
 			     list = list.Rest, other = other.Rest)
@@ -464,10 +464,10 @@
 		/// </summary>
 		/// <param name="func">Function that maps the items.</param>
 		/// <returns>The mapped list.</returns>
-		public List<U> Map<U> (Func<T, U> func)
+		public NOPList<U> Map<U> (Func<T, U> func)
 		{
 			if (IsEmpty)
-				return List<U>.Empty;
+				return NOPList<U>.Empty;
 			
 			var result = List.Cons (func (First));
 			var last = result;
@@ -489,7 +489,7 @@
 		/// </returns>
 		public override bool Equals (object obj)
 		{
-			var otherList = obj as List<T>;
+			var otherList = obj as NOPList<T>;
 			return (otherList != null) && EqualTo (otherList);
 		}
 		
@@ -520,7 +520,7 @@
 		public string ToString (string openBracket, string closeBracket, string separator)
 		{
 			StringBuilder sb = new StringBuilder (openBracket);
-			List<T > list = this;
+			NOPList<T > list = this;
 			
 			while (!list.IsEmpty)
 			{
@@ -543,7 +543,7 @@
 		/// <returns>An enumerator containing the items of the list.</returns>
 		public IEnumerator<T> GetEnumerator ()
 		{
-			for (List<T> list = this; !list.IsEmpty; list = list.Rest)
+			for (NOPList<T> list = this; !list.IsEmpty; list = list.Rest)
 				yield return list.First;
 		}
 
@@ -565,7 +565,7 @@
 
 		#region Operator overloads
 		
-		public static List<T> operator | (T first, List<T> rest)
+		public static NOPList<T> operator | (T first, NOPList<T> rest)
 		{
 			return Cons (first, rest);
 		}
@@ -574,24 +574,24 @@
 	}
 	
 	/// <summary>
-	/// Dynamic (non-generic) list of objects.
+	/// Static helper class for creating lists.
 	/// </summary>
 	public static class List
 	{
 		/// <summary>
 		/// Helper to create a cons list without explicitly specifying the item type. 
 		/// </summary>
-		public static List<T> Cons<T> (T first, List<T> rest)
+		public static NOPList<T> Cons<T> (T first, NOPList<T> rest)
 		{
-			return List<T>.Cons (first, rest);
+			return NOPList<T>.Cons (first, rest);
 		}
 
 		/// <summary>
 		/// Helper to create a cons list without explicitly specifying the item type. 
 		/// </summary>
-		public static List<T> Cons<T> (T first)
+		public static NOPList<T> Cons<T> (T first)
 		{
-			return List<T>.Cons (first, List<T>.Empty);
+			return NOPList<T>.Cons (first, NOPList<T>.Empty);
 		}
 
 		/// <summary>
@@ -600,12 +600,12 @@
 		/// <param name="array">The array whose items are placed into the list.</param>
 		/// <returns>A new list that contains the same items in the same order as the 
 		/// array.</returns>
-		public static List<T> FromArray<T> (T[] array)
+		public static NOPList<T> FromArray<T> (T[] array)
 		{
-			List<T > result = List<T>.Empty;
+			NOPList<T > result = NOPList<T>.Empty;
 			
 			for (int i = array.Length - 1; i >= 0; i--)
-				result = List<T>.Cons (array [i], result);
+				result = NOPList<T>.Cons (array [i], result);
 			return result;
 		}
 
@@ -614,7 +614,7 @@
 		/// </summary>
 		/// <param name="items">The items that are placed into the list.</param>
 		/// <returns>A new list that contains the items in the order specified.</returns>
-		public static List<T> Create<T> (params T[] items)
+		public static NOPList<T> Create<T> (params T[] items)
 		{
 			return FromArray (items);
 		}
@@ -624,9 +624,9 @@
 		/// </summary>
 		/// <param name="items">The items that are placed into the list.</param>
 		/// <returns>A new list that contains the items in the order specified.</returns>
-		public static List<T> Create<T> (IEnumerable<T> items)
+		public static NOPList<T> Create<T> (IEnumerable<T> items)
 		{
-			return List<T>.FromEnumerable (items);
+			return NOPList<T>.FromEnumerable (items);
 		}
 	}
 }

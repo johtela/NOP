@@ -9,17 +9,17 @@ namespace NOP.Testbench
 		[Test]
 		public void TestEmptyList ()
 		{
-			List<int > list = List<int>.Empty;
+			NOPList<int > list = NOPList<int>.Empty;
 			Check.IsTrue (list.IsEmpty);
 
-			list = List<int>.Cons (0, list);
+			list = NOPList<int>.Cons (0, list);
 			Check.IsFalse (list.IsEmpty);
 		}
         
 		[Test]
 		public void TestCreationFromEmpty ()
 		{
-			var list = List<int>.Empty;
+			var list = NOPList<int>.Empty;
 			list = 3 | list;
 			list = 2 | list;
 			list = 1 | list;
@@ -53,11 +53,11 @@ namespace NOP.Testbench
 			Check.IsTrue (List.Create (1, 2, 3).EqualTo (list.FindNext (1)));
 			Check.IsTrue (List.Create (2, 3).EqualTo (list.FindNext (2)));
 			Check.IsTrue (List.Create (3).EqualTo (list.FindNext (3)));
-			Check.IsTrue (List<int>.Empty.EqualTo (list.FindNext (4)));
+			Check.IsTrue (NOPList<int>.Empty.EqualTo (list.FindNext (4)));
 
 			Check.IsTrue (List.Create (1, 2, 3).EqualTo (list.FindNext (i => i > 0)));
 			Check.IsTrue (List.Create (3).EqualTo (list.FindNext (i => i > 2)));
-			Check.IsTrue (List<int>.Empty.EqualTo (list.FindNext (i => i > 3)));
+			Check.IsTrue (NOPList<int>.Empty.EqualTo (list.FindNext (i => i > 3)));
 		}
         
 		[Test]
@@ -94,7 +94,7 @@ namespace NOP.Testbench
 			Check.IsTrue (List.Create (1, 2, 2, 3).EqualTo (list.InsertBefore (2, 3)));
 			Check.IsTrue (List.Create (1, 2, 3, 4).EqualTo (list.InsertBefore (4, 0)));
 			Check.IsTrue (List.Create (0, 1, 2, 3).EqualTo (list.InsertBefore (0, 1)));
-			Check.IsTrue (List.Create (1).EqualTo (List<int>.Empty.InsertBefore (1, 0)));
+			Check.IsTrue (List.Create (1).EqualTo (NOPList<int>.Empty.InsertBefore (1, 0)));
 		}
         
 		[Test]
@@ -114,7 +114,7 @@ namespace NOP.Testbench
 			var list = List.Create (1, 2, 3, 4, 5);
 
 			Check.AreEqual ("[1, 2, 3, 4, 5]", list.ToString ());
-			Check.AreEqual ("[]", List<int>.Empty.ToString ());
+			Check.AreEqual ("[]", NOPList<int>.Empty.ToString ());
 
 			var tuple = Tuple.Create (1, 'a');
 			Check.AreEqual ("(1, a)", tuple.ToString ());
@@ -128,7 +128,7 @@ namespace NOP.Testbench
 			var res = list.Collect (i => List.Create (i + 10, i + 20, i + 30));
 			Check.IsTrue (res.EqualTo (List.Create (11, 21, 31, 12, 22, 32, 13, 23, 33)));
 
-			var res2 = List<int>.Empty.Collect (i => List.Create (i));
+			var res2 = NOPList<int>.Empty.Collect (i => List.Create (i));
 			Check.IsTrue (res2.IsEmpty);
 		}
         
@@ -159,7 +159,7 @@ namespace NOP.Testbench
 		{
 			Func<int, int > timesTwo = n => n * 2;
 			Check.IsTrue (List.Create (1, 2, 3).Map (timesTwo).EqualTo (List.Create (2, 4, 6)));
-			Check.IsTrue (List<int>.Empty.Map (timesTwo).EqualTo (List<int>.Empty));
+			Check.IsTrue (NOPList<int>.Empty.Map (timesTwo).EqualTo (NOPList<int>.Empty));
 			Check.IsTrue (List.Cons (1).Map (timesTwo).EqualTo (List.Create (2)));
 		}
 		

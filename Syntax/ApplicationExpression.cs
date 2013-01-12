@@ -3,11 +3,12 @@ namespace NOP
 	using System;
     using System.Linq;
 	using Collections;
+    using System.Collections.Generic;
 	
 	public class ApplicationExpression : Expression
 	{
 		public readonly Expression FuncName;
-		public readonly List<Expression> Parameters;
+		public readonly NOPList<Expression> Parameters;
 		
 		public ApplicationExpression (SExpr.List funcExpr) : base (funcExpr)
 		{
@@ -29,7 +30,7 @@ namespace NOP
 			return te;
 		}
 
-        protected override System.Collections.Generic.IEnumerable<AstNode> GetChildNodes ()
+        protected override IEnumerable<AstNode> GetChildNodes ()
         {
             return FuncName | Parameters;
         }

@@ -1,6 +1,8 @@
 namespace NOP
 {
 	using System;
+    using System.Collections.Generic;
+    using NOP.Collections;
 
 	public class BasicTypeReference : TypeReference
 	{
@@ -10,6 +12,11 @@ namespace NOP
 		{
 			TypeName = new SymbolExpression (typeName);
 		}
+
+        protected override IEnumerable<AstNode> GetChildNodes ()
+        {
+            return List.Cons (TypeName);
+        }
 	}
 }
 

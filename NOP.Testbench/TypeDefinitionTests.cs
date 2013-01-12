@@ -56,7 +56,7 @@ namespace NOP.Testbench
 			return  (Class)Namespace.Find ("NOP.Testbench.Foo");
 		}
 		
-		private static Tuple<Class, object, List<object>> GetFoo (int val)
+		private static Tuple<Class, object, NOPList<object>> GetFoo (int val)
 		{
 			var fooClass = GetFooClass ();
 			var args = List.Create<object> (val);

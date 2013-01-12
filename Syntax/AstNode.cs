@@ -2,6 +2,7 @@ namespace NOP
 {
 	using System;
 	using Collections;
+    using System.Collections.Generic;
 
 	/// <summary>
 	/// Exception for interpreter errors.
@@ -35,7 +36,7 @@ namespace NOP
 		/// is exhausted or the type of the token does not match, an error is raised. Advances 
 		/// the list of S-expressions to the next item.
 		/// </summary>
-		protected T Expect<T> (ref List<SExpr> sexps, string token) where T: SExpr
+		protected T Expect<T> (ref NOPList<SExpr> sexps, string token) where T: SExpr
 		{
 			if (sexps.IsEmpty)
 				ParseError (SExp, string.Format ("Expected {0} but reached the end of list.", 
@@ -55,7 +56,7 @@ namespace NOP
 		/// Raises an error if the list is exhausted. If the specified S-expression is 
 		/// read the list is advanced to the next item. Otherwise the list remains the same.
 		/// </summary>
-		protected bool NextSExp<T> (ref List<SExpr> sexps, out T sexp) where T: SExpr
+		protected bool NextSExp<T> (ref NOPList<SExpr> sexps, out T sexp) where T: SExpr
 		{
 			if (sexps.IsEmpty)
 				ParseError (SExp, string.Format ("Unexpected end of list."));
@@ -72,9 +73,9 @@ namespace NOP
         /// Return the list of abstract syntax tree nodes under this node.
         /// Must be overridden by AST nodes that have children.
         /// </summary>
-        protected virtual System.Collections.Generic.IEnumerable<AstNode> GetChildNodes()
+        protected virtual IEnumerable<AstNode> GetChildNodes()
         {
-            return List<AstNode>.Empty;
+            return NOPList<AstNode>.Empty;
         }
 	}
 }

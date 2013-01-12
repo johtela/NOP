@@ -59,14 +59,14 @@ namespace NOP
 		/// </summary>
 		private class ListBuilder : ExprBuilder
 		{
-			private readonly List<ExprBuilder> _items;
+			private readonly NOPList<ExprBuilder> _items;
 			
 			public ListBuilder (SysColl.IEnumerable<ExprBuilder> items)
 			{
 				_items = List.Create (items);
 			}
 			
-			public ListBuilder (List<ExprBuilder> items)
+			public ListBuilder (NOPList<ExprBuilder> items)
 			{
 				_items = items;
 			}
@@ -106,7 +106,7 @@ namespace NOP
 		/// <summary>
 		/// Create a list expression builder
 		/// </summary>
-		public static ExprBuilder L (List<ExprBuilder> items)
+		public static ExprBuilder L (NOPList<ExprBuilder> items)
 		{
 			return new ListBuilder (items);
 		}
@@ -154,7 +154,7 @@ namespace NOP
 		/// <summary>
 		/// Create a list of parameter names.
 		/// </summary>
-		public static List<string> P (params string[] args)
+		public static NOPList<string> P (params string[] args)
 		{
 			return List.Create (args);
 		}
@@ -162,7 +162,7 @@ namespace NOP
 		/// <summary>
 		/// Create a builder for the "lambda" expression.
 		/// </summary>
-		public static ExprBuilder Lambda (List<string> args, ExprBuilder body)
+		public static ExprBuilder Lambda (NOPList<string> args, ExprBuilder body)
 		{
 			return new ListBuilder (S ("lambda") | (L (args.Map (arg => S (arg))) | List.Cons (body)));
 		}

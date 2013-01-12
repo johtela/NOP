@@ -3,7 +3,7 @@ namespace NOP
 	using System;
 	using System.Linq;
 	using Collections;
-	using StrSeq=System.Collections.Generic.IEnumerable<string>;
+	using System.Collections.Generic;
 	
 	/// <summary>
 	/// The type environment maps expression variables (NOT type variables) to polytupes.
@@ -66,7 +66,7 @@ namespace NOP
 		/// </summary>
 		private class InitialEnvironment : MonoType.Builder
 		{
-			private static StrSeq GetTypeVars (MonoType[] parameters)
+			private static IEnumerable<string> GetTypeVars (MonoType[] parameters)
 			{
 				foreach (var par in parameters)
 					if (par is MonoType.Var) yield return (par as MonoType.Var).Name;

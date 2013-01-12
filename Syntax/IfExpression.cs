@@ -3,6 +3,7 @@ namespace NOP
 	using System;
     using Collections;
     using Visuals;
+    using System.Collections.Generic;
 
 	public class IfExpression : Expression
 	{
@@ -32,5 +33,10 @@ namespace NOP
 			return TypeExpr.Builder.If (Condition.GetTypeExpr (), ThenExpression.GetTypeExpr (),
 			                            ElseExpression.GetTypeExpr ());
 		}
+
+        protected override IEnumerable<AstNode> GetChildNodes ()
+        {
+            return List.Create (Condition, ThenExpression, ElseExpression);
+        }
 	}
 }

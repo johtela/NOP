@@ -2,10 +2,11 @@ namespace NOP
 {
 	using System;
 	using Collections;
+    using System.Collections.Generic;
 
 	public class LambdaExpression : Expression
 	{
-		public readonly List<SymbolExpression> Parameters;
+		public readonly NOPList<SymbolExpression> Parameters;
 		public readonly Expression FunctionBody;
 		
 		public LambdaExpression (SExpr.List lambdaExpr) : base (lambdaExpr)
@@ -31,6 +32,11 @@ namespace NOP
 			return TypeExpr.Builder.MultiLam (Parameters.Map (s => s.Symbol.Name), 
 				FunctionBody.GetTypeExpr ());
 		}
+
+        protected override IEnumerable<AstNode> GetChildNodes ()
+        {
+            return Parameters.Append<AstNode> (FunctionBody);
+        }
 	}
 }
 

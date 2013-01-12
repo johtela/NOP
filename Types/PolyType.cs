@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 	using Collections;
-	using StrSeq=System.Collections.Generic.IEnumerable<string>;
+	using System.Collections.Generic;
 	
 	/// <summary>
 	/// Polytypes represent generic types, from which a set of MonoTypes can be generated. They
@@ -24,7 +24,7 @@ namespace NOP
 		/// <summary>
 		/// Create a polytype.
 		/// </summary>
-		public Polytype (MonoType type, StrSeq tvars)
+		public Polytype (MonoType type, IEnumerable<string> tvars)
 		{
 			Type = type;
 			GenericTypeVars = tvars != null ? Set<string>.Create (tvars) : Set<string>.Empty;

@@ -1,6 +1,8 @@
 namespace NOP
 {
 	using System;
+    using System.Collections.Generic;
+    using NOP.Collections;
 
 	public class SetExpression : Expression
 	{
@@ -21,5 +23,10 @@ namespace NOP
 				TypeExpr.Builder.App (TypeExpr.Builder.Var ("set!"), Variable.GetTypeExpr ()), 
 				Value.GetTypeExpr ());
 		}
+
+        protected override IEnumerable<AstNode> GetChildNodes ()
+        {
+            return List.Create<AstNode> (Variable, Value);
+        }
 	}
 }

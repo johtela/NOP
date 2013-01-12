@@ -1,6 +1,8 @@
 namespace NOP
 {
 	using System;
+    using System.Collections.Generic;
+    using NOP.Collections;
 
 	public class VariableDefinition : AstNode
 	{
@@ -26,6 +28,10 @@ namespace NOP
 				}
 			}
 		}
+
+        protected override IEnumerable<AstNode> GetChildNodes ()
+        {
+            return List.Create<AstNode> (Name, Type);
+        }
 	}
 }
-

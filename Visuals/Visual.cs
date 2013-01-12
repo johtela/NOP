@@ -1,7 +1,7 @@
 ﻿namespace NOP
 {
 	using System;
-	using SeqVisual=System.Collections.Generic.IEnumerable<Visual>;
+	using System.Collections.Generic;
 	using System.Linq;
 	using NOP.Collections;
     using System.Drawing;
@@ -104,7 +104,7 @@
 			/// <summary>
 			/// The visuals in the stack.
 			/// </summary>
-			public readonly List<Visual> Items;
+			public readonly NOPList<Visual> Items;
 			
 			/// <summary>
 			/// The direction of the stack (horizontal or vertical)
@@ -128,7 +128,7 @@
 			/// <summary>
 			/// Initializes a new stack.
 			/// </summary>
-			public _Stack (List<Visual> items, StackDirection direction, HAlign horizAlign,
+			public _Stack (NOPList<Visual> items, StackDirection direction, HAlign horizAlign,
 				VAlign vertAlign)
 			{
 				Items = items;
@@ -254,7 +254,7 @@
 		/// <summary>
 		/// Create a horizontal stack.
 		/// </summary>
-		public static Visual HorizontalStack (VAlign alignment, SeqVisual visuals)
+		public static Visual HorizontalStack (VAlign alignment, IEnumerable<Visual> visuals)
 		{
 			return new _Stack (List.Create (visuals), StackDirection.Horizontal, HAlign.Left, alignment);
 		}
@@ -270,7 +270,7 @@
 		/// <summary>
 		/// Create a vertical stack.
 		/// </summary>
-		public static Visual VerticalStack (HAlign alignment, SeqVisual visuals)
+		public static Visual VerticalStack (HAlign alignment, IEnumerable<Visual> visuals)
 		{
 			return new _Stack (List.Create (visuals), StackDirection.Vertical, alignment, VAlign.Top);
 		}
@@ -336,7 +336,7 @@
         /// <summary>
         /// Map a list of S-expressions to a sequence of visuals.
         /// </summary>
-        private static SeqVisual FromSExpList (SExpr.List list)
+        private static IEnumerable<Visual> FromSExpList (SExpr.List list)
         {
             return list.Items.Map (se => Indirect (se));
         }

@@ -13,6 +13,11 @@ namespace NOP
 			ArgumentType = ParseTypeExpression (Expect<SExpr> (ref sexps, "type"));
 			ResultType = ParseTypeExpression (Expect<SExpr> (ref sexps, "type"));
 		}
+
+        protected override System.Collections.Generic.IEnumerable<AstNode> GetChildNodes ()
+        {
+            return List.Create<AstNode> (ArgumentType, ResultType);
+        }
 	}
 }
 

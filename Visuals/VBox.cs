@@ -111,6 +111,9 @@ namespace NOP
 			get { return Width <= 0 || Height <= 0; }
 		}
 	
+        /// <summary>
+        /// Return System.Drawing.SizeF with same dimensions.
+        /// </summary>
 	    public SizeF AsSizeF
         {
             get { return new SizeF (Width, Height); }

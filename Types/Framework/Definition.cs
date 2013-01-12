@@ -1,7 +1,7 @@
 namespace NOP.Framework
 {
 	using System.Reflection;
-	using ExprList = NOP.Collections.List<object>;
+	using ExprList = NOP.Collections.NOPList<object>;
 
 	/// <summary>
 	/// Delegate type for (static) functions.

@@ -8,7 +8,7 @@
 
     public class VisualConsole : Form
     {
-        private List<Visual> _visuals = List<Visual>.Empty;
+        private NOPList<Visual> _visuals = NOPList<Visual>.Empty;
         private VisualControl _control;
       
         public VisualConsole ()
