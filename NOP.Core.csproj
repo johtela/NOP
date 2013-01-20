@@ -58,6 +58,8 @@
     <Compile Include="Testing\VisualConsole.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Types\Program.cs" />
+    <Compile Include="Types\SExprPath.cs" />
     <Compile Include="Visuals\Visual.cs" />
     <Compile Include="Interpreter\Environment.cs" />
     <Compile Include="Interpreter\InitialEnv.cs" />
