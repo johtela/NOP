@@ -4,33 +4,47 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using NOP.Collections;
-    using System.Drawing;
-    using System.Drawing.Drawing2D;
-    using System.Text;
+	using System.Drawing;
+	using System.Drawing.Drawing2D;
+	using System.Text;
 	
 	/// <summary>
 	/// Enumeration for defining the stack direction.
 	/// </summary>
-	public enum VisualDirection { Horizontal, Vertical };
+	public enum VisualDirection
+	{
+		Horizontal,
+		Vertical }
+	;
 	
 	/// <summary>
 	/// Horizontal alignment of the items in a stack.
 	/// </summary>
-	public enum HAlign { Left, Center, Right };
+	public enum HAlign
+	{
+		Left,
+		Center,
+		Right }
+	;
 	
 	/// <summary>
 	/// Vertical alignment of the items in a stack.
 	/// </summary>
-	public enum VAlign { Top, Center, Bottom };
+	public enum VAlign
+	{
+		Top,
+		Center,
+		Bottom }
+	;
 		
 	/// <summary>
 	/// Visuals that represent the elements in the program.
 	/// </summary>
 	public abstract class Visual
 	{
-        private static Font _defaultFont = new Font ("DejaVu Sans Mono", 11);
-        private static Brush _defaultBrush = Brushes.Black;
-        private static Pen _rectPen = new Pen (Color.Gray, 1) { DashStyle = DashStyle.Dot };
+		private static Font _defaultFont = new Font ("DejaVu Sans Mono", 11);
+		private static Brush _defaultBrush = Brushes.Black;
+		private static Pen _rectPen = new Pen (Color.Gray, 1) { DashStyle = DashStyle.Dot };
 
 		/// <summary>
 		/// An abstract method that calculates the size of a visual once it is constructed.
@@ -49,15 +63,15 @@
 		/// fit.</param>
 		protected abstract void Draw (Graphics gr, VBox availableSize);
 		
-        public void Render (Graphics gr, VBox availableSize)
-        {
-            Draw (gr, availableSize);
-        }
+		public void Render (Graphics gr, VBox availableSize)
+		{
+			Draw (gr, availableSize);
+		}
 
-        public VBox GetSize (Graphics gr)
-        {
-            return CalculateSize (gr);
-        }
+		public VBox GetSize (Graphics gr)
+		{
+			return CalculateSize (gr);
+		}
 
 		/// <summary>
 		/// A label that renders some static text into the output.
@@ -82,18 +96,18 @@
 			/// </summary>
 			protected override VBox CalculateSize (Graphics gr)
 			{
-				return new VBox (gr.MeasureString(Text, _defaultFont).Width , _defaultFont.Height);
+				return new VBox (gr.MeasureString (Text, _defaultFont).Width + 5, _defaultFont.Height);
 			}
 			
 			/// <summary>
 			/// Draw the label into the specified context.
 			/// </summary>
-            protected override void Draw (Graphics gr, VBox availableSize)
-            {
-                var pos = new PointF (0, 0);
-                gr.DrawString (Text, _defaultFont, _defaultBrush, pos);
-                //gr.DrawRectangle (_rectPen, 0, 0, availableSize.Width, availableSize.Height);
-            }
+			protected override void Draw (Graphics gr, VBox availableSize)
+			{
+				var pos = new PointF (0, 0);
+				gr.DrawString (Text, _defaultFont, _defaultBrush, pos);
+				//gr.DrawRectangle (_rectPen, 0, 0, availableSize.Width, availableSize.Height);
+			}
 		}
 		
 		/// <summary>
@@ -149,7 +163,7 @@
 			/// heights of the visuals in it. The width of the stack is the with of 
 			/// the widest item.
 			/// </description>
-            protected override VBox CalculateSize (Graphics gr)
+			protected override VBox CalculateSize (Graphics gr)
 			{
 				return Items.Fold (VBox.Empty, (acc, v) => 
 				{
@@ -157,7 +171,8 @@
 					return Direction == VisualDirection.Horizontal ?
 						acc.VMax (box).HAdd (box) :
 						acc.HMax (box).VAdd (box);
-				});
+				}
+				);
 			}
 			
 			/// <summary>
@@ -167,9 +182,12 @@
 			{
 				switch (HorizAlign)
 				{
-					case HAlign.Center: return (outerWidth - innerWidth) / 2;
-					case HAlign.Right: return outerWidth - innerWidth;
-					default: return 0;
+					case HAlign.Center:
+						return (outerWidth - innerWidth) / 2;
+					case HAlign.Right:
+						return outerWidth - innerWidth;
+					default:
+						return 0;
 				}
 			}
 			
@@ -180,22 +198,26 @@
 			{
 				switch (VertAlign)
 				{
-					case VAlign.Center: return (outerHeight - innerHeight) / 2;
-					case VAlign.Bottom: return outerHeight - innerHeight;
-					default: return 0;
+					case VAlign.Center:
+						return (outerHeight - innerHeight) / 2;
+					case VAlign.Bottom:
+						return outerHeight - innerHeight;
+					default:
+						return 0;
 				}
 			}
 			
 			/// <summary>
 			/// Draw the stack into the specified context.
 			/// </summary>
-            protected override void Draw (Graphics gr, VBox availableSize)
+			protected override void Draw (Graphics gr, VBox availableSize)
 			{
 				var stack = CalculateSize (gr);
 				
 				foreach (Visual visual in Items)
 				{
-					if (availableSize.IsEmpty) break;
+					if (availableSize.IsEmpty)
+						break;
 					
 					var inner = visual.CalculateSize (gr);
 					var outer = Direction == VisualDirection.Horizontal ?
@@ -218,85 +240,85 @@
 						availableSize = availableSize.VSub (outer);
 					}
 				}
-            }
+			}
 		}
 
-        /// <summary>
-        /// Use the depiction of a S-expression.
-        /// </summary>
-        class _Depiction : Visual
-        {
-            public readonly SExpr SExpr;
+		/// <summary>
+		/// Use the depiction of a S-expression.
+		/// </summary>
+		class _Depiction : Visual
+		{
+			public readonly SExpr SExpr;
 
-            public _Depiction (SExpr sexp)
-            {
-                SExpr = sexp;
-            }
+			public _Depiction (SExpr sexp)
+			{
+				SExpr = sexp;
+			}
 
-            protected override VBox CalculateSize (Graphics gr)
-            {
-                return SExpr.Depiction.CalculateSize (gr);
-            }
+			protected override VBox CalculateSize (Graphics gr)
+			{
+				return SExpr.Depiction.CalculateSize (gr);
+			}
 
-            protected override void Draw (Graphics gr, VBox availableSize)
-            {
-                SExpr.Depiction.Draw (gr, availableSize);
-            }
-        }
+			protected override void Draw (Graphics gr, VBox availableSize)
+			{
+				SExpr.Depiction.Draw (gr, availableSize);
+			}
+		}
 
-        /// <summary>
-        /// Hidden visual that has the same size as the undelying visual.
-        /// </summary>
-        private sealed class _Hidden : Visual
-        {
-            public readonly Visual Visual;
+		/// <summary>
+		/// Hidden visual that has the same size as the undelying visual.
+		/// </summary>
+		private sealed class _Hidden : Visual
+		{
+			public readonly Visual Visual;
 
-            public _Hidden (Visual visual)
-            {
-                Visual = visual;
-            }
+			public _Hidden (Visual visual)
+			{
+				Visual = visual;
+			}
 
-            protected override VBox CalculateSize (Graphics gr)
-            {
-                return Visual.CalculateSize (gr);
-            }
+			protected override VBox CalculateSize (Graphics gr)
+			{
+				return Visual.CalculateSize (gr);
+			}
 
-            protected override void Draw (Graphics gr, VBox availableSize)
-            {
-            }
-        }
+			protected override void Draw (Graphics gr, VBox availableSize)
+			{
+			}
+		}
 
-        /// <summary>
-        /// Horizontal of vertical ruler.
-        /// </summary>
-        private sealed class _Ruler : Visual
-        {
-            private readonly VisualDirection Direction;
+		/// <summary>
+		/// Horizontal of vertical ruler.
+		/// </summary>
+		private sealed class _Ruler : Visual
+		{
+			private readonly VisualDirection Direction;
 
-            public _Ruler (VisualDirection direction)
-            {
-                Direction = direction;
-            }
+			public _Ruler (VisualDirection direction)
+			{
+				Direction = direction;
+			}
 
-            protected override VBox CalculateSize (Graphics gr)
-            {
-                return new VBox(8, 8);
-            }
+			protected override VBox CalculateSize (Graphics gr)
+			{
+				return new VBox (8, 8);
+			}
 
-            protected override void Draw (Graphics gr, VBox availableSize)
-            {
-                if (Direction == VisualDirection.Horizontal)
-                {
-                    var y = availableSize.Height / 2;
-                    gr.DrawLine (_rectPen, 0, y, availableSize.Width, y);
-                }
-                else
-                {
-                    var x = availableSize.Width / 2;
-                    gr.DrawLine (_rectPen, x, 0, x, availableSize.Height);
-                }
-            }
-        }
+			protected override void Draw (Graphics gr, VBox availableSize)
+			{
+				if (Direction == VisualDirection.Horizontal)
+				{
+					var y = availableSize.Height / 2;
+					gr.DrawLine (_rectPen, 0, y, availableSize.Width, y);
+				}
+				else
+				{
+					var x = availableSize.Width / 2;
+					gr.DrawLine (_rectPen, x, 0, x, availableSize.Height);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Create a new label.
@@ -338,94 +360,94 @@
 			return new _Stack (List.Create (visuals), VisualDirection.Vertical, alignment, VAlign.Top);
 		}
 
-        /// <summary>
-        /// Create an indirect visual.
-        /// </summary>
-        public static Visual Depiction (SExpr sexp)
-        {
-            return new _Depiction (sexp);
-        }
+		/// <summary>
+		/// Create an indirect visual.
+		/// </summary>
+		public static Visual Depiction (SExpr sexp)
+		{
+			return new _Depiction (sexp);
+		}
 
-        /// <summary>
-        /// Hide a visual.
-        /// </summary>
-        public static Visual Hidden (Visual visual)
-        {
-            return new _Hidden (visual);
-        }
+		/// <summary>
+		/// Hide a visual.
+		/// </summary>
+		public static Visual Hidden (Visual visual)
+		{
+			return new _Hidden (visual);
+		}
 
-        /// <summary>
-        /// Create a visual for a symbol S-expression.
-        /// </summary>
-        public static Visual Symbol (SExpr sexp)
-        {
-            return Label (((SExpr.Symbol)sexp).Name);
-        }
+		/// <summary>
+		/// Create a visual for a symbol S-expression.
+		/// </summary>
+		public static Visual Symbol (SExpr sexp)
+		{
+			return Label (((SExpr.Symbol)sexp).Name);
+		}
 
-        /// <summary>
-        /// Create a visual for a literal S-expression.
-        /// </summary>
-        public static Visual Literal (SExpr sexp)
-        {
-            return Label (((SExpr.Literal)sexp).Value.ToString ());
-        }
+		/// <summary>
+		/// Create a visual for a literal S-expression.
+		/// </summary>
+		public static Visual Literal (SExpr sexp)
+		{
+			return Label (((SExpr.Literal)sexp).Value.ToString ());
+		}
 
-        /// <summary>
-        /// Create a horizontal list of S-expressions.
-        /// </summary>
-        public static Visual HList (NOPList<SExpr> sexps)
-        {
-            return HStack (VAlign.Top, FromSExpList (sexps));
-        }
+		/// <summary>
+		/// Create a horizontal list of S-expressions.
+		/// </summary>
+		public static Visual HList (NOPList<SExpr> sexps)
+		{
+			return HStack (VAlign.Top, FromSExpList (sexps));
+		}
 
-        /// <summary>
-        /// Return a vertical list of S-expressions.
-        /// </summary>
-        public static Visual VList (NOPList<SExpr> sexps)
-        {
-            return VStack (HAlign.Left, FromSExpList (sexps));
-        }
+		/// <summary>
+		/// Return a vertical list of S-expressions.
+		/// </summary>
+		public static Visual VList (NOPList<SExpr> sexps)
+		{
+			return VStack (HAlign.Left, FromSExpList (sexps));
+		}
 
-        /// <summary>
-        /// Surrond a visual horizontally by parentheses.
-        /// </summary>
-        /// <param name="v"></param>
-        /// <returns></returns>
-        public static Visual Parenthesize (Visual v)
-        {
-            return HStack (VAlign.Top, Label ("("), v, Label (")"));
-        }
+		/// <summary>
+		/// Surrond a visual horizontally by parentheses.
+		/// </summary>
+		/// <param name="v"></param>
+		/// <returns></returns>
+		public static Visual Parenthesize (Visual v)
+		{
+			return HStack (VAlign.Top, Label ("("), v, Label (")"));
+		}
 
-        /// <summary>
-        /// Create a margin with a width of n X characters.
-        /// </summary>
-        public static Visual Margin (int n)
-        {
-            return Hidden (Label ("X".Times (n)));
-        }
+		/// <summary>
+		/// Create a margin with a width of n X characters.
+		/// </summary>
+		public static Visual Margin (int n)
+		{
+			return Hidden (Label ("X".Times (n)));
+		}
 
-        /// <summary>
-        /// Create a horizontal ruler.
-        /// </summary>
-        public static Visual HRuler ()
-        {
-            return new _Ruler (VisualDirection.Horizontal);
-        }
+		/// <summary>
+		/// Create a horizontal ruler.
+		/// </summary>
+		public static Visual HRuler ()
+		{
+			return new _Ruler (VisualDirection.Horizontal);
+		}
 
-        /// <summary>
-        /// Create a vertical ruler.
-        /// </summary>
-        public static Visual VRuler ()
-        {
-            return new _Ruler (VisualDirection.Vertical);
-        }
+		/// <summary>
+		/// Create a vertical ruler.
+		/// </summary>
+		public static Visual VRuler ()
+		{
+			return new _Ruler (VisualDirection.Vertical);
+		}
 
-        /// <summary>
-        /// Map a list of S-expressions to a sequence of visuals.
-        /// </summary>
-        private static IEnumerable<Visual> FromSExpList (NOPList<SExpr> sexps)
-        {
-            return sexps.Map (se => Depiction (se));
-        }
+		/// <summary>
+		/// Map a list of S-expressions to a sequence of visuals.
+		/// </summary>
+		private static IEnumerable<Visual> FromSExpList (NOPList<SExpr> sexps)
+		{
+			return sexps.Map (se => Depiction (se));
+		}
 	}
 }
