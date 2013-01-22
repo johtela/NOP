@@ -14,9 +14,7 @@ namespace NOP.Testbench
 		[STAThread]
 		public static void Main (string[] args)
 		{
-			Application.EnableVisualStyles ();
-
-			Task.Factory.StartNew (() =>
+			var task = Task.Factory.StartNew (() =>
                 Tester.RunTests (
                     new CollectionTests (),
                     //new InterpreterTests (),
@@ -26,10 +24,11 @@ namespace NOP.Testbench
                     new TypeCheckingTests (),
                     new ParserTests ())
 			);
+			task.Wait ();
 
-			VConsole = new VisualConsole ();
-			Application.Run (VConsole);
-			VConsole.Dispose ();
+//			VConsole = new VisualConsole ();
+//			Application.Run (VConsole);
+//			VConsole.Dispose ();
 		}
 	}
 }

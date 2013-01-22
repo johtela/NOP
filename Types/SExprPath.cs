@@ -85,10 +85,14 @@
 			while (list.NotEmpty && inds.NotEmpty)
 			{
 				SExprNode node = null, prev = null;
-				for (var i = 0; list.NotEmpty && i <= inds.First; i++, list = list.Rest)
+				var i = 0;
+
+				while (list.NotEmpty && i <= inds.First)
 				{
-					node = new SExprNode (list, i, prev, parent);
+					node = new SExprNode (list, i++, prev, parent);
 					prev = node;
+					if (i <= inds.First)
+						list = list.Rest;
 				}
 				if (list.NotEmpty && list.First is SExpr.List)
 					list = (list.First as SExpr.List).Items;

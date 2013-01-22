@@ -4,20 +4,24 @@ namespace NOP.Testbench
 	using System.Linq;
 	using NOP;
 	using NOP.Collections;
-    using NOP.Testing;
+	using NOP.Testing;
 
 	public class ParserTests : ExprUser
 	{
 		private void AssertParsesTo<T> (string type, ExprBuilder eb) where T : Expression
 		{
-            var sexp = eb.Build ();
+			AssertParsesTo<T> (type, eb.Build ());
+		}
+
+		private void AssertParsesTo<T> (string type, SExpr sexp) where T : Expression
+		{
 			var expr = Expression.Parse (sexp);
-            Check.IsOfType<T> (expr);
+			Check.IsOfType<T> (expr);
 			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
-            expr.ChangeVisualDepictions ();
-            Runner.VConsole.ShowVisual (sexp.Depiction);
-        }
-		
+//			expr.ChangeVisualDepictions ();
+//			Runner.VConsole.ShowVisual (sexp.Depiction);
+		}
+
 		[Test]
 		public void TestAtom ()
 		{
@@ -52,7 +56,8 @@ namespace NOP.Testbench
 				Let ("foo", Lambda (P ("i"), 
 				If (Call ("eq?", S ("i"), A (3)), 
 					A ("It's numberwang!"), 
-					A ("It's a number"))),
+					A ("It's a number"))
+			),
 				Call ("foo", A (3)))
 			);
 		}
@@ -63,18 +68,41 @@ namespace NOP.Testbench
 			AssertParsesTo<LetExpression> ("System.Boolean",
 				Let ("foo", A (42),
 				Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
-				Call ("bar", S ("foo"), A (3))))
+				Call ("bar", S ("foo"), A (3)))
+			)
 			);
 		}
 
 		[Test]
 		public void TestNestedLambdas ()
 		{
-			AssertParsesTo<ApplicationExpression> ("System.Boolean",
-				Call (Lambda (P ("foo"),
+			var prog = SampleProgram ().Build ();
+			AssertParsesTo<ApplicationExpression> ("System.Boolean", prog);
+		}
+
+		[Test]
+		public void TestSExprPath ()
+		{
+			var prog = (SampleProgram ().Build () as SExpr.List).Items;
+			var path = new SExprPath (List.Create (0, 2, 2, 1, 1));
+
+			Check.AreEqual (path.Target (prog).First, S ("y").Build ());
+			var prev = path.PrevSibling (prog);
+
+			Check.AreEqual (prev.Item1.First, S ("x").Build ());
+			Check.AreEqual (prev.Item2.PrevSibling (prog).Item1.First, L (S ("x"), S ("y")).Build ()); 
+
+			path = new SExprPath (List.Create (0, 2));
+			Check.AreEqual (path.NextSibling (prog).Item1.First, A (4).Build ());
+		}
+
+		private ExprBuilder SampleProgram ()
+		{
+			return Call (
+				Lambda (P ("foo"),
 					Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
-					Call ("bar", S ("foo"), A (3)))), A(4))
-			);
+			    	Call ("bar", S ("foo"), A (3)))
+			), A (4));
 		}
 	}
 }
