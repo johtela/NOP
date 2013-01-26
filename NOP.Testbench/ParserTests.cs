@@ -83,7 +83,7 @@ namespace NOP.Testbench
 		[Test]
 		public void TestSExprPath ()
 		{
-			var prog = (SampleProgram ().Build () as SExpr.List).Items;
+			var prog = SampleProgram ().Build ();
 			var path = new SExprPath (List.Create (0, 2, 2, 1, 1));
 
 			Check.AreEqual (path.Target (prog).First, S ("y").Build ());
