@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 	using Collections;
-    using System.Collections.Generic;
+	using System.Collections.Generic;
 
 	/// <summary>
 	/// Exception for interpreter errors.
@@ -69,37 +69,38 @@ namespace NOP
 			return false;
 		}
 	
-        /// <summary>
-        /// Return the list of abstract syntax tree nodes under this node.
-        /// Must be overridden by AST nodes that have children.
-        /// </summary>
-        protected virtual IEnumerable<AstNode> GetChildNodes()
-        {
-            return NOPList<AstNode>.Empty;
-        }
+		/// <summary>
+		/// Return the list of abstract syntax tree nodes under this node.
+		/// Must be overridden by AST nodes that have children.
+		/// </summary>
+		protected virtual IEnumerable<AstNode> GetChildNodes ()
+		{
+			return NOPList<AstNode>.Empty;
+		}
 
-        /// <summary>
-        /// Change the visual depiction of the AST node.
-        /// </summary>
-        protected virtual void ChangeVisual()
-        {
-        }
+		/// <summary>
+		/// Change the visual depiction of the AST node.
+		/// </summary>
+		protected virtual Visual GetVisual ()
+		{
+			return SExp.Depiction;
+		}
 
-        /// <summary>
-        /// Walk through the AST tree depth first performing a given
-        /// action for each node traversed.
-        /// </summary>
-        public void WalkTreeDepthFirst (Action<AstNode> action)
-        {
-            foreach (var child in GetChildNodes ())
-                child.WalkTreeDepthFirst (action);
-            action (this);
-        }
+		/// <summary>
+		/// Walk through the AST tree depth first performing a given
+		/// action for each node traversed.
+		/// </summary>
+		public void WalkTreeDepthFirst (Action<AstNode> action)
+		{
+			foreach (var child in GetChildNodes ())
+				child.WalkTreeDepthFirst (action);
+			action (this);
+		}
 
-        public void ChangeVisualDepictions()
-        {
-            WalkTreeDepthFirst (node => node.ChangeVisual ());
-        }
+		public void ChangeVisualDepictions ()
+		{
+			WalkTreeDepthFirst (node => node.SExp.Depiction = node.GetVisual ());
+		}
 	}
 }
 

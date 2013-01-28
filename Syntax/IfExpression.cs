@@ -1,9 +1,9 @@
 namespace NOP
 {
 	using System;
-    using Collections;
-    using V = NOP.Visual;
-    using System.Collections.Generic;
+	using Collections;
+	using V = NOP.Visual;
+	using System.Collections.Generic;
 
 	public class IfExpression : Expression
 	{
@@ -19,18 +19,19 @@ namespace NOP
 			ElseExpression = Parse (Expect<SExpr> (ref sexps, "else expression"));
 		}
 
-        protected override void ChangeVisual()
-        {
-            var skeyword = ((SExpr.List)SExp).Items.First;
-            var scond = Condition.SExp;
-            var sthen = ThenExpression.SExp;
-            var selse = ElseExpression.SExp;
+		protected override Visual GetVisual ()
+		{
+			var skeyword = ((SExpr.List)SExp).Items.First;
+			var scond = Condition.SExp;
+			var sthen = ThenExpression.SExp;
+			var selse = ElseExpression.SExp;
 
-            SExp.Depiction = V.HStack (VAlign.Top,
+			return V.HStack (VAlign.Top,
                 V.Depiction (skeyword), V.Depiction (scond), V.VStack (HAlign.Left,
                     V.HStack (VAlign.Top, V.Label ("then"), V.Depiction (sthen)),
-                    V.HStack (VAlign.Top, V.Label ("else"), V.Depiction (selse))));
-        }
+                    V.HStack (VAlign.Top, V.Label ("else"), V.Depiction (selse)))
+			);
+		}
 		
 		public override TypeExpr GetTypeExpr ()
 		{
@@ -39,9 +40,9 @@ namespace NOP
 			                            ElseExpression.GetTypeExpr ());
 		}
 
-        protected override IEnumerable<AstNode> GetChildNodes ()
-        {
-            return List.Create (Condition, ThenExpression, ElseExpression);
-        }
+		protected override IEnumerable<AstNode> GetChildNodes ()
+		{
+			return List.Create (Condition, ThenExpression, ElseExpression);
+		}
 	}
 }

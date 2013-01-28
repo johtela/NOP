@@ -1,10 +1,10 @@
 namespace NOP
 {
 	using System;
-    using System.Linq;
+	using System.Linq;
 	using Collections;
-    using System.Collections.Generic;
-    using V = NOP.Visual;
+	using System.Collections.Generic;
+	using V = NOP.Visual;
 	
 	public class ApplicationExpression : Expression
 	{
@@ -31,17 +31,17 @@ namespace NOP
 			return te;
 		}
 
-        protected override IEnumerable<AstNode> GetChildNodes ()
-        {
-            return FuncName | Parameters;
-        }
+		protected override IEnumerable<AstNode> GetChildNodes ()
+		{
+			return FuncName | Parameters;
+		}
 
-        protected override void ChangeVisual ()
-        {
-            var sexps = ((SExpr.List)SExp).Items;
+		protected override Visual GetVisual ()
+		{
+			var sexps = ((SExpr.List)SExp).Items;
 
-            SExp.Depiction = V.HStack (VAlign.Top, V.Depiction (sexps.First),
+			return V.HStack (VAlign.Top, V.Depiction (sexps.First),
                 V.Parenthesize (V.HList (sexps.Rest)));
-        }
+		}
 	}
 }

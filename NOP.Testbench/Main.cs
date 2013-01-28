@@ -9,12 +9,12 @@ namespace NOP.Testbench
 
 	class Runner
 	{
-		public static VisualConsole VConsole;
+		public static VisualConsole VConsole = new VisualConsole ();
 
 		[STAThread]
 		public static void Main (string[] args)
 		{
-			var task = Task.Factory.StartNew (() =>
+			Task.Factory.StartNew (() =>
                 Tester.RunTests (
                     new CollectionTests (),
                     //new InterpreterTests (),
@@ -24,11 +24,8 @@ namespace NOP.Testbench
                     new TypeCheckingTests (),
                     new ParserTests ())
 			);
-			task.Wait ();
-
-//			VConsole = new VisualConsole ();
-//			Application.Run (VConsole);
-//			VConsole.Dispose ();
+			Application.Run (VConsole);
+			VConsole.Dispose ();
 		}
 	}
 }

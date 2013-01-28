@@ -76,8 +76,7 @@
 			/// </summary>
 			public SExprNode Next
 			{
-				get 
-				{
+				get {
 					if (_next == null && !Current.Rest.IsEmpty)
 						_next = new SExprNode (Current.Rest, Index + 1, this, Parent);
 					return _next; 
@@ -89,8 +88,7 @@
 			/// </summary>
 			public SExprNode FirstChild
 			{
-				get 
-				{ 
+				get { 
 					if (_firstChild == null)
 					{
 						var lst = Current.First as SExpr.List;
@@ -106,8 +104,7 @@
 			/// </summary>
 			public SExprPath Path
 			{
-				get 
-				{
+				get {
 					var result = NOPList<int>.Empty;
 					var node = this;
 
@@ -191,7 +188,7 @@
 
 		/// <summary>
 		/// Return a tuple containing the sexp next to the sexp pointed by 
-		/// the path, and the path to the next S-expression.
+		/// the path and its path.
 		/// </summary>
 		public Tuple<NOPList<SExpr>, SExprPath> NextSibling (SExpr root)
 		{
@@ -206,7 +203,7 @@
 
 		/// <summary>
 		/// Return a tuple containing the sexp previous to the sexp pointed by 
-		/// the path, and the path to the previous S-expression.
+		/// the path and its path.
 		/// </summary>
 		public Tuple<NOPList<SExpr>, SExprPath> PrevSibling (SExpr root)
 		{

@@ -18,8 +18,8 @@ namespace NOP.Testbench
 			var expr = Expression.Parse (sexp);
 			Check.IsOfType<T> (expr);
 			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
-//			expr.ChangeVisualDepictions ();
-//			Runner.VConsole.ShowVisual (sexp.Depiction);
+			expr.ChangeVisualDepictions ();
+			Runner.VConsole.ShowVisual (Visual.Depiction (sexp));
 		}
 
 		[Test]
@@ -65,10 +65,10 @@ namespace NOP.Testbench
 		[Test]
 		public void TestNestedLets ()
 		{
-			AssertParsesTo<LetExpression> ("System.Boolean",
-				Let ("foo", A (42),
-				Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
-				Call ("bar", S ("foo"), A (3)))
+			AssertParsesTo<LetExpression> ("System.Boolean", 
+               Let ("foo", A (42), 
+			     Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
+			     Call ("bar", S ("foo"), A (3)))
 			)
 			);
 		}
@@ -76,8 +76,7 @@ namespace NOP.Testbench
 		[Test]
 		public void TestNestedLambdas ()
 		{
-			var prog = SampleProgram ().Build ();
-			AssertParsesTo<ApplicationExpression> ("System.Boolean", prog);
+			AssertParsesTo<ApplicationExpression> ("System.Boolean", SampleProgram ());
 		}
 
 		[Test]

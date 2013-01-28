@@ -42,18 +42,14 @@
 	/// </summary>
 	public abstract class Visual
 	{
-		private static Font _defaultFont = new Font ("DejaVu Sans Mono", 11);
-		private static Brush _defaultBrush = Brushes.Black;
-		private static Pen _rectPen = new Pen (Color.Gray, 1) { DashStyle = DashStyle.Dot };
-
 		/// <summary>
 		/// An abstract method that calculates the size of a visual once it is constructed.
 		/// </summary>
 		/// <param name="context">The Cairo context to which the visual is eventually
 		/// drawn to.</param>
-		/// <returns>The desired size of the visual that should alwasys be smaller than 
+		/// <returns>The desired size of the visual that should always be smaller than 
 		/// the available space.</returns>
-		protected abstract VBox CalculateSize (Graphics gr);
+		protected abstract VBox CalculateSize (GraphicsContext context);
 		
 		/// <summary>
 		/// Draw the visual into specified context using the available size.
@@ -61,16 +57,16 @@
 		/// <param name="context">The Cairo context to which the visual is drawn to.</param>
 		/// <param name='availableSize'>The available size into which the visual should
 		/// fit.</param>
-		protected abstract void Draw (Graphics gr, VBox availableSize);
+		protected abstract void Draw (GraphicsContext context, VBox availableSize);
 		
-		public void Render (Graphics gr, VBox availableSize)
+		public void Render (GraphicsContext context, VBox availableSize)
 		{
-			Draw (gr, availableSize);
+			Draw (context, availableSize);
 		}
 
-		public VBox GetSize (Graphics gr)
+		public VBox GetSize (GraphicsContext context)
 		{
-			return CalculateSize (gr);
+			return CalculateSize (context);
 		}
 
 		/// <summary>
@@ -94,18 +90,19 @@
 			/// <summary>
 			/// Calculates the size of the label.
 			/// </summary>
-			protected override VBox CalculateSize (Graphics gr)
+			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				return new VBox (gr.MeasureString (Text, _defaultFont).Width + 5, _defaultFont.Height);
+				return new VBox (context.Graphics.MeasureString (Text, context.DefaultFont).Width + 5, 
+				                 context.DefaultFont.Height);
 			}
 			
 			/// <summary>
 			/// Draw the label into the specified context.
 			/// </summary>
-			protected override void Draw (Graphics gr, VBox availableSize)
+			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
 				var pos = new PointF (0, 0);
-				gr.DrawString (Text, _defaultFont, _defaultBrush, pos);
+				context.Graphics.DrawString (Text, context.DefaultFont, context.DefaultBrush, pos);
 				//gr.DrawRectangle (_rectPen, 0, 0, availableSize.Width, availableSize.Height);
 			}
 		}
@@ -163,11 +160,11 @@
 			/// heights of the visuals in it. The width of the stack is the with of 
 			/// the widest item.
 			/// </description>
-			protected override VBox CalculateSize (Graphics gr)
+			protected override VBox CalculateSize (GraphicsContext context)
 			{
 				return Items.Fold (VBox.Empty, (acc, v) => 
 				{
-					var box = v.CalculateSize (gr);
+					var box = v.CalculateSize (context);
 					return Direction == VisualDirection.Horizontal ?
 						acc.VMax (box).HAdd (box) :
 						acc.HMax (box).VAdd (box);
@@ -210,33 +207,33 @@
 			/// <summary>
 			/// Draw the stack into the specified context.
 			/// </summary>
-			protected override void Draw (Graphics gr, VBox availableSize)
+			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
-				var stack = CalculateSize (gr);
+				var stack = CalculateSize (context);
 				
 				foreach (Visual visual in Items)
 				{
 					if (availableSize.IsEmpty)
 						break;
 					
-					var inner = visual.CalculateSize (gr);
+					var inner = visual.CalculateSize (context);
 					var outer = Direction == VisualDirection.Horizontal ?
 						new VBox (inner.Width, stack.Height) :
 						new VBox (stack.Width, inner.Height);
-					var st = gr.Save ();
-					gr.TranslateTransform (DeltaX (outer.Width, inner.Width), 
+					var st = context.Graphics.Save ();
+					context.Graphics.TranslateTransform (DeltaX (outer.Width, inner.Width), 
 						DeltaY (outer.Height, inner.Height));
-					visual.Render (gr, outer);
-					gr.Restore (st);
+					visual.Render (context, outer);
+					context.Graphics.Restore (st);
 					
 					if (Direction == VisualDirection.Horizontal)
 					{
-						gr.TranslateTransform (outer.Width, 0);
+						context.Graphics.TranslateTransform (outer.Width, 0);
 						availableSize = availableSize.HSub (outer);
 					}
 					else
 					{
-						gr.TranslateTransform (0, outer.Height);
+						context.Graphics.TranslateTransform (0, outer.Height);
 						availableSize = availableSize.VSub (outer);
 					}
 				}
@@ -255,14 +252,16 @@
 				SExpr = sexp;
 			}
 
-			protected override VBox CalculateSize (Graphics gr)
+			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				return SExpr.Depiction.CalculateSize (gr);
+				return SExpr.Depiction.CalculateSize (context);
 			}
 
-			protected override void Draw (Graphics gr, VBox availableSize)
+			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
-				SExpr.Depiction.Draw (gr, availableSize);
+				SExpr.Depiction.Draw (context.FocusedExpr == SExpr ? 
+				                      new GraphicsContext (context.Graphics) { DefaultBrush = Brushes.Blue } :
+				                      context, availableSize);
 			}
 		}
 
@@ -278,12 +277,12 @@
 				Visual = visual;
 			}
 
-			protected override VBox CalculateSize (Graphics gr)
+			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				return Visual.CalculateSize (gr);
+				return Visual.CalculateSize (context);
 			}
 
-			protected override void Draw (Graphics gr, VBox availableSize)
+			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
 			}
 		}
@@ -300,22 +299,22 @@
 				Direction = direction;
 			}
 
-			protected override VBox CalculateSize (Graphics gr)
+			protected override VBox CalculateSize (GraphicsContext context)
 			{
 				return new VBox (8, 8);
 			}
 
-			protected override void Draw (Graphics gr, VBox availableSize)
+			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
 				if (Direction == VisualDirection.Horizontal)
 				{
 					var y = availableSize.Height / 2;
-					gr.DrawLine (_rectPen, 0, y, availableSize.Width, y);
+					context.Graphics.DrawLine (context.RectPen, 0, y, availableSize.Width, y);
 				}
 				else
 				{
 					var x = availableSize.Width / 2;
-					gr.DrawLine (_rectPen, x, 0, x, availableSize.Height);
+					context.Graphics.DrawLine (context.RectPen, x, 0, x, availableSize.Height);
 				}
 			}
 		}

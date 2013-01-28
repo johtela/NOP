@@ -2,8 +2,8 @@ namespace NOP
 {
 	using System;
 	using Collections;
-    using System.Collections.Generic;
-    using V = NOP.Visual;
+	using System.Collections.Generic;
+	using V = NOP.Visual;
 
 	public class LambdaExpression : Expression
 	{
@@ -34,22 +34,22 @@ namespace NOP
 				FunctionBody.GetTypeExpr ());
 		}
 
-        protected override IEnumerable<AstNode> GetChildNodes ()
-        {
-            return Parameters.Append<AstNode> (FunctionBody);
-        }
+		protected override IEnumerable<AstNode> GetChildNodes ()
+		{
+			return Parameters.Append<AstNode> (FunctionBody);
+		}
 
-        protected override void ChangeVisual ()
-        {
-            var sexps = ((SExpr.List)SExp).Items;
-            var slambda = sexps.First;
-            var sparams = sexps.Rest.First;
-            var sbody = sexps.Rest.Rest.First;
+		protected override Visual GetVisual ()
+		{
+			var sexps = ((SExpr.List)SExp).Items;
+			var slambda = sexps.First;
+			var sparams = sexps.Rest.First;
+			var sbody = sexps.Rest.Rest.First;
 
-            SExp.Depiction = V.VStack (HAlign.Left,
+			return V.VStack (HAlign.Left,
                 V.HStack (VAlign.Top, V.Depiction (slambda), V.Depiction (sparams)),
                 V.HStack (VAlign.Top, V.Margin (2), V.Depiction (sbody)));
-        }
+		}
 	}
 }
 

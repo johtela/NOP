@@ -1,9 +1,9 @@
 namespace NOP
 {
 	using System;
-    using System.Collections.Generic;
-    using Collections;
-    using V = NOP.Visual;
+	using System.Collections.Generic;
+	using Collections;
+	using V = NOP.Visual;
 	
 	public class LetExpression : Expression
 	{
@@ -26,22 +26,22 @@ namespace NOP
 			                             Body.GetTypeExpr ());
 		}
 
-        protected override IEnumerable<AstNode> GetChildNodes ()
-        {
-            return List.Create<AstNode> (Variable, Value, Body);
-        }
+		protected override IEnumerable<AstNode> GetChildNodes ()
+		{
+			return List.Create<AstNode> (Variable, Value, Body);
+		}
 
-        protected override void ChangeVisual ()
-        {
-            var slet = ((SExpr.List)SExp).Items.First;
-            var svar = Variable.SExp;
-            var sval = Value.SExp;
-            var sbody = Body.SExp;
+		protected override Visual GetVisual ()
+		{
+			var slet = ((SExpr.List)SExp).Items.First;
+			var svar = Variable.SExp;
+			var sval = Value.SExp;
+			var sbody = Body.SExp;
 
-            SExp.Depiction = V.VStack (HAlign.Left,
+			return V.VStack (HAlign.Left,
                 V.HStack (VAlign.Top, V.Depiction (slet), V.Depiction (svar), 
                     V.Label ("="), V.Depiction (sval)),
                 V.HStack (VAlign.Top, V.Depiction (sbody)));
-        }
+		}
 	}
 }
