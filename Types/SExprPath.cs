@@ -180,40 +180,40 @@
 		/// closest previous sexp item, if the path refers to a
 		/// non-existent S-expression.
 		/// </summary>
-		public NOPList<SExpr> Target (SExpr root)
+		public SExpr Target (SExpr root)
 		{
 			var node = NodeOfPath (root);
-			return node != null ? node.Current : NOPList<SExpr>.Empty;
+			return node != null ? node.Current.First : root;
 		}
 
 		/// <summary>
 		/// Return a tuple containing the sexp next to the sexp pointed by 
 		/// the path and its path.
 		/// </summary>
-		public Tuple<NOPList<SExpr>, SExprPath> NextSibling (SExpr root)
+		public Tuple<SExpr, SExprPath> NextSibling (SExpr root)
 		{
 			var node = NodeOfPath (root);
 
 			while (node != null && node.Next == null)
 				node = node.Parent;
 			return node != null ?
-				Tuple.Create (node.Next.Current, node.Next.Path) :
-				Tuple.Create (NOPList<SExpr>.Empty, new SExprPath ());
+				Tuple.Create (node.Next.Current.First, node.Next.Path) :
+				Tuple.Create (root, new SExprPath ());
 		}
 
 		/// <summary>
 		/// Return a tuple containing the sexp previous to the sexp pointed by 
 		/// the path and its path.
 		/// </summary>
-		public Tuple<NOPList<SExpr>, SExprPath> PrevSibling (SExpr root)
+		public Tuple<SExpr, SExprPath> PrevSibling (SExpr root)
 		{
 			var node = NodeOfPath (root);
 
 			if (node != null)
 				node = node.Previous ?? node.Parent;
 			return node != null ?
-				Tuple.Create (node.Current, node.Path) :
-				Tuple.Create (NOPList<SExpr>.Empty, new SExprPath ());
+				Tuple.Create (node.Current.First, node.Path) :
+				Tuple.Create (root, new SExprPath ());
 		}
 	}
 }

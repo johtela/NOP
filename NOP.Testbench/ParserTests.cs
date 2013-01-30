@@ -19,7 +19,7 @@ namespace NOP.Testbench
 			Check.IsOfType<T> (expr);
 			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
 			expr.ChangeVisualDepictions ();
-			Runner.VConsole.ShowVisual (Visual.Depiction (sexp));
+			Runner.VConsole.ShowSExpr (sexp);
 		}
 
 		[Test]
@@ -66,9 +66,9 @@ namespace NOP.Testbench
 		public void TestNestedLets ()
 		{
 			AssertParsesTo<LetExpression> ("System.Boolean", 
-               Let ("foo", A (42), 
-			     Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
-			     Call ("bar", S ("foo"), A (3)))
+			   Let ("foo", A (42), 
+				 Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
+				 Call ("bar", S ("foo"), A (3)))
 			)
 			);
 		}
@@ -85,14 +85,14 @@ namespace NOP.Testbench
 			var prog = SampleProgram ().Build ();
 			var path = new SExprPath (List.Create (0, 2, 2, 1, 1));
 
-			Check.AreEqual (path.Target (prog).First, S ("y").Build ());
+			Check.AreEqual (path.Target (prog), S ("y").Build ());
 			var prev = path.PrevSibling (prog);
 
-			Check.AreEqual (prev.Item1.First, S ("x").Build ());
-			Check.AreEqual (prev.Item2.PrevSibling (prog).Item1.First, L (S ("x"), S ("y")).Build ()); 
+			Check.AreEqual (prev.Item1, S ("x").Build ());
+			Check.AreEqual (prev.Item2.PrevSibling (prog).Item1, L (S ("x"), S ("y")).Build ()); 
 
 			path = new SExprPath (List.Create (0, 2));
-			Check.AreEqual (path.NextSibling (prog).Item1.First, A (4).Build ());
+			Check.AreEqual (path.NextSibling (prog).Item1, A (4).Build ());
 		}
 
 		private ExprBuilder SampleProgram ()
@@ -100,7 +100,7 @@ namespace NOP.Testbench
 			return Call (
 				Lambda (P ("foo"),
 					Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
-			    	Call ("bar", S ("foo"), A (3)))
+					Call ("bar", S ("foo"), A (3)))
 			), A (4));
 		}
 	}

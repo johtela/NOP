@@ -259,9 +259,13 @@
 
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
-				SExpr.Depiction.Draw (context.FocusedExpr == SExpr ? 
-				                      new GraphicsContext (context.Graphics) { DefaultBrush = Brushes.Blue } :
-				                      context, availableSize);
+				if (context.FocusedExpr == SExpr)
+				{
+					var box = CalculateSize (context);
+					context.Graphics.FillRectangle (Brushes.Blue, 0, 0, box.Width, box.Height);
+					context = new GraphicsContext (context.Graphics) { DefaultBrush = Brushes.White };
+				}
+				SExpr.Depiction.Draw (context, availableSize);
 			}
 		}
 

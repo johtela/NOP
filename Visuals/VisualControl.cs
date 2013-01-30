@@ -1,6 +1,6 @@
 ﻿namespace NOP.Visuals
 {
-    using System;
+	using System;
 	using System.Windows.Forms;
 	using System.Drawing;
 
@@ -8,6 +8,8 @@
 	{
 		private Visual _visual;
 		private VBox _size;
+		private SExpr _code;
+		private SExprPath _path;
 
 		public VisualControl ()
 		{
@@ -22,6 +24,17 @@
 			{
 				_visual = value;
 				this.BeginInvoke (new Action (CalculateNewSize));
+			}
+		}
+
+		public SExpr Code
+		{
+			get { return _code; }
+			set
+			{
+				_code = value;
+				Visual = Visual.Depiction (_code);
+				_path = new SExprPath ();
 			}
 		}
 
@@ -40,8 +53,9 @@
 		{
 			base.OnPaint (pe);
 
+			var focused = _path != null && _code != null ? _path.Target(_code) : null;
 			if (_visual != null)
-				_visual.Render (new GraphicsContext (pe.Graphics), _size);
+				_visual.Render (new GraphicsContext (pe.Graphics, focused), _size);
 		}
 	}
 }
