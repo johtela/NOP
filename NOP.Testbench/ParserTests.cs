@@ -62,22 +62,22 @@ namespace NOP.Testbench
 			);
 		}
 
-		[Test]
-		public void TestNestedLets ()
-		{
-			AssertParsesTo<LetExpression> ("System.Boolean", 
-			   Let ("foo", A (42), 
-				 Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
-				 Call ("bar", S ("foo"), A (3)))
-			)
-			);
-		}
+		//[Test]
+		//public void TestNestedLets ()
+		//{
+		//    AssertParsesTo<LetExpression> ("System.Boolean", 
+		//       Let ("foo", A (42), 
+		//         Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
+		//         Call ("bar", S ("foo"), A (3)))
+		//    )
+		//    );
+		//}
 
-		[Test]
-		public void TestNestedLambdas ()
-		{
-			AssertParsesTo<ApplicationExpression> ("System.Boolean", SampleProgram ());
-		}
+		//[Test]
+		//public void TestNestedLambdas ()
+		//{
+		//    AssertParsesTo<ApplicationExpression> ("System.Boolean", SampleProgram ());
+		//}
 
 		[Test]
 		public void TestSExprPath ()

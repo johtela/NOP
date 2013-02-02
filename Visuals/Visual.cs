@@ -92,7 +92,7 @@
 			/// </summary>
 			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				return new VBox (context.Graphics.MeasureString (Text, context.DefaultFont).Width + 5, 
+				return new VBox (context.Graphics.MeasureString (Text, context.DefaultFont).Width, 
 				                 context.DefaultFont.Height);
 			}
 			
@@ -262,7 +262,7 @@
 				if (context.FocusedExpr == SExpr)
 				{
 					var box = CalculateSize (context);
-					context.Graphics.FillRectangle (Brushes.Blue, 0, 0, box.Width, box.Height);
+					context.Graphics.FillRectangle (Brushes.RoyalBlue, 0, 0, box.Width, box.Height);
 					context = new GraphicsContext (context.Graphics) { DefaultBrush = Brushes.White };
 				}
 				SExpr.Depiction.Draw (context, availableSize);

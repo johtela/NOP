@@ -3,6 +3,7 @@
 	using System;
 	using System.Windows.Forms;
 	using System.Drawing;
+	using System.Drawing.Drawing2D;
 
 	public class VisualControl : Control
 	{
@@ -49,13 +50,52 @@
 			Invalidate ();
 		}
 
+		protected override bool IsInputKey (System.Windows.Forms.Keys keyData)
+		{
+			switch (keyData)
+			{
+				case Keys.Down:
+				case Keys.Up:
+				case Keys.Left:
+				case Keys.Right:
+					return true;
+			}
+			return base.IsInputKey (keyData);
+		}
+
+		protected override void OnKeyDown (KeyEventArgs e)
+		{
+			switch (e.KeyCode)
+			{
+				case Keys.Down:
+					_path = _path.NextSibling (_code).Item2;
+					break;
+				case Keys.Up: 
+					_path = _path.PrevSibling (_code).Item2;
+					break;
+				case Keys.Left:
+					_path = _path.Previous (_code).Item2;
+					break;
+				case Keys.Right:
+					_path = _path.Next (_code).Item2;
+					break;
+				default:
+					base.OnKeyDown (e);
+					return;
+			}
+			Invalidate ();
+		}
+
 		protected override void OnPaint (PaintEventArgs pe)
 		{
 			base.OnPaint (pe);
 
-			var focused = _path != null && _code != null ? _path.Target(_code) : null;
+			var focused = _path != null && _code != null ? _path.Target (_code) : null;
 			if (_visual != null)
+			{
+				pe.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 				_visual.Render (new GraphicsContext (pe.Graphics, focused), _size);
+			}
 		}
 	}
 }
