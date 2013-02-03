@@ -151,7 +151,7 @@
 			var node = (root as SExpr.List).Items;
 			var path = List.Create (Tuple.Create (0, node));
 
-			while (node.NotEmpty && path.NotEmpty && node.First != target)
+			while (node.NotEmpty && path.NotEmpty && !ReferenceEquals(node.First, target))
 			{
 				if (node.First is SExpr.List)
 				{
@@ -165,12 +165,18 @@
 				}
 				else if (path.Rest.NotEmpty)
 				{
-					path = path.Rest;
-					node = path.First.Item2.Rest;
+					do
+					{
+						path = path.Rest;
+						node = path.First.Item2.Rest;
+					}
+					while (node.IsEmpty && path.Rest.NotEmpty);
 					path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
 				}
 			}
-			return path.Map (t => t.Item1).Reverse ();
+			return node.IsEmpty ? 
+				NOPList<int>.Empty :
+				path.Map (t => t.Item1).Reverse ();
 		}
 
 		public SExprPath (SExpr root, SExpr target)

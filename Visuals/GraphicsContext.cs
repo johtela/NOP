@@ -15,7 +15,7 @@ namespace NOP.Visuals
 		public Font DefaultFont;
 		public Brush DefaultBrush;
 		public Pen RectPen;
-		public NOPList<HitRect> HitRects = NOPList<HitRect>.Empty;
+		public static NOPList<HitRect> HitRects;
 
 		public GraphicsContext (Graphics gr, SExpr focused)
 		{

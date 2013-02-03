@@ -271,7 +271,7 @@
 					context = new GraphicsContext (context.Graphics) { DefaultBrush = Brushes.White };
 				}
 				var hitRect = new HitRect (box.AsRectF (context.Graphics.Transform), SExpr);
-				context.HitRects = hitRect | context.HitRects;
+				GraphicsContext.HitRects = hitRect | GraphicsContext.HitRects;
 				SExpr.Depiction.Draw (context, availableSize);
 			}
 		}

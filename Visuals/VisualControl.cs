@@ -110,8 +110,9 @@
 			{
 				pe.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 				var ctx = new GraphicsContext (pe.Graphics, focused);
+				GraphicsContext.HitRects = NOPList<HitRect>.Empty;
 				_visual.Render (ctx, _size);
-				_hitRects = ctx.HitRects;
+				_hitRects = GraphicsContext.HitRects;
 			}
 		}
 	}
