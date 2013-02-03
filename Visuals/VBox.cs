@@ -1,7 +1,8 @@
-namespace NOP
+namespace NOP.Visuals
 {
 	using System;
-    using System.Drawing;
+	using System.Drawing;
+using System.Drawing.Drawing2D;
 	
 	/// <summary>
 	/// Structure that is used to layout visuals.
@@ -111,13 +112,20 @@ namespace NOP
 			get { return Width <= 0 || Height <= 0; }
 		}
 	
-        /// <summary>
-        /// Return System.Drawing.SizeF with same dimensions.
-        /// </summary>
-	    public SizeF AsSizeF
-        {
-            get { return new SizeF (Width, Height); }
-        }
+		/// <summary>
+		/// Return System.Drawing.SizeF with same dimensions.
+		/// </summary>
+		public SizeF AsSizeF
+		{
+			get { return new SizeF (Width, Height); }
+		}
+
+		public RectangleF AsRectF (Matrix matrix)
+		{
+			var points = new PointF[] { new PointF (0, 0) };
+			matrix.TransformPoints (points);
+			return new RectangleF (points[0], AsSizeF);
+		}
 
 		public override string ToString ()
 		{

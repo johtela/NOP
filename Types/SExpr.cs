@@ -1,8 +1,8 @@
 namespace NOP
 {
-    using System;
+	using System;
 	using Visuals;
-    
+	
 	/// <summary>
 	/// The definition of the LISP S-expression. The basic element from which 
 	/// the programs are constructed. Like text in the traditional programming
@@ -24,18 +24,18 @@ namespace NOP
 				Value = value;
 				Depiction = Visual.Literal (this);
 			}
-            
+			
 			public override bool Equals (object obj)
 			{
 				var other = obj as Literal;
 				return other != null && Value.Equals (other.Value);
 			}
-            
+			
 			public override int GetHashCode ()
 			{
 				return Value.GetHashCode ();
 			}
-            
+			
 			public override string ToString ()
 			{
 				return Value.ToString ();
@@ -54,18 +54,18 @@ namespace NOP
 				Name = name;
 				Depiction = Visual.Symbol (this);
 			}
-            
+			
 			public override bool Equals (object obj)
 			{
 				var other = obj as Symbol;
 				return other != null && other.Name == Name;
 			}
-            
+			
 			public override int GetHashCode ()
 			{
 				return Name.GetHashCode ();
 			}
-            
+			
 			public override string ToString ()
 			{
 				return Name;
@@ -84,18 +84,18 @@ namespace NOP
 				Items = items;
 				Depiction = Visual.Parenthesize (Visual.HList (Items));
 			}
-            
+			
 			public override bool Equals (object obj)
 			{
 				var other = obj as List;
 				return other != null && Items.Equals (other.Items);
 			}
-            
+			
 			public override int GetHashCode ()
 			{
 				return Items.GetHashCode ();
 			}
-            
+			
 			public override string ToString ()
 			{
 				return Items.ToString ();

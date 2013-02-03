@@ -4,7 +4,8 @@ namespace NOP
 	using System.Linq;
 	using Collections;
 	using System.Collections.Generic;
-	using V = NOP.Visual;
+	using Visuals;
+	using V = NOP.Visuals.Visual;
 	
 	public class ApplicationExpression : Expression
 	{
@@ -41,7 +42,7 @@ namespace NOP
 			var sexps = ((SExpr.List)SExp).Items;
 
 			return V.HStack (VAlign.Top, V.Depiction (sexps.First),
-                V.Parenthesize (V.HList (sexps.Rest)));
+				V.Parenthesize (V.HList (sexps.Rest)));
 		}
 	}
 }

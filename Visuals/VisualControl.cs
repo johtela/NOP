@@ -4,6 +4,7 @@
 	using System.Windows.Forms;
 	using System.Drawing;
 	using System.Drawing.Drawing2D;
+	using NOP.Collections;
 
 	public class VisualControl : Control
 	{
@@ -11,6 +12,7 @@
 		private VBox _size;
 		private SExpr _code;
 		private SExprPath _path;
+		private NOPList<HitRect> _hitRects;
 
 		public VisualControl ()
 		{
@@ -86,6 +88,16 @@
 			Invalidate ();
 		}
 
+		protected override void OnMouseDown (MouseEventArgs e)
+		{
+			base.OnMouseDown (e);
+			var point = new PointF (e.X, e.Y);
+
+			var hitRect = _hitRects.FindNext (hr => hr.Rect.Contains (point));
+			if (hitRect.NotEmpty)
+				_path = new SExprPath ();
+		}
+
 		protected override void OnPaint (PaintEventArgs pe)
 		{
 			base.OnPaint (pe);
@@ -94,7 +106,9 @@
 			if (_visual != null)
 			{
 				pe.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-				_visual.Render (new GraphicsContext (pe.Graphics, focused), _size);
+				var ctx = new GraphicsContext (pe.Graphics, focused);
+				_visual.Render (ctx, _size);
+				_hitRects = ctx.HitRects;
 			}
 		}
 	}

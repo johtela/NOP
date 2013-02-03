@@ -3,7 +3,8 @@ namespace NOP
 	using System;
 	using System.Collections.Generic;
 	using Collections;
-	using V = NOP.Visual;
+	using NOP.Visuals;
+	using V = NOP.Visuals.Visual;
 	
 	public class LetExpression : Expression
 	{
@@ -23,7 +24,7 @@ namespace NOP
 		{
 			base.GetTypeExpr ();
 			return TypeExpr.Builder.Let (Variable.Symbol.Name, Value.GetTypeExpr (), 
-			                             Body.GetTypeExpr ());
+										 Body.GetTypeExpr ());
 		}
 
 		protected override IEnumerable<AstNode> GetChildNodes ()
@@ -39,9 +40,9 @@ namespace NOP
 			var sbody = Body.SExp;
 
 			return V.VStack (HAlign.Left,
-                V.HStack (VAlign.Top, V.Depiction (slet), V.Depiction (svar), 
-                    V.Label ("="), V.Depiction (sval)),
-                V.HStack (VAlign.Top, V.Depiction (sbody)));
+				V.HStack (VAlign.Top, V.Depiction (slet), V.Depiction (svar), 
+					V.Label ("="), V.Depiction (sval)),
+				V.HStack (VAlign.Top, V.Depiction (sbody)));
 		}
 	}
 }

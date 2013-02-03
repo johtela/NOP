@@ -3,6 +3,7 @@ namespace NOP
 	using System;
 	using Collections;
 	using System.Collections.Generic;
+	using Visuals;
 
 	/// <summary>
 	/// Exception for interpreter errors.

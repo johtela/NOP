@@ -3,7 +3,8 @@ namespace NOP
 	using System;
 	using Collections;
 	using System.Collections.Generic;
-	using V = NOP.Visual;
+	using Visuals;
+	using V = NOP.Visuals.Visual;
 
 	public class LambdaExpression : Expression
 	{
@@ -47,8 +48,8 @@ namespace NOP
 			var sbody = sexps.Rest.Rest.First;
 
 			return V.VStack (HAlign.Left,
-                V.HStack (VAlign.Top, V.Depiction (slambda), V.Depiction (sparams)),
-                V.HStack (VAlign.Top, V.Margin (2), V.Depiction (sbody)));
+				V.HStack (VAlign.Top, V.Depiction (slambda), V.Depiction (sparams)),
+				V.HStack (VAlign.Top, V.Margin (2), V.Depiction (sbody)));
 		}
 	}
 }

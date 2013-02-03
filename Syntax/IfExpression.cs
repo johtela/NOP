@@ -1,9 +1,10 @@
 namespace NOP
 {
 	using System;
-	using Collections;
-	using V = NOP.Visual;
 	using System.Collections.Generic;
+	using Collections;
+	using Visuals;
+	using V = NOP.Visuals.Visual;
 
 	public class IfExpression : Expression
 	{
@@ -27,9 +28,9 @@ namespace NOP
 			var selse = ElseExpression.SExp;
 
 			return V.HStack (VAlign.Top,
-                V.Depiction (skeyword), V.Depiction (scond), V.VStack (HAlign.Left,
-                    V.HStack (VAlign.Top, V.Label ("then"), V.Depiction (sthen)),
-                    V.HStack (VAlign.Top, V.Label ("else"), V.Depiction (selse)))
+				V.Depiction (skeyword), V.Depiction (scond), V.VStack (HAlign.Left,
+					V.HStack (VAlign.Top, V.Label ("then"), V.Depiction (sthen)),
+					V.HStack (VAlign.Top, V.Label ("else"), V.Depiction (selse)))
 			);
 		}
 		
@@ -37,7 +38,7 @@ namespace NOP
 		{
 			base.GetTypeExpr ();
 			return TypeExpr.Builder.If (Condition.GetTypeExpr (), ThenExpression.GetTypeExpr (),
-			                            ElseExpression.GetTypeExpr ());
+										ElseExpression.GetTypeExpr ());
 		}
 
 		protected override IEnumerable<AstNode> GetChildNodes ()

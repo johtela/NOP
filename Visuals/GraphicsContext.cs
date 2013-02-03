@@ -1,4 +1,4 @@
-namespace NOP
+namespace NOP.Visuals
 {
 	using System;
 	using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace NOP
 		public Font DefaultFont;
 		public Brush DefaultBrush;
 		public Pen RectPen;
-
+		public NOPList<HitRect> HitRects = NOPList<HitRect>.Empty;
 
 		public GraphicsContext (Graphics gr, SExpr focused)
 		{

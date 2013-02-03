@@ -1,4 +1,4 @@
-﻿namespace NOP
+﻿namespace NOP.Visuals
 {
 	using System;
 	using System.Collections.Generic;
@@ -42,6 +42,8 @@
 	/// </summary>
 	public abstract class Visual
 	{
+		private Nullable<VBox> _size;
+
 		/// <summary>
 		/// An abstract method that calculates the size of a visual once it is constructed.
 		/// </summary>
@@ -66,7 +68,9 @@
 
 		public VBox GetSize (GraphicsContext context)
 		{
-			return CalculateSize (context);
+			if (_size == null)
+				_size = CalculateSize (context);
+			return _size.Value;
 		}
 
 		/// <summary>
@@ -209,14 +213,14 @@
 			/// </summary>
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
-				var stack = CalculateSize (context);
+				var stack = GetSize (context);
 				
 				foreach (Visual visual in Items)
 				{
 					if (availableSize.IsEmpty)
 						break;
 					
-					var inner = visual.CalculateSize (context);
+					var inner = visual.GetSize (context);
 					var outer = Direction == VisualDirection.Horizontal ?
 						new VBox (inner.Width, stack.Height) :
 						new VBox (stack.Width, inner.Height);
@@ -259,12 +263,15 @@
 
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
+				var box = GetSize (context);
+
 				if (context.FocusedExpr == SExpr)
 				{
-					var box = CalculateSize (context);
 					context.Graphics.FillRectangle (Brushes.RoyalBlue, 0, 0, box.Width, box.Height);
 					context = new GraphicsContext (context.Graphics) { DefaultBrush = Brushes.White };
 				}
+				var hitRect = new HitRect (box.AsRectF (context.Graphics.Transform), SExpr);
+				context.HitRects = hitRect | context.HitRects;
 				SExpr.Depiction.Draw (context, availableSize);
 			}
 		}

@@ -1,6 +1,7 @@
 namespace NOP
 {
 	using System;
+	using Visuals;
 
 	public class LiteralExpression : Expression
 	{
