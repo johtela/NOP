@@ -76,7 +76,7 @@
 			/// </summary>
 			public SExprNode Next
 			{
-				get 
+				get
 				{
 					if (_next == null && !Current.Rest.IsEmpty)
 						_next = new SExprNode (Current.Rest, Index + 1, this, Parent);
@@ -89,7 +89,7 @@
 			/// </summary>
 			public SExprNode FirstChild
 			{
-				get 
+				get
 				{ 
 					if (_firstChild == null)
 					{
@@ -106,7 +106,7 @@
 			/// </summary>
 			public SExprPath Path
 			{
-				get 
+				get
 				{
 					var result = NOPList<int>.Empty;
 					var node = this;
@@ -140,6 +140,42 @@
 		/// </summary>
 		public SExprPath () : this (List.Create(0))
 		{
+		}
+
+		private NOPList<int> FindNode (SExpr root, SExpr target)
+		{
+			if (root == target)
+				return List.Create (0);
+			if (!(root is SExpr.List))
+				return NOPList<int>.Empty;
+			var node = (root as SExpr.List).Items;
+			var path = List.Create (Tuple.Create (0, node));
+
+			while (node.NotEmpty && path.NotEmpty && node.First != target)
+			{
+				if (node.First is SExpr.List)
+				{
+					node = (node.First as SExpr.List).Items;
+					path = Tuple.Create (0, node) | path;
+				}
+				else if (node.Rest.NotEmpty)
+				{
+					node = node.Rest;
+					path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
+				}
+				else if (path.Rest.NotEmpty)
+				{
+					path = path.Rest;
+					node = path.First.Item2.Rest;
+					path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
+				}
+			}
+			return path.Map (t => t.Item1).Reverse ();
+		}
+
+		public SExprPath (SExpr root, SExpr target)
+		{
+			Path = FindNode (root, target);
 		}
 
 		public override string ToString ()
@@ -194,20 +230,20 @@
 			return node != null ? node.Current.First : root;
 		}
 
-		private Tuple<SExpr, SExprPath> CurrentOrEmpty(SExprNode node, SExpr root)
+		private Tuple<SExpr, SExprPath> CurrentOrEmpty (SExprNode node, SExpr root)
 		{
 			return node != null ?
 				Tuple.Create (node.Current.First, node.Path) :
 				Tuple.Create (root, new SExprPath ());
 		}
 
-		private Tuple<SExpr, SExprPath> NextOrEmpty(SExprNode node, SExpr root)
+		private Tuple<SExpr, SExprPath> NextOrEmpty (SExprNode node, SExpr root)
 		{
 			while (node != null && node.Next == null)
 				node = node.Parent;
 			return node != null ?
 				Tuple.Create (node.Next.Current.First, node.Next.Path) :
-				Tuple.Create (root, new SExprPath (List.Create(int.MaxValue)));
+				Tuple.Create (root, new SExprPath (List.Create (int.MaxValue)));
 		}
 
 		/// <summary>

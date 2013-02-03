@@ -96,7 +96,7 @@
 			/// </summary>
 			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				return new VBox (context.Graphics.MeasureString (Text, context.DefaultFont).Width, 
+				return new VBox (context.Graphics.MeasureString (Text, context.DefaultFont).Width + 4, 
 				                 context.DefaultFont.Height);
 			}
 			

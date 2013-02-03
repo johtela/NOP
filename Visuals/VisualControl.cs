@@ -95,7 +95,10 @@
 
 			var hitRect = _hitRects.FindNext (hr => hr.Rect.Contains (point));
 			if (hitRect.NotEmpty)
-				_path = new SExprPath ();
+			{
+				_path = new SExprPath (_code, hitRect.First.SExp);
+				Invalidate ();
+			}
 		}
 
 		protected override void OnPaint (PaintEventArgs pe)
