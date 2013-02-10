@@ -1,6 +1,7 @@
 namespace NOP
 {
 	using System;
+	using Collections;
 	using Visuals;
 	
 	/// <summary>
@@ -77,9 +78,9 @@ namespace NOP
 		/// </summary>
 		public class List : SExpr
 		{
-			public readonly Collections.NOPList<SExpr> Items;
+			public readonly NOPList<SExpr> Items;
 
-			public List (Collections.NOPList<SExpr> items)
+			public List (NOPList<SExpr> items)
 			{
 				Items = items;
 				Depiction = Visual.Parenthesize (Visual.HList (Items));
@@ -100,6 +101,11 @@ namespace NOP
 			{
 				return Items.ToString ();
 			}
+		}
+
+		public NOPList<SExpr> AsList
+		{
+			get { return (this as List).Items; }
 		}
 	}
 }

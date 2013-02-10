@@ -15,14 +15,15 @@ namespace NOP.Testbench
 		public static void Main (string[] args)
 		{
 			Task.Factory.StartNew (() =>
-                Tester.RunTests (
-                    new CollectionTests (),
-                    //new InterpreterTests (),
-                    new MapTests (),
-                    new SetTests (),
-                    new TypeDefinitionTests (),
-                    new TypeCheckingTests (),
-                    new ParserTests ())
+				Tester.RunTests (
+					new CollectionTests (),
+					//new InterpreterTests (),
+					new MapTests (),
+					new SetTests (),
+					new TypeDefinitionTests (),
+					new TypeCheckingTests (),
+					new ParserTests (),
+					new SExprPathTests ())
 			);
 			Application.Run (VConsole);
 			VConsole.Dispose ();

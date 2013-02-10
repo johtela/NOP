@@ -142,20 +142,25 @@
 		{
 		}
 
+		public SExprPath (SExpr root, SExpr target)
+		{
+			Path = FindNode (root, target);
+		}
+
 		private NOPList<int> FindNode (SExpr root, SExpr target)
 		{
 			if (root == target)
 				return List.Create (0);
 			if (!(root is SExpr.List))
 				return NOPList<int>.Empty;
-			var node = (root as SExpr.List).Items;
+			var node = root.AsList;
 			var path = List.Create (Tuple.Create (0, node));
 
 			while (node.NotEmpty && path.NotEmpty && !ReferenceEquals(node.First, target))
 			{
 				if (node.First is SExpr.List)
 				{
-					node = (node.First as SExpr.List).Items;
+					node = node.First.AsList;
 					path = Tuple.Create (0, node) | path;
 				}
 				else if (node.Rest.NotEmpty)
@@ -177,16 +182,6 @@
 			return node.IsEmpty ? 
 				NOPList<int>.Empty :
 				path.Map (t => t.Item1).Reverse ();
-		}
-
-		public SExprPath (SExpr root, SExpr target)
-		{
-			Path = FindNode (root, target);
-		}
-
-		public override string ToString ()
-		{
-			return Path.ToString ();
 		}
 
 		/// <summary>
@@ -218,22 +213,11 @@
 						list = list.Rest;
 				}
 				if (list.NotEmpty && list.First is SExpr.List)
-					list = (list.First as SExpr.List).Items;
+					list = list.First.AsList;
 				inds = inds.Rest;
 				parent = node;
 			}
 			return parent;
-		}
-
-		/// <summary>
-		/// Return the sexp list item pointed by the path, or the
-		/// closest previous sexp item, if the path refers to a
-		/// non-existent S-expression.
-		/// </summary>
-		public SExpr Target (SExpr root)
-		{
-			var node = NodeOfPath (root);
-			return node != null ? node.Current.First : root;
 		}
 
 		private Tuple<SExpr, SExprPath> CurrentOrEmpty (SExprNode node, SExpr root)
@@ -250,6 +234,27 @@
 			return node != null ?
 				Tuple.Create (node.Next.Current.First, node.Next.Path) :
 				Tuple.Create (root, new SExprPath (List.Create (int.MaxValue)));
+		}
+
+		private bool TryMove (ref SExprNode node, SExprNode newNode)
+		{
+			if (newNode != null)
+			{
+				node = newNode;
+				return true;
+			}
+			return false;
+		}
+
+		/// <summary>
+		/// Return the sexp list item pointed by the path, or the
+		/// closest previous sexp item, if the path refers to a
+		/// non-existent S-expression.
+		/// </summary>
+		public SExpr Target (SExpr root)
+		{
+			var node = NodeOfPath (root);
+			return node != null ? node.Current.First : root;
 		}
 
 		/// <summary>
@@ -273,6 +278,10 @@
 			return CurrentOrEmpty (node, root);
 		}
 
+		/// <summary>
+		/// Return the next S-expression of the path when traversing the
+		/// tree in depth-first manner.
+		/// </summary>
 		public Tuple<SExpr, SExprPath> Next (SExpr root)
 		{
 			var node = NodeOfPath (root);
@@ -281,16 +290,10 @@
 				NextOrEmpty (node, root);
 		}
 
-		private bool TryMove (ref SExprNode node, SExprNode newNode)
-		{
-			if (newNode != null)
-			{
-				node = newNode;
-				return true;
-			}
-			return false;
-		}
-
+		/// <summary>
+		/// Return the next S-expression of the path when traversing the
+		/// tree in depth-first manner.
+		/// </summary>
 		public Tuple<SExpr, SExprPath> Previous (SExpr root)
 		{
 			var node = NodeOfPath (root);
@@ -306,6 +309,14 @@
 					node = node.Parent;
 			}
 			return CurrentOrEmpty (node, root);
+		}
+
+		/// <summary>
+		/// Return the string representation of the path.
+		/// </summary>
+		public override string ToString ()
+		{
+			return Path.ToString ();
 		}
 	}
 }

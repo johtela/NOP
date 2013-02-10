@@ -223,6 +223,20 @@
             return list.IsEmpty ? default (T) : list.First;
         }
 
+		/// <summary>
+		/// Return the Nth tail of the list.
+		/// </summary>
+		/// <param name="n">The index of the tail to be returned.</param>
+		/// <returns>The nth tail of the list.</returns>
+		public NOPList<T> RestNth (int n)
+		{
+			var list = this;
+
+			while (n-- > 0)
+				list = list.Rest;
+			return list;
+		}
+
         /// <summary>
         /// Return the position of the specified item.
         /// </summary>

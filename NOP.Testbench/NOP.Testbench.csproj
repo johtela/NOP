@@ -39,6 +39,8 @@
     <Compile Include="CollectionTests.cs" />
     <Compile Include="InterpreterTests.cs" />
     <Compile Include="MapTests.cs" />
+    <Compile Include="SExprPathTests.cs" />
+    <Compile Include="TestPrograms.cs" />
     <Compile Include="TypeDefinitionTests.cs" />
     <Compile Include="Arithmetic.cs" />
     <Compile Include="SetTests.cs" />

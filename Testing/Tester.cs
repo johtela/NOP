@@ -56,7 +56,7 @@ namespace NOP
 		{
 			if (!x.Equals (y))
 				throw new TestFailed (string.Format ("'{0}' and '{1}' should be equal.", x, y));
-		}
+			}
 		
 		/// <summary>
 		/// Check that two values are not equal.
