@@ -303,7 +303,7 @@
 		/// </summary>
 		private sealed class _Ruler : Visual
 		{
-			private readonly VisualDirection Direction;
+			public readonly VisualDirection Direction;
 
 			public _Ruler (VisualDirection direction)
 			{
@@ -327,6 +327,22 @@
 					var x = availableSize.Width / 2;
 					context.Graphics.DrawLine (context.RectPen, x, 0, x, availableSize.Height);
 				}
+			}
+		}
+
+		private class _TextEdit : Visual
+		{
+			private string _text;
+			private Action<string> _accept;
+
+			protected override VBox CalculateSize (GraphicsContext context)
+			{
+				throw new NotImplementedException ();
+			}
+
+			protected override void Draw (GraphicsContext context, VBox availableSize)
+			{
+				throw new NotImplementedException ();
 			}
 		}
 

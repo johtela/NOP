@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="Types\Program.cs" />
     <Compile Include="Types\SExprPath.cs" />
+    <Compile Include="Visuals\Animation.cs" />
     <Compile Include="Visuals\HitRect.cs" />
     <Compile Include="Visuals\Visual.cs" />
     <Compile Include="Interpreter\Environment.cs" />

@@ -1,9 +1,7 @@
 namespace NOP.Testbench
 {
-	using System;
 	using NOP;
-	using NOP.Collections;
-	
+
 	public class TypeCheckingTests : TypeExpr.Builder
 	{
 		private void CheckType (TypeExpr expr, string type)

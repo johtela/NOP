@@ -21,7 +21,7 @@ namespace NOP
 		protected override Visual GetVisual ()
 		{
 			return Literal.Value is string ?
-				SExp.Depiction = Visual.Label (string.Format ("\"{0}\"", Literal.Value)) :
+				Visual.Label (string.Format ("\"{0}\"", Literal.Value)) :
 				base.GetVisual ();
 		}
 	}

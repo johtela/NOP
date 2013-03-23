@@ -1,10 +1,5 @@
 ﻿namespace NOP.Testbench
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Text;
-
 	public class TestPrograms : ExprUser
 	{
 		public static ExprBuilder SimpleLet ()

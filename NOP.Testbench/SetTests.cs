@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using NOP.Collections;
-
 namespace NOP.Testbench
 {
+	using System.Collections.Generic;
+	using NOP.Collections;
+
 	public class SetTests
 	{
 		private const int _itemCount = 10000;
@@ -22,7 +20,7 @@ namespace NOP.Testbench
 			return Set<int>.Create (Range (0, _itemCount));
 		}
 
-        [Test]
+		[Test]
 		public void TestTreeStructure ()
 		{
 			var s = Set<string>.Empty;
@@ -34,7 +32,7 @@ namespace NOP.Testbench
 			Check.IsFalse (s.Contains ("2"));
 		}
 
-        [Test]
+		[Test]
 		public void TestAddition ()
 		{
 			var s = CreateTestSet ();
@@ -45,7 +43,7 @@ namespace NOP.Testbench
 			}
 		}
 
-        [Test]
+		[Test]
 		public void TestRemoval ()
 		{
 			var s = CreateTestSet ();
@@ -60,7 +58,7 @@ namespace NOP.Testbench
 
 		}
 
-        [Test]
+		[Test]
 		public void TestImmutability ()
 		{
 			var s = CreateTestSet ();
@@ -71,7 +69,7 @@ namespace NOP.Testbench
 			Check.IsTrue (s.Contains (64));
 		}
 
-        [Test]
+		[Test]
 		public void TestEnumeration ()
 		{
 			var s = CreateTestSet ();
@@ -84,7 +82,7 @@ namespace NOP.Testbench
 			}                        
 		}
 
-        [Test]
+		[Test]
 		public void TestCount ()
 		{
 			var s = CreateTestSet ();
@@ -150,7 +148,6 @@ namespace NOP.Testbench
 			{
 				Check.IsTrue (s1.Contains (i));
 			}
-			
 		}
 	}
 }

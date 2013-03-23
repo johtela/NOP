@@ -11,8 +11,9 @@
 		private Visual _visual;
 		private VBox _size;
 		private SExpr _code;
-		private SExprPath _path;
+		private SExprPath _focusedPath;
 		private NOPList<HitRect> _hitRects;
+		private bool _editing;
 
 		public VisualControl ()
 		{
@@ -37,7 +38,7 @@
 			{
 				_code = value;
 				Visual = Visual.Depiction (_code);
-				_path = new SExprPath ();
+				_focusedPath = new SExprPath ();
 			}
 		}
 
@@ -52,7 +53,7 @@
 			Invalidate ();
 		}
 
-		protected override bool IsInputKey (System.Windows.Forms.Keys keyData)
+		protected override bool IsInputKey (Keys keyData)
 		{
 			switch (keyData)
 			{
@@ -67,25 +68,42 @@
 
 		protected override void OnKeyDown (KeyEventArgs e)
 		{
-			switch (e.KeyCode)
+			if (e.KeyCode == Keys.Enter)
+			{
+				// Enter edit mode only if focused S-exp is not a list.
+				if (!(GetFocusedExpr () is SExpr.List))
+					_editing = !_editing;
+			}
+			else if (_editing)
+			{
+
+			}
+			else Navigate (e.KeyCode);
+		}
+
+		private void Navigate (Keys key)
+		{
+			switch (key)
 			{
 				case Keys.Down:
-					_path = _path.NextSibling (_code).Item2;
+					_focusedPath = _focusedPath.NextSibling (_code).Item2;
 					break;
-				case Keys.Up: 
-					_path = _path.PrevSibling (_code).Item2;
+				case Keys.Up:
+					_focusedPath = _focusedPath.PrevSibling (_code).Item2;
 					break;
 				case Keys.Left:
-					_path = _path.Previous (_code).Item2;
+					_focusedPath = _focusedPath.Previous (_code).Item2;
 					break;
 				case Keys.Right:
-					_path = _path.Next (_code).Item2;
+					_focusedPath = _focusedPath.Next (_code).Item2;
 					break;
-				default:
-					base.OnKeyDown (e);
-					return;
 			}
 			Invalidate ();
+		}
+
+		private SExpr GetFocusedExpr ()
+		{
+			return _focusedPath != null && _code != null ? _focusedPath.Target (_code) : null;
 		}
 
 		protected override void OnMouseDown (MouseEventArgs e)
@@ -96,7 +114,7 @@
 			var hitRect = _hitRects.FindNext (hr => hr.Rect.Contains (point));
 			if (hitRect.NotEmpty)
 			{
-				_path = new SExprPath (_code, hitRect.First.SExp);
+				_focusedPath = new SExprPath (_code, hitRect.First.SExp);
 				Invalidate ();
 			}
 		}
@@ -105,7 +123,7 @@
 		{
 			base.OnPaint (pe);
 
-			var focused = _path != null && _code != null ? _path.Target (_code) : null;
+			var focused = GetFocusedExpr ();
 			if (_visual != null)
 			{
 				pe.Graphics.SmoothingMode = SmoothingMode.AntiAlias;

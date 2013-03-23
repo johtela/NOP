@@ -12,6 +12,7 @@ namespace NOP
 	public abstract class SExpr
 	{
 		internal Visual Depiction { get; set; }
+		internal Visual Editor { get; set; }
 
 		/// <summary>
 		/// Literal value.

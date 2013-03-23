@@ -12,6 +12,7 @@ namespace NOP.Visuals
 	{
 		public readonly Graphics Graphics;
 		public readonly SExpr FocusedExpr;
+		public readonly bool EditMode;
 		public Font DefaultFont;
 		public Brush DefaultBrush;
 		public Pen RectPen;
