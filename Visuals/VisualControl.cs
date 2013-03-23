@@ -1,9 +1,10 @@
 ﻿namespace NOP.Visuals
 {
 	using System;
-	using System.Windows.Forms;
 	using System.Drawing;
 	using System.Drawing.Drawing2D;
+	using System.Drawing.Text;
+	using System.Windows.Forms;
 	using NOP.Collections;
 
 	public class VisualControl : Control
@@ -127,7 +128,7 @@
 			if (_visual != null)
 			{
 				pe.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-				var ctx = new GraphicsContext (pe.Graphics, focused);
+				var ctx = new GraphicsContext (pe.Graphics, focused, VisualStyle.Default);
 				GraphicsContext.HitRects = NOPList<HitRect>.Empty;
 				_visual.Render (ctx, _size);
 				_hitRects = GraphicsContext.HitRects;

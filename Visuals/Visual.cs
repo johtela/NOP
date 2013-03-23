@@ -9,36 +9,38 @@
 	using System.Text;
 	
 	/// <summary>
+	/// Interface that can be implemented by any object that
+	/// can be visualized with the elements of the Visual library.
+	/// </summary>
+	public interface IVisualizable
+	{
+		Visual ToVisual ();
+	}
+
+	/// <summary>
 	/// Enumeration for defining the stack direction.
 	/// </summary>
-	public enum VisualDirection
-	{
-		Horizontal,
-		Vertical }
-	;
+	public enum VisualDirection { Horizontal, Vertical }
 	
 	/// <summary>
 	/// Horizontal alignment of the items in a stack.
 	/// </summary>
-	public enum HAlign
-	{
-		Left,
-		Center,
-		Right }
-	;
+	public enum HAlign { Left, Center, Right }
 	
 	/// <summary>
 	/// Vertical alignment of the items in a stack.
 	/// </summary>
-	public enum VAlign
-	{
-		Top,
-		Center,
-		Bottom }
-	;
+	public enum VAlign { Top, Center, Bottom }
 		
 	/// <summary>
-	/// Visuals that represent the elements in the program.
+	/// A visual is a drawable figure that knows how to calculate
+	/// its size. It is drawn in a two-pass algorithm with first
+	/// phase calculating the required size, and the second phase
+	/// actually drawing the graphics.
+	/// 
+	/// Visuals can be composed with other visuals to create complex
+	/// layout structures. The simple primitives and collections of
+	/// visuals suchs as stacks are used to create more complex ones.
 	/// </summary>
 	public abstract class Visual
 	{
@@ -47,16 +49,14 @@
 		/// <summary>
 		/// An abstract method that calculates the size of a visual once it is constructed.
 		/// </summary>
-		/// <param name="context">The Cairo context to which the visual is eventually
-		/// drawn to.</param>
-		/// <returns>The desired size of the visual that should always be smaller than 
-		/// the available space.</returns>
+		/// <param name="context">The graphics context which used in drawing.</param>
+		/// <returns>The desired size of the visual.</returns>
 		protected abstract VBox CalculateSize (GraphicsContext context);
 		
 		/// <summary>
 		/// Draw the visual into specified context using the available size.
 		/// </summary>
-		/// <param name="context">The Cairo context to which the visual is drawn to.</param>
+		/// <param name="context">The graphics context which used in drawing.</param>
 		/// <param name='availableSize'>The available size into which the visual should
 		/// fit.</param>
 		protected abstract void Draw (GraphicsContext context, VBox availableSize);
@@ -74,7 +74,7 @@
 		}
 
 		/// <summary>
-		/// A label that renders some static text into the output.
+		/// A label that renders static text.
 		/// </summary>
 		private sealed class _Label : Visual
 		{
@@ -96,8 +96,8 @@
 			/// </summary>
 			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				return new VBox (context.Graphics.MeasureString (Text, context.DefaultFont).Width + 4, 
-				                 context.DefaultFont.Height);
+				return new VBox (context.Graphics.MeasureString (Text, context.Style.Font).Width, 
+					context.Style.Font.Height);
 			}
 			
 			/// <summary>
@@ -106,8 +106,7 @@
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
 				var pos = new PointF (0, 0);
-				context.Graphics.DrawString (Text, context.DefaultFont, context.DefaultBrush, pos);
-				//gr.DrawRectangle (_rectPen, 0, 0, availableSize.Width, availableSize.Height);
+				context.Graphics.DrawString (Text, context.Style.Font, context.Style.Brush, pos);
 			}
 		}
 		
@@ -268,7 +267,8 @@
 				if (context.FocusedExpr == SExpr)
 				{
 					context.Graphics.FillRectangle (Brushes.RoyalBlue, 0, 0, box.Width, box.Height);
-					context = new GraphicsContext (context.Graphics) { DefaultBrush = Brushes.White };
+					context = new GraphicsContext (context,
+						new VisualStyle(context.Style, brush: Brushes.White));
 				}
 				var hitRect = new HitRect (box.AsRectF (context.Graphics.Transform), SExpr);
 				GraphicsContext.HitRects = hitRect | GraphicsContext.HitRects;
@@ -320,12 +320,12 @@
 				if (Direction == VisualDirection.Horizontal)
 				{
 					var y = availableSize.Height / 2;
-					context.Graphics.DrawLine (context.RectPen, 0, y, availableSize.Width, y);
+					context.Graphics.DrawLine (context.Style.Pen, 0, y, availableSize.Width, y);
 				}
 				else
 				{
 					var x = availableSize.Width / 2;
-					context.Graphics.DrawLine (context.RectPen, x, 0, x, availableSize.Height);
+					context.Graphics.DrawLine (context.Style.Pen, x, 0, x, availableSize.Height);
 				}
 			}
 		}
@@ -343,6 +343,28 @@
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
 				throw new NotImplementedException ();
+			}
+		}
+
+		private class _Frame : Visual
+		{
+			public readonly Visual Visual;
+
+			public _Frame (Visual visual)
+			{
+				Visual = visual;
+			}
+
+			protected override VBox CalculateSize (GraphicsContext context)
+			{
+				return Visual.CalculateSize (context);
+			}
+
+			protected override void Draw (GraphicsContext context, VBox availableSize)
+			{
+				var box = Visual.GetSize(context);
+				Visual.Render (context, availableSize);
+				context.Graphics.DrawRectangle (context.Style.Pen, 0, 0, box.Width, box.Height);
 			}
 		}
 
@@ -466,6 +488,14 @@
 		public static Visual VRuler ()
 		{
 			return new _Ruler (VisualDirection.Vertical);
+		}
+
+		/// <summary>
+		/// Frame a visual with a rectangle.
+		/// </summary>
+		public static Visual Frame (Visual visual)
+		{
+			return new _Frame (visual);
 		}
 
 		/// <summary>
