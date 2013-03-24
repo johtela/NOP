@@ -8,7 +8,7 @@
 
 	public class VisualConsole : Form
 	{
-//		private NOPList<Visual> _visuals = NOPList<Visual>.Empty;
+		private NOPList<Visual> _visuals = NOPList<Visual>.Empty;
 		private VisualControl _control;
 	  
 		public VisualConsole ()
@@ -24,16 +24,16 @@
 			_control.Focus ();
 		}
 
-		//public void ShowVisual(Visual visual)
-		//{
-		//    lock (_visuals)
-		//    {
-		//        _visuals = visual | _visuals;
-		//        _control.Visual = Visual.VStack (HAlign.Left,
-		//            _visuals.Collect (v => List.Create (v, Visual.HRuler ())));
-		//        Invalidate ();
-		//    }
-		//}
+		public void ShowVisual (Visual visual)
+		{
+			lock (_visuals)
+			{
+				_visuals = visual | _visuals;
+				_control.Visual = Visual.VStack (HAlign.Left,
+					_visuals.Collect (v => List.Create (v, Visual.HRuler ())));
+				Invalidate ();
+			}
+		}
 
 		public void ShowSExpr (SExpr sexp)
 		{

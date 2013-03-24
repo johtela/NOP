@@ -626,7 +626,8 @@
 
 		public Visual ToVisual ()
 		{
-			throw new NotImplementedException ();
+			return Visual.HStack (VAlign.Top, 
+				Map (item => Visual.Frame (Visual.Label (item.ToString ()))));
 		}
 
 		#endregion

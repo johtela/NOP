@@ -15,7 +15,7 @@ namespace NOP.Testbench
 			list = NOPList<int>.Cons (0, list);
 			Check.IsFalse (list.IsEmpty);
 		}
-        
+		
 		[Test]
 		public void TestCreationFromEmpty ()
 		{
@@ -31,7 +31,7 @@ namespace NOP.Testbench
 
 			Check.AreEqual (3, list.Length);
 		}
-        
+		
 		[Test]
 		public void TestCreationFromArray ()
 		{
@@ -43,8 +43,9 @@ namespace NOP.Testbench
 			Check.IsTrue (list.Rest.Rest.Rest.IsEmpty);
 
 			Check.AreEqual (3, list.Length);
+			Runner.VConsole.ShowVisual (list.ToVisual ());
 		}
-        
+		
 		[Test]
 		public void TestFindAndEqualTo ()
 		{
@@ -59,7 +60,7 @@ namespace NOP.Testbench
 			Check.IsTrue (List.Create (3).EqualTo (list.FindNext (i => i > 2)));
 			Check.IsTrue (NOPList<int>.Empty.EqualTo (list.FindNext (i => i > 3)));
 		}
-        
+		
 		[Test]
 		public void TestGetNthItem ()
 		{
@@ -73,7 +74,7 @@ namespace NOP.Testbench
 				list.Nth (3);
 			});
 		}
-        
+		
 		[Test]
 		public void TestEnumeration ()
 		{
@@ -85,7 +86,7 @@ namespace NOP.Testbench
 				Check.AreEqual (i++, item);
 			}
 		}
-        
+		
 		[Test]
 		public void TestInsertBefore ()
 		{
@@ -96,7 +97,7 @@ namespace NOP.Testbench
 			Check.IsTrue (List.Create (0, 1, 2, 3).EqualTo (list.InsertBefore (0, 1)));
 			Check.IsTrue (List.Create (1).EqualTo (NOPList<int>.Empty.InsertBefore (1, 0)));
 		}
-        
+		
 		[Test]
 		public void TestRemove ()
 		{
@@ -107,7 +108,7 @@ namespace NOP.Testbench
 			Check.IsTrue (List.Create (1, 2, 3, 4).EqualTo (list.Remove (5)));
 			Check.IsTrue (list.EqualTo (list.Remove (0)));
 		}
-        
+		
 		[Test]
 		public void TestToString ()
 		{
@@ -119,7 +120,7 @@ namespace NOP.Testbench
 			var tuple = Tuple.Create (1, 'a');
 			Check.AreEqual ("(1, a)", tuple.ToString ());
 		}
-        
+		
 		[Test]
 		public void TestCollect ()
 		{
@@ -131,7 +132,7 @@ namespace NOP.Testbench
 			var res2 = NOPList<int>.Empty.Collect (i => List.Create (i));
 			Check.IsTrue (res2.IsEmpty);
 		}
-        
+		
 		[Test]
 		public void TestZipWith ()
 		{

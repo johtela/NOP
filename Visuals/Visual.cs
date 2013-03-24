@@ -405,7 +405,7 @@
 			{
 				var box = Visual.GetSize(context);
 				Visual.Render (context, availableSize);
-				context.Graphics.DrawRectangle (context.Style.Pen, 0, 0, box.Width, box.Height);
+				context.Graphics.DrawRectangle (context.Style.Pen, 0, 0, box.Width - 1, box.Height - 1);
 			}
 		}
 
