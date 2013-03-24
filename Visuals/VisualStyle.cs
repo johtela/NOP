@@ -7,7 +7,7 @@
 	{
 		private readonly VisualStyle _parent;
 		private readonly Font _font;
-		private readonly Brush _brush;
+		private readonly Brush _textBrush;
 		private readonly Pen _pen;
 
 		public static VisualStyle Default = new VisualStyle (
@@ -20,7 +20,7 @@
 		{
 			_parent = parent ?? Default;
 			_font = font;
-			_brush = brush;
+			_textBrush = brush;
 			_pen = pen;
 		}
 
@@ -40,14 +40,14 @@
 			}
 		}
 
-		public Brush Brush
+		public Brush TextBrush
 		{
 			get
 			{
 				var vs = this;
-				while (vs._brush == null)
+				while (vs._textBrush == null)
 					vs = vs._parent;
-				return vs._brush;
+				return vs._textBrush;
 			}
 		}
 

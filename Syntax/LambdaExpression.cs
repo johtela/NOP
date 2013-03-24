@@ -21,8 +21,7 @@ namespace NOP
 				if (par == null)
 					ParseError (sexp, "Expected a symbol");
 				return new SymbolExpression (par);
-			}
-			);
+			});
 			if (sexps.IsEmpty)
 				ParseError (lambdaExpr, "Function body is missing");
 			FunctionBody = Parse (sexps.First);
@@ -49,8 +48,7 @@ namespace NOP
 
 			return V.VStack (HAlign.Left,
 				V.HStack (VAlign.Top, V.Frame (V.Depiction (slambda)), V.Depiction (sparams)),
-				V.HStack (VAlign.Top, V.Margin (2), V.Depiction (sbody)));
+				V.Margin (V.Depiction (sbody), 24));
 		}
 	}
 }
-

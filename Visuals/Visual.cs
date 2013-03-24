@@ -74,6 +74,19 @@
 		}
 
 		/// <summary>
+		/// Helper base class to create wrapped visuals.
+		/// </summary>
+		private abstract class _Wrapped : Visual
+		{
+			public readonly Visual Visual;
+
+			public _Wrapped (Visual visual)
+			{
+				Visual = visual;
+			}
+		}
+
+		/// <summary>
 		/// A label that renders static text.
 		/// </summary>
 		private sealed class _Label : Visual
@@ -105,11 +118,45 @@
 			/// </summary>
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
-				var pos = new PointF (0, 0);
-				context.Graphics.DrawString (Text, context.Style.Font, context.Style.Brush, pos);
+				context.Graphics.DrawString (Text, context.Style.Font, context.Style.TextBrush, 
+					new PointF (0, 0));
 			}
 		}
-		
+
+		/// <summary>
+		/// Add margins to a visual.
+		/// </summary>
+		private sealed class _Margin : _Wrapped
+		{
+			public readonly float Left;
+			public readonly float Right;
+			public readonly float Top;
+			public readonly float Bottom;
+
+			public _Margin (Visual visual, float left, float right, float top, float bottom)
+				: base (visual)
+			{
+				Left = left;
+				Right = right;
+				Top = top;
+				Bottom = bottom;
+			}
+
+			protected override VBox CalculateSize (GraphicsContext context)
+			{
+				var box = Visual.GetSize (context);
+				return new VBox (box.Width + Left + Right, box.Height + Top + Bottom);
+			}
+
+			protected override void Draw (GraphicsContext context, VBox availableSize)
+			{
+				var st = context.Graphics.Save ();
+				context.Graphics.TranslateTransform (Left, Top);
+				Visual.Render (context, availableSize);
+				context.Graphics.Restore (st);
+			}
+		}
+
 		/// <summary>
 		/// Stack of visuals that are laid out either horizontally (left to right) or
 		/// vertically (top to bottom).
@@ -246,7 +293,7 @@
 		/// <summary>
 		/// Use the depiction of a S-expression.
 		/// </summary>
-		class _Depiction : Visual
+		private sealed class _Depiction : Visual
 		{
 			public readonly SExpr SExpr;
 
@@ -268,7 +315,7 @@
 				{
 					context.Graphics.FillRectangle (Brushes.RoyalBlue, 0, 0, box.Width, box.Height);
 					context = new GraphicsContext (context,
-						new VisualStyle(context.Style, brush: Brushes.White));
+						new VisualStyle (context.Style, brush: Brushes.White));
 				}
 				var hitRect = new HitRect (box.AsRectF (context.Graphics.Transform), SExpr);
 				GraphicsContext.HitRects = hitRect | GraphicsContext.HitRects;
@@ -279,23 +326,16 @@
 		/// <summary>
 		/// Hidden visual that has the same size as the undelying visual.
 		/// </summary>
-		private sealed class _Hidden : Visual
+		private sealed class _Hidden : _Wrapped
 		{
-			public readonly Visual Visual;
-
-			public _Hidden (Visual visual)
-			{
-				Visual = visual;
-			}
+			public _Hidden (Visual visual) : base (visual) { }
 
 			protected override VBox CalculateSize (GraphicsContext context)
 			{
 				return Visual.CalculateSize (context);
 			}
 
-			protected override void Draw (GraphicsContext context, VBox availableSize)
-			{
-			}
+			protected override void Draw (GraphicsContext context, VBox availableSize) { }
 		}
 
 		/// <summary>
@@ -330,7 +370,10 @@
 			}
 		}
 
-		private class _TextEdit : Visual
+		/// <summary>
+		/// Text editor.
+		/// </summary>
+		private sealed class _TextEdit : Visual
 		{
 			private string _text;
 			private Action<string> _accept;
@@ -346,14 +389,12 @@
 			}
 		}
 
-		private class _Frame : Visual
+		/// <summary>
+		/// Frame a visual.
+		/// </summary>
+		private sealed class _Frame : _Wrapped
 		{
-			public readonly Visual Visual;
-
-			public _Frame (Visual visual)
-			{
-				Visual = visual;
-			}
+			public _Frame (Visual visual) : base (visual) { }
 
 			protected override VBox CalculateSize (GraphicsContext context)
 			{
@@ -365,6 +406,29 @@
 				var box = Visual.GetSize(context);
 				Visual.Render (context, availableSize);
 				context.Graphics.DrawRectangle (context.Style.Pen, 0, 0, box.Width, box.Height);
+			}
+		}
+
+		/// <summary>
+		/// Apply a new style to a visual.
+		/// </summary>
+		private sealed class _Styled : _Wrapped
+		{
+			public readonly VisualStyle Style;
+
+			public _Styled (Visual visual, VisualStyle style) : base (visual) 
+			{
+				Style = style;
+			}
+
+			protected override VBox CalculateSize (GraphicsContext context)
+			{
+				return Visual.GetSize (context);
+			}
+
+			protected override void Draw (GraphicsContext context, VBox availableSize)
+			{
+				Visual.Render (new GraphicsContext(context, Style), availableSize);
 			}
 		}
 
@@ -469,9 +533,10 @@
 		/// <summary>
 		/// Create a margin with a width of n X characters.
 		/// </summary>
-		public static Visual Margin (int n)
+		public static Visual Margin (Visual visual, float left = 0, float right = 0, 
+			float top = 0, float bottom = 0)
 		{
-			return Hidden (Label ("X".Times (n)));
+			return new _Margin (visual, left, right, top, bottom);
 		}
 
 		/// <summary>
