@@ -1,11 +1,11 @@
 namespace NOP.Collections
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
 
-    /// <summary>
+	/// <summary>
 	/// Exception that is thrown if an empty map is accessed.
 	/// </summary>
 	public class EmptyMapException : Exception
@@ -36,7 +36,7 @@ namespace NOP.Collections
 		/// </summary>
 		protected internal abstract V Value { get; }
 
-        #region Public interface
+		#region Public interface
 
 		/// <summary>
 		/// Returns an empty map.
@@ -55,7 +55,7 @@ namespace NOP.Collections
 		public static Map<K, V> FromPairs (IEnumerable<Tuple<K, V>> pairs)
 		{
 			var array = pairs.Select<Tuple<K, V>, Map<K, V>> (
-                pair => new _MapNode (pair.Item1, pair.Item2, Empty, Empty)).ToArray ();
+				pair => new _MapNode (pair.Item1, pair.Item2, Empty, Empty)).ToArray ();
 
 			return Tree<Map<K, V>, K>.FromArray (array, true);
 		}
@@ -102,7 +102,7 @@ namespace NOP.Collections
 		/// <returns>True, if the map contains the key; false, otherwise.</returns>
 		public bool Contains (K key)
 		{
-			return Tree<Map<K, V>, K>.Search (this, key) != Empty;
+			return !Tree<Map<K, V>, K>.Search (this, key).IsEmpty ();
 		}
 
 		/// <summary>
@@ -118,7 +118,7 @@ namespace NOP.Collections
 			{
 				var node = Tree<Map<K, V>, K>.Search (this, key);
 
-				if (node == Empty)
+				if (node.IsEmpty ())
 					throw new KeyNotFoundException ("Key not found: " + key.ToString ());
 				return node.Value;
 			}
@@ -139,7 +139,7 @@ namespace NOP.Collections
 		{
 			get
 			{
-				foreach (_MapNode node in Tree<Map<K, V>, K>.Enumerate(this))
+				foreach (_MapNode node in Tree<Map<K, V>, K>.TraverseDepthFirst(this))
 				{
 					yield return node.Key;
 				}             
@@ -153,14 +153,14 @@ namespace NOP.Collections
 		{
 			get
 			{
-				foreach (_MapNode node in Tree<Map<K, V>, K>.Enumerate(this))
+				foreach (_MapNode node in Tree<Map<K, V>, K>.TraverseDepthFirst(this))
 				{
 					yield return node.Value;
 				}
 			}
 		}
 
-        #endregion
+		#endregion
 
 		/// <summary>
 		/// A concrete map implementation that represents the empty map.
@@ -195,6 +195,11 @@ namespace NOP.Collections
 			protected internal override Tree<K> Clone (Tree<K> newLeft, Tree<K> newRight, bool inPlace)
 			{
 				return this;
+			}
+
+			protected internal override bool IsEmpty ()
+			{
+				return true;
 			}
 		}
 
@@ -263,7 +268,12 @@ namespace NOP.Collections
 			}
 		}
 
-        #region IEnumerable<Tuple<K,V>> Members
+		protected internal override bool IsEmpty ()
+		{
+			return false;
+		}
+
+		#region IEnumerable<Tuple<K,V>> Members
 
 		/// <summary>
 		/// Enumerate the key-value pairs in the map.
@@ -272,15 +282,15 @@ namespace NOP.Collections
 		/// in the order determined by the keys.</returns>
 		public IEnumerator<Tuple<K, V>> GetEnumerator ()
 		{
-			foreach (_MapNode node in Tree<Map<K, V>, K>.Enumerate(this))
+			foreach (_MapNode node in Tree<Map<K, V>, K>.TraverseDepthFirst(this))
 			{
 				yield return new Tuple<K, V>(node.Key, node.Value);
 			}
 		}
 
-        #endregion
+		#endregion
 
-        #region IEnumerable Members
+		#region IEnumerable Members
 
 		/// <summary>
 		/// Enumerate the key-value pairs in the map.
@@ -292,6 +302,6 @@ namespace NOP.Collections
 			return GetEnumerator ();
 		}
 
-        #endregion
+		#endregion
 	}
 }

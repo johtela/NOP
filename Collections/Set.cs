@@ -1,11 +1,11 @@
 namespace NOP.Collections
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
 
-    /// <summary>
+	/// <summary>
 	/// Exception that is thrown if an empty set is accessed.
 	/// </summary>
 	public class EmptySetException : Exception
@@ -32,7 +32,7 @@ namespace NOP.Collections
 			Tree<Set<T>, T>._empty = new _Empty ();
 		}
 
-        #region Public interface
+		#region Public interface
 
 		/// <summary>
 		/// Returns an empty set.
@@ -93,7 +93,7 @@ namespace NOP.Collections
 		/// <returns>True, if the set contains the item; false, otherwise.</returns>
 		public bool Contains (T item)
 		{
-			return Tree<Set<T>, T>.Search (this, item) != Empty;
+			return !Tree<Set<T>, T>.Search (this, item).IsEmpty ();
 		}
 		
 		/// <summary>
@@ -128,7 +128,7 @@ namespace NOP.Collections
 			get { return Weight; }
 		}
 
-        #endregion
+		#endregion
 
 		/// <summary>
 		/// A concrete set implementation that represents the empty set.
@@ -158,6 +158,11 @@ namespace NOP.Collections
 			protected internal override Tree<T> Clone (Tree<T> newLeft, Tree<T> newRight, bool inPlace)
 			{
 				return this;
+			}
+
+			protected internal override bool IsEmpty ()
+			{
+				return true;
 			}
 		}
 
@@ -219,7 +224,12 @@ namespace NOP.Collections
 			}
 		}
 
-        #region IEnumerable<T> Members
+		protected internal override bool IsEmpty ()
+		{
+			return false;
+		}
+
+		#region IEnumerable<T> Members
 
 		/// <summary>
 		/// Enumerate the key-value pairs in the map.
@@ -228,15 +238,15 @@ namespace NOP.Collections
 		/// in the order determined by the keys.</returns>
 		public IEnumerator<T> GetEnumerator ()
 		{
-			foreach (_SetNode node in Tree<Set<T>, T>.Enumerate(this))
+			foreach (_SetNode node in Tree<Set<T>, T>.TraverseDepthFirst(this))
 			{
 				yield return node.Key;
 			}
 		}
 
-        #endregion
+		#endregion
 
-        #region IEnumerable Members
+		#region IEnumerable Members
 
 		/// <summary>
 		/// Enumerate the key-value pairs in the map.
@@ -248,7 +258,7 @@ namespace NOP.Collections
 			return GetEnumerator ();
 		}
 
-        #endregion
+		#endregion
 		
 		public override string ToString ()
 		{

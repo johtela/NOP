@@ -5,7 +5,7 @@ namespace NOP.Testbench
 
 	public class SetTests
 	{
-		private const int _itemCount = 10000;
+		private const int _itemCount = 65;
 
 		private IEnumerable<int> Range (int min, int max)
 		{
@@ -52,8 +52,8 @@ namespace NOP.Testbench
 			Check.IsFalse (s.Contains (33));
 			Check.AreEqual (_itemCount - 1, s.Count);
 
-			s = s.Remove (77);
-			Check.IsFalse (s.Contains (77));
+			s = s.Remove (55);
+			Check.IsFalse (s.Contains (55));
 			Check.AreEqual (_itemCount - 2, s.Count);
 
 		}
@@ -88,6 +88,7 @@ namespace NOP.Testbench
 			var s = CreateTestSet ();
 
 			Check.AreEqual (_itemCount, s.Count);
+			Runner.VConsole.ShowVisual (s.ToVisual ());
 		}
 		
 		[Test]
@@ -98,6 +99,7 @@ namespace NOP.Testbench
 			
 			s = s.Add("foo");
 			Check.AreEqual (3, s.Count);
+			Runner.VConsole.ShowVisual (s.ToVisual ());
 		}
 		
 		[Test]
