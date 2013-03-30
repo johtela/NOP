@@ -84,6 +84,16 @@
 			{
 				Visual = visual;
 			}
+
+			protected override VBox CalculateSize (GraphicsContext context)
+			{
+				return Visual.CalculateSize (context);
+			}
+
+			protected override void Draw (GraphicsContext context, VBox availableSize)
+			{
+				Visual.Render (context, availableSize);
+			}
 		}
 
 		/// <summary>
@@ -144,7 +154,7 @@
 
 			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				var box = Visual.GetSize (context);
+				var box = base.CalculateSize (context);
 				return new VBox (box.Width + Left + Right, box.Height + Top + Bottom);
 			}
 
@@ -152,7 +162,7 @@
 			{
 				var st = context.Graphics.Save ();
 				context.Graphics.TranslateTransform (Left, Top);
-				Visual.Render (context, availableSize);
+				base.Draw (context, availableSize);
 				context.Graphics.Restore (st);
 			}
 		}
@@ -330,11 +340,6 @@
 		{
 			public _Hidden (Visual visual) : base (visual) { }
 
-			protected override VBox CalculateSize (GraphicsContext context)
-			{
-				return Visual.CalculateSize (context);
-			}
-
 			protected override void Draw (GraphicsContext context, VBox availableSize) { }
 		}
 
@@ -396,15 +401,10 @@
 		{
 			public _Frame (Visual visual) : base (visual) { }
 
-			protected override VBox CalculateSize (GraphicsContext context)
-			{
-				return Visual.CalculateSize (context);
-			}
-
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
-				var box = Visual.GetSize(context);
-				Visual.Render (context, availableSize);
+				var box = Visual.GetSize (context);
+				base.Draw (context, availableSize);
 				context.Graphics.DrawRectangle (context.Style.Pen, 0, 0, box.Width - 1, box.Height - 1);
 			}
 		}
@@ -421,14 +421,86 @@
 				Style = style;
 			}
 
-			protected override VBox CalculateSize (GraphicsContext context)
+			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
-				return Visual.GetSize (context);
+				Visual.Render (new GraphicsContext(context, Style), availableSize);
+			}
+		}
+
+		/// <summary>
+		/// Target of a connector.
+		/// </summary>
+		private class _Anchor : _Wrapped
+		{
+			public PointF Position;
+			public readonly HAlign HorizAlign;
+			public readonly VAlign VertAlign;
+
+			public _Anchor (Visual visual, HAlign horizAlign, VAlign vertAlign)
+				: base (visual)
+			{
+				HorizAlign = horizAlign;
+				VertAlign = vertAlign;
+			}
+
+			private PointF GetAnchorPosition (Matrix matrix, VBox box)
+			{
+				var anchor = new PointF[1];
+				switch (HorizAlign)
+				{
+					case HAlign.Left:
+						anchor[0].X = 0;
+						break;
+					case HAlign.Center:
+						anchor[0].X = box.Width / 2;
+						break;
+					case HAlign.Right:
+						anchor[0].X = box.Width;
+						break;
+				}
+				switch (VertAlign)
+				{
+					case VAlign.Top:
+						anchor[0].Y = 0;
+						break;
+					case VAlign.Center:
+						anchor[0].Y = box.Height / 2;
+						break;
+					case VAlign.Bottom:
+						anchor[0].Y = box.Height;
+						break;
+				}
+				matrix.TransformPoints (anchor);
+				return anchor[0];
 			}
 
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
-				Visual.Render (new GraphicsContext(context, Style), availableSize);
+				Position = GetAnchorPosition (context.Graphics.Transform, Visual.GetSize (context));
+				base.Draw (context, availableSize);
+			}
+		}
+
+		/// <summary>
+		/// Connector draws a line to an anchor.
+		/// </summary>
+		private sealed class _Connector : _Anchor
+		{
+			public readonly _Anchor Target;
+
+			public _Connector (Visual visual, _Anchor target, HAlign horizAlign, VAlign vertAlign)
+				: base (visual, horizAlign, vertAlign)
+			{
+				Target = target;
+			}
+
+			protected override void Draw (GraphicsContext context, VBox availableSize)
+			{
+				base.Draw (context, availableSize);
+				var state = context.Graphics.Save ();
+				context.Graphics.ResetTransform ();
+				context.Graphics.DrawLine (context.Style.Pen, Position, Target.Position);
+				context.Graphics.Restore (state);
 			}
 		}
 
@@ -561,6 +633,25 @@
 		public static Visual Frame (Visual visual)
 		{
 			return new _Frame (visual);
+		}
+
+		/// <summary>
+		/// Create an anchor around a visual to act as a target of a connector.
+		/// </summary>
+		public static Visual Anchor (Visual visual, HAlign horizAlign, VAlign vertAlign)
+		{
+			return new _Anchor (visual, horizAlign, vertAlign);
+		}
+
+		/// <summary>
+		/// Draws a connector between visuals. The target visual must be wrapped by an
+		/// anchor in order to draw a connector to it.
+		/// </summary>
+		public static Visual Connector (Visual visual, Visual target, HAlign horizAlign, VAlign vertAlign)
+		{
+			if (!(target is _Anchor))
+				throw new ArgumentException ("Target visual must be surronded by an anchor", "target");
+			return new _Connector(visual, target as _Anchor, horizAlign, vertAlign);
 		}
 
 		/// <summary>

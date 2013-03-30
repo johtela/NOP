@@ -2,6 +2,7 @@ namespace NOP.Testbench
 {
 	using System.Collections.Generic;
 	using NOP.Collections;
+	using System;
 
 	public class SetTests
 	{
@@ -27,9 +28,26 @@ namespace NOP.Testbench
 
 			s = s.Add ("0");
 			s = s.Add ("1");
+			s = s.Add ("3");
+			s = s.Add ("4");
+			s = s.Add ("5");
 			Check.IsTrue (s.Contains ("0"));
 			Check.IsTrue (s.Contains ("1"));
 			Check.IsFalse (s.Contains ("2"));
+			Runner.VConsole.ShowVisual (s.ToVisual ());
+		}
+
+		[Test]
+		public void TestBalancing ()
+		{
+			var s = Set<int>.Empty;
+			var rnd = new Random ();
+
+			for (int i = 0; i < 80; i++)
+			{
+				s = s.Add (rnd.Next(1000));
+			}
+			Runner.VConsole.ShowVisual (s.ToVisual ());
 		}
 
 		[Test]

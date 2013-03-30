@@ -18,7 +18,7 @@
 
 		public VisualControl ()
 		{
-			BackColor = Color.White;
+			BackColor = Color.Blue;
 			DoubleBuffered = true;
 		}
 

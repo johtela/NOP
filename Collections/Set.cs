@@ -73,7 +73,7 @@ namespace NOP.Collections
 		{
 			return Contains (item) ? 
 				this :
-				Tree<Set<T>, T>.Add (this, new _SetNode (item, Empty, Empty), 1);
+				Tree<Set<T>, T>.Add (this, new _SetNode (item, Empty, Empty));
 		}
 
 		/// <summary>

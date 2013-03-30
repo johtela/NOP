@@ -51,17 +51,26 @@
 
 		#region IVisualizable implementation
 		
-		private Visual NodeVisual(string text)
+		private Visual NodeVisual(string text, Visual parent)
 		{
-			return Visual.Margin (Visual.Frame (Visual.Label (text)), right: 4, bottom: 10);
+			var node = Visual.Frame (Visual.Label (text));
+			return Visual.Anchor (
+				parent == null ? node : Visual.Connector (node, parent, HAlign.Center, VAlign.Top),
+				HAlign.Center, VAlign.Bottom);
+		}
+
+		private Visual TreeVisual (Visual parent)
+		{
+			if (IsEmpty ())
+				return Visual.Margin (NodeVisual ("-", parent), right: 4, bottom: 4);
+			var node = NodeVisual(Key.ToString () + ":" + Weight.ToString (), parent);
+			return Visual.VStack (HAlign.Center, Visual.Margin (node, right: 4, bottom: 20),
+				Visual.HStack (VAlign.Top, Left.TreeVisual (node), Right.TreeVisual (node)));
 		}
 
 		public Visual ToVisual ()
 		{
-			return IsEmpty () ? 
-				NodeVisual("-") :
-				Visual.VStack (HAlign.Center, NodeVisual(Key.ToString ()), 
-					Visual.HStack (VAlign.Top, Left.ToVisual (), Right.ToVisual ()));
+			return TreeVisual (null);
 		}
 
 		#endregion
@@ -151,19 +160,25 @@
 		/// <param name="height">The height of the node specified by the 
 		/// tree<see cref="tree"/> parameter.</param>
 		/// <returns>A new tree that contains the given item.</returns>
-		public static T Add(T tree, T item, int height)
+		private static T Add(T tree, T item, ref int height)
 		{
 			if (tree.IsEmpty ())
 				return item;
 
-			bool rebalance = (height > 0) && (height > (10 * Math.Log(tree.Weight + 1, 2)));
-			int nextHeight = (height > 0) && (!rebalance) ? height + 1 : 0; 
-			
+			height++;
 			T result = item.Key.CompareTo(tree.Key) > 0 ?
-				(T)tree.Clone(tree.Left, Add(Right(tree), item, nextHeight), false) :
-				(T)tree.Clone(Add(Left(tree), item, nextHeight), tree.Right, false);
-			if (rebalance)
-				result = Rebalance(result);
+				(T)tree.Clone(tree.Left, Add(Right(tree), item, ref height), false) :
+				(T)tree.Clone(Add(Left(tree), item, ref height), tree.Right, false);
+			return result;
+		}
+
+		public static T Add(T tree, T item)
+		{
+			var height = 0;
+			T result = Add (tree, item, ref height);
+
+			if (height > (10 * Math.Log (tree.Weight + 1, 2)))
+				result = Rebalance (result);
 			return result;
 		}
 

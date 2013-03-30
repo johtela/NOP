@@ -82,7 +82,7 @@ namespace NOP.Collections
 			if (Contains(key))
 				throw new ArgumentException("Duplicate key: " + key);
 			
-			return Tree<Map<K, V>, K>.Add (this, new _MapNode (key, value, Empty, Empty), 1);
+			return Tree<Map<K, V>, K>.Add (this, new _MapNode (key, value, Empty, Empty));
 		}
 
 		/// <summary>

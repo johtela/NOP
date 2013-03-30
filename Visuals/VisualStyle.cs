@@ -12,8 +12,8 @@
 
 		public static VisualStyle Default = new VisualStyle (
 			font: new Font ("DejaVu Sans Mono", 11),
-			brush: Brushes.Black,
-			pen: new Pen (Color.Gray, 1) { DashStyle = DashStyle.Dash });
+			brush: Brushes.LightBlue,
+			pen: new Pen (Color.Black, 1) { DashStyle = DashStyle.Dash });
 
 		public VisualStyle (VisualStyle parent = null, Font font = null, 
 			Brush brush = null, Pen pen = null)
