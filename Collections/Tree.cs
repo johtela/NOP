@@ -50,10 +50,10 @@
 		protected internal abstract bool IsEmpty ();
 
 		#region IVisualizable implementation
-		
-		private Visual NodeVisual(string text, Visual parent)
+
+		private Visual NodeVisual (string text, Visual parent)
 		{
-			var node = Visual.Frame (Visual.Label (text));
+			var node = Visual.Frame (Visual.Margin (Visual.Label (text), 2, 2, 2, 2), FrameKind.Ellipse);
 			return Visual.Anchor (
 				parent == null ? node : Visual.Connector (node, parent, HAlign.Center, VAlign.Top),
 				HAlign.Center, VAlign.Bottom);
@@ -63,7 +63,7 @@
 		{
 			if (IsEmpty ())
 				return Visual.Margin (NodeVisual ("-", parent), right: 4, bottom: 4);
-			var node = NodeVisual(Key.ToString () + ":" + Weight.ToString (), parent);
+			var node = NodeVisual (Key.ToString () + ":" + Weight.ToString (), parent);
 			return Visual.VStack (HAlign.Center, Visual.Margin (node, right: 4, bottom: 20),
 				Visual.HStack (VAlign.Top, Left.TreeVisual (node), Right.TreeVisual (node)));
 		}

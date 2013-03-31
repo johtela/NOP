@@ -31,6 +31,11 @@
 	/// Vertical alignment of the items in a stack.
 	/// </summary>
 	public enum VAlign { Top, Center, Bottom }
+
+	/// <summary>
+	/// Type of frame to be drawn.
+	/// </summary>
+	public enum FrameKind { Rectangle, Ellipse }
 		
 	/// <summary>
 	/// A visual is a drawable figure that knows how to calculate
@@ -399,13 +404,29 @@
 		/// </summary>
 		private sealed class _Frame : _Wrapped
 		{
-			public _Frame (Visual visual) : base (visual) { }
+			public readonly FrameKind Kind;
+
+			public _Frame (Visual visual, FrameKind kind) : base (visual) 
+			{
+				Kind = kind;
+			}
 
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
 				var box = Visual.GetSize (context);
 				base.Draw (context, availableSize);
-				context.Graphics.DrawRectangle (context.Style.Pen, 0, 0, box.Width - 1, box.Height - 1);
+
+				switch (Kind)
+				{
+					case FrameKind.Rectangle:
+						context.Graphics.DrawRectangle (context.Style.Pen, 
+							0, 0, box.Width - 1, box.Height - 1);
+						break;
+					case FrameKind.Ellipse:
+						context.Graphics.DrawEllipse (context.Style.Pen, 
+							0, 0, box.Width - 1, box.Height - 1);
+						break;
+				}
 			}
 		}
 
@@ -630,9 +651,9 @@
 		/// <summary>
 		/// Frame a visual with a rectangle.
 		/// </summary>
-		public static Visual Frame (Visual visual)
+		public static Visual Frame (Visual visual, FrameKind kind)
 		{
-			return new _Frame (visual);
+			return new _Frame (visual, kind);
 		}
 
 		/// <summary>

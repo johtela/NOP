@@ -47,7 +47,7 @@ namespace NOP
 			var sbody = sexps.Rest.Rest.First;
 
 			return V.VStack (HAlign.Left,
-				V.HStack (VAlign.Top, V.Frame (V.Depiction (slambda)), V.Depiction (sparams)),
+				V.HStack (VAlign.Top, V.Frame (V.Depiction (slambda), FrameKind.Rectangle), V.Depiction (sparams)),
 				V.Margin (V.Depiction (sbody), 24));
 		}
 	}

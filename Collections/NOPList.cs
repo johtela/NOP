@@ -627,7 +627,7 @@
 		public Visual ToVisual ()
 		{
 			return Visual.HStack (VAlign.Top, 
-				Map (item => Visual.Frame (Visual.Label (item.ToString ()))));
+				Map (item => Visual.Frame (Visual.Label (item.ToString ()), FrameKind.Rectangle)));
 		}
 
 		#endregion

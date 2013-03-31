@@ -45,7 +45,7 @@ namespace NOP.Testbench
 
 			for (int i = 0; i < 80; i++)
 			{
-				s = s.Add (rnd.Next(1000));
+				s = s.Add (i);
 			}
 			Runner.VConsole.ShowVisual (s.ToVisual ());
 		}
@@ -73,7 +73,6 @@ namespace NOP.Testbench
 			s = s.Remove (55);
 			Check.IsFalse (s.Contains (55));
 			Check.AreEqual (_itemCount - 2, s.Count);
-
 		}
 
 		[Test]
