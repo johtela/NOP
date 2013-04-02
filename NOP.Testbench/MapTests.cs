@@ -150,5 +150,12 @@ namespace NOP.Testbench
 				map = map.Add("foo", 3);
 			});
 		}
+
+		[Test]
+		public void TestReducibility ()
+		{
+			var m = CreateTestMap ();
+			m.Foreach (0, (t, i) => Check.AreEqual (i, t.Item1));
+		}
 	}
 }

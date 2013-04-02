@@ -22,7 +22,7 @@ namespace NOP.Collections
 	/// An immutable set data structure.
 	/// </summary>
 	/// <typeparam name="T">The value type of the map.</typeparam>
-	public abstract class Set<T> : Tree<T>, IEnumerable<T> where T : IComparable<T>
+	public abstract class Set<T> : Tree<T>, IEnumerable<T>, IReducible<T> where T : IComparable<T>
 	{
 		/// <summary>
 		/// Static constructor initializes the empty set reference.
@@ -31,6 +31,9 @@ namespace NOP.Collections
 		{
 			Tree<Set<T>, T>._empty = new _Empty ();
 		}
+
+		public abstract U ReduceLeft<U> (U acc, Func<U, T, U> func);
+		public abstract U ReduceRight<U> (Func<T, U, U> func, U acc);
 
 		#region Public interface
 
@@ -164,6 +167,16 @@ namespace NOP.Collections
 			{
 				return true;
 			}
+
+			public override U ReduceLeft<U> (U acc, Func<U, T, U> func)
+			{
+				return acc;
+			}
+
+			public override U ReduceRight<U> (Func<T, U, U> func, U acc)
+			{
+				return acc;
+			}
 		}
 
 		/// <summary>
@@ -222,20 +235,25 @@ namespace NOP.Collections
 				else
 					return new _SetNode (_item, (Set<T>)newLeft, (Set<T>)newRight);
 			}
-		}
 
-		protected internal override bool IsEmpty ()
-		{
-			return false;
+			protected internal override bool IsEmpty ()
+			{
+				return false;
+			}
+
+			public override U ReduceLeft<U> (U acc, Func<U, T, U> func)
+			{
+				return _right.ReduceLeft (func (_left.ReduceLeft (acc, func), Key), func);
+			}
+
+			public override U ReduceRight<U> (Func<T, U, U> func, U acc)
+			{
+				return _left.ReduceRight (func, func (Key, _right.ReduceRight (func, acc)));
+			}
 		}
 
 		#region IEnumerable<T> Members
 
-		/// <summary>
-		/// Enumerate the key-value pairs in the map.
-		/// </summary>
-		/// <returns>The enumeration that contains all the key-value pairs in the map
-		/// in the order determined by the keys.</returns>
 		public IEnumerator<T> GetEnumerator ()
 		{
 			foreach (_SetNode node in Tree<Set<T>, T>.TraverseDepthFirst(this))
@@ -248,11 +266,6 @@ namespace NOP.Collections
 
 		#region IEnumerable Members
 
-		/// <summary>
-		/// Enumerate the key-value pairs in the map.
-		/// </summary>
-		/// <returns>The enumeration that contains all the key-value pairs in the map
-		/// in the order determined by the keys.</returns>
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
 		{
 			return GetEnumerator ();

@@ -265,7 +265,7 @@
 	/// front, inner, and back parts where the inner part can be empty.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public abstract class FingerTree<T> : IReducible<T>, IEnumerable<T>
+	public abstract class FingerTree<T> : IReducible<T>
 	{
 		public abstract FingerTree<T> AddLeft (T leftItem);
 		public abstract FingerTree<T> AddRight (T rightItem);
@@ -533,19 +533,5 @@
 			}
 			return new _Deep (front, inner, new Digit<T> (back));
 		}
-
-		#region IEnumerable implementation
-		
-		public IEnumerator<T> GetEnumerator ()
-		{
-			return List.FromReducible (this).GetEnumerator ();
-		}
-
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
-		{
-			return GetEnumerator ();
-		}
-
-		#endregion	
 	}
 }

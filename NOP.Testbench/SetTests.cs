@@ -168,5 +168,12 @@ namespace NOP.Testbench
 				Check.IsTrue (s1.Contains (i));
 			}
 		}
+
+		[Test]
+		public void TestReducibility ()
+		{
+			var s = CreateTestSet ();
+			s.Foreach (0, Check.AreEqual);
+		}
 	}
 }

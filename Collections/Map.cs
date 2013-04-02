@@ -21,7 +21,8 @@ namespace NOP.Collections
 	/// </summary>
 	/// <typeparam name="K">The key type of the map.</typeparam>
 	/// <typeparam name="V">The value type of the map.</typeparam>
-	public abstract class Map<K, V> : Tree<K>, IEnumerable<Tuple<K, V>> where K : IComparable<K>
+	public abstract class Map<K, V> : Tree<K>, IEnumerable<Tuple<K, V>>, IReducible<Tuple<K, V>>
+		where K : IComparable<K>
 	{
 		/// <summary>
 		/// Static constructor initializes the empty map reference.
@@ -35,6 +36,9 @@ namespace NOP.Collections
 		/// Abstract method that gives the value attached to the tree node.
 		/// </summary>
 		protected internal abstract V Value { get; }
+
+		public abstract U ReduceLeft<U> (U acc, Func<U, Tuple<K, V>, U> func);
+		public abstract U ReduceRight<U> (Func<Tuple<K, V>, U, U> func, U acc);
 
 		#region Public interface
 
@@ -201,6 +205,16 @@ namespace NOP.Collections
 			{
 				return true;
 			}
+
+			public override U ReduceLeft<U> (U acc, Func<U, Tuple<K, V>, U> func)
+			{
+				return acc;
+			}
+
+			public override U ReduceRight<U> (Func<Tuple<K, V>, U, U> func, U acc)
+			{
+				return acc;
+			}
 		}
 
 		/// <summary>
@@ -266,11 +280,23 @@ namespace NOP.Collections
 				else
 					return new _MapNode (_key, _value, (Map<K, V>)newLeft, (Map<K, V>)newRight);
 			}
-		}
 
-		protected internal override bool IsEmpty ()
-		{
-			return false;
+			protected internal override bool IsEmpty ()
+			{
+				return false;
+			}
+
+			public override U ReduceLeft<U> (U acc, Func<U, Tuple<K, V>, U> func)
+			{
+				return _right.ReduceLeft (func (_left.ReduceLeft (acc, func),
+					Tuple.Create (_key, _value)), func);
+			}
+
+			public override U ReduceRight<U> (Func<Tuple<K, V>, U, U> func, U acc)
+			{
+				return _left.ReduceRight(func, 
+					func (Tuple.Create(Key, Value), _right.ReduceRight(func, acc)));
+			}
 		}
 
 		#region IEnumerable<Tuple<K,V>> Members

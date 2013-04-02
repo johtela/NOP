@@ -8,7 +8,7 @@
 
 	public class FingerTreeTests
 	{
-		const int Count = 1000;
+		const int Count = 10000;
 		FingerTree<int> TestTree = FingerTree<int>.FromEnumerable (Enumerable.Range (1, Count));
 
 		[Test]
@@ -42,11 +42,17 @@
 		{
 			var i = 0;
 
-			foreach (var item in TestTree)
+			foreach (var item in List.FromReducible(TestTree))
 			{
 				Check.AreEqual (item, ++i);
 			}
 			Check.AreEqual (Count, i);
+		}
+
+		[Test]
+		public void TestForeach ()
+		{
+			TestTree.Foreach (1, Check.AreEqual);
 		}
 	}
 }
