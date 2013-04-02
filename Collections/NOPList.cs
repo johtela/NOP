@@ -17,7 +17,7 @@
 	/// An immutable linked list.
 	/// </summary>
 	/// <typeparam name="T">The item type of the list.</typeparam>
-	public class NOPList<T> : IEnumerable<T>, IVisualizable
+	public class NOPList<T> : IEnumerable<T>, IReducible<T>, IVisualizable
 	{
 		private static readonly NOPList<T> _empty = new NOPList<T> (default(T), null);
 		private T _first;
@@ -477,12 +477,13 @@
 		}
 
 		/// <summary>
-		/// Folds the list with a specified function and initial value.
+		/// Left-reduces the list to a single value with a specified function 
+		/// and initial value.
 		/// </summary>
 		/// <param name='acc'>The initial value of the accumulator.</param>
-		/// <param name='func'>The function to fold the list.</param>
+		/// <param name='func'>The function to reduce the list.</param>
 		/// <typeparam name='U'>The type of the accumulator.</typeparam>
-		public U Fold<U> (U acc, Func<U, T, U> func)
+		public U ReduceLeft<U> (U acc, Func<U, T, U> func)
 		{
 			for (var list = this; !list.IsEmpty; list = list.Rest)
 				acc = func (acc, list.First);
@@ -490,27 +491,28 @@
 		}
 
 		/// <summary>
-		/// Folds the list backwards with a specified function and initial value.
+		/// Right-reduces the list to a single value with a specified function 
+		/// and initial value.
 		/// </summary>
 		/// <param name='acc'>The initial value of the accumulator.</param>
 		/// <param name='func'>The function to fold the list.</param>
 		/// <typeparam name='U'>The type of the accumulator.</typeparam>
-		public U FoldBack<U> (U acc, Func<U, T, U> func)
+		public U ReduceRight<U> (Func<T, U, U> func, U acc)
 		{
 			for (var list = Reverse (); !list.IsEmpty; list = list.Rest)
-				acc = func (acc, list.First);
+				acc = func (list.First, acc);
 			return acc;
 		}
 		
 		/// <summary>
-		/// Folds the list with other list. The fold is terminated when
-		/// either of the lists are exhausted.
+		/// Left-reduces the list with other list. The reduction is terminated 
+		/// when either of the lists are exhausted.
 		/// </summary>
 		/// <returns>The accumulated value.</returns>
 		/// <param name='acc'>Initial accumulator value.</param>
 		/// <param name='func'>The function applied to the lists' items.</param>
-		/// <param name='other'>The list to be folded with.</param>
-		public U FoldWith<U, V> (U acc, Func<U, T, V, U> func, NOPList<V> other)
+		/// <param name='other'>The list to be reduced with.</param>
+		public U ReduceWith<U, V> (U acc, Func<U, T, V, U> func, NOPList<V> other)
 		{
 			for (var list = this; !(list.IsEmpty || other.IsEmpty); 
 				 list = list.Rest, other = other.Rest)
@@ -561,7 +563,7 @@
 		/// </returns>
 		public override int GetHashCode ()
 		{
-			return Fold (0, (h, e) => h ^ e.GetHashCode ());
+			return ReduceLeft (0, (h, e) => h ^ e.GetHashCode ());
 		}
 
 		/// <summary>
@@ -671,13 +673,16 @@
 		/// array.</returns>
 		public static NOPList<T> FromArray<T> (T[] array)
 		{
-			NOPList<T > result = NOPList<T>.Empty;
-			
-			for (int i = array.Length - 1; i >= 0; i--)
-				result = NOPList<T>.Cons (array [i], result);
-			return result;
+			return array.ReduceRight (NOPList<T>.Cons, NOPList<T>.Empty);
 		}
 
+		/// <summary>
+		/// Create a list from a reducible structure.
+		/// </summary>
+		public static NOPList<T> FromReducible<T> (IReducible<T> reducible)
+		{
+			return reducible.ReduceRight (NOPList<T>.Cons, NOPList<T>.Empty);
+		}
 		/// <summary>
 		/// Constructs a new list from a variable argument list.
 		/// </summary>

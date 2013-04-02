@@ -227,7 +227,7 @@
 			/// </description>
 			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				return Items.Fold (VBox.Empty, (acc, v) => 
+				return Items.ReduceLeft (VBox.Empty, (acc, v) => 
 				{
 					var box = v.CalculateSize (context);
 					return Direction == VisualDirection.Horizontal ?

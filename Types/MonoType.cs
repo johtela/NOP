@@ -202,7 +202,7 @@
 			
 			public override Set<string> GetTypeVars ()
 			{
-				return TypeArgs.Fold (Set<string>.Empty, (s, t) => s + t.GetTypeVars ());
+				return TypeArgs.ReduceLeft (Set<string>.Empty, (s, t) => s + t.GetTypeVars ());
 			}
 			
 			protected override MonoType TypeVarsToLetters ()
@@ -218,7 +218,7 @@
 			
 			public override int GetHashCode ()
 			{
-				return TypeArgs.Fold (Name.GetHashCode (), (h, t) => h ^ t.GetHashCode ());
+				return TypeArgs.ReduceLeft (Name.GetHashCode (), (h, t) => h ^ t.GetHashCode ());
 			}
 			
 			public override string ToString ()

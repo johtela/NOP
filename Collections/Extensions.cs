@@ -23,6 +23,20 @@ namespace NOP.Collections
 			return result;
 		}
 
+		public static U ReduceLeft<T, U> (this T[] array, U acc, Func<U, T, U> func)
+		{
+			for (int i = 0; i < array.Length; i++)
+				acc = func (acc, array[i]);
+			return acc;
+		}
+
+		public static U ReduceRight<T, U> (this T[] array, Func<T, U, U> func, U acc)
+		{
+			for (int i = array.Length - 1; i >= 0; i--)
+				acc = func (array[i], acc);
+			return acc;
+		}
+
 		#endregion
 
 		#region IEnumerable extensions

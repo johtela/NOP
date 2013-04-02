@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using NOP.Collections;
-
 namespace NOP.Testbench
 {
+	using System;
+	using System.Collections.Generic;
+	using NOP.Collections;
+
 	public class MapTests
 	{
 		private const int _itemCount = 10000;
@@ -32,7 +32,7 @@ namespace NOP.Testbench
 			return dictionary;
 		}
 
-        [Test]
+		[Test]
 		public void TestTreeStructure ()
 		{
 			var map = Map<int, string>.Empty;
@@ -43,7 +43,7 @@ namespace NOP.Testbench
 			Check.IsTrue (map.Contains (1));
 		}
 
-        [Test]
+		[Test]
 		public void TestAddition ()
 		{
 			var map = CreateTestMap ();
@@ -54,7 +54,7 @@ namespace NOP.Testbench
 			}
 		}
 
-        [Test]
+		[Test]
 		public void TestAdditionDictionary ()
 		{
 			var dictionary = CreateTestDictionary ();
@@ -65,7 +65,7 @@ namespace NOP.Testbench
 			}
 		}
 
-        [Test]
+		[Test]
 		public void TestRemoval ()
 		{
 			var map = CreateTestMap ();
@@ -80,7 +80,7 @@ namespace NOP.Testbench
 
 		}
 
-        [Test]
+		[Test]
 		public void TestImmutability ()
 		{
 			var map = CreateTestMap ();
@@ -91,7 +91,7 @@ namespace NOP.Testbench
 			Check.IsTrue (map.Contains (64));
 		}
 
-        [Test]
+		[Test]
 		public void TestEnumeration ()
 		{
 			var map = CreateTestMap ();
@@ -105,7 +105,7 @@ namespace NOP.Testbench
 			}                        
 		}
 
-        [Test]
+		[Test]
 		public void TestEnumerationDictionary ()
 		{
 			var dictionary = CreateTestDictionary ();
@@ -119,7 +119,7 @@ namespace NOP.Testbench
 			}
 		}
 
-        [Test]
+		[Test]
 		public void TestCount ()
 		{
 			var map = CreateTestMap ();
@@ -127,7 +127,7 @@ namespace NOP.Testbench
 			Check.AreEqual (_itemCount, map.Count);
 		}
 
-        [Test]
+		[Test]
 		public void TestCountDictionary ()
 		{
 			var dictionary = CreateTestDictionary ();
@@ -140,10 +140,10 @@ namespace NOP.Testbench
 		{
 			Check.Throws<ArgumentException>(() =>
 				Map<string, int>.FromPairs(Tuple.Create("foo", 1), 
-		                                   Tuple.Create("bar", 2),
-			                               Tuple.Create("foo", 3)));
+										   Tuple.Create("bar", 2),
+										   Tuple.Create("foo", 3)));
 			Check.Throws<ArgumentException>(() =>
-           	{
+			{
 				var map = Map<string, int>.Empty;
 				map = map.Add("foo", 1);
 				map = map.Add("bar", 2);

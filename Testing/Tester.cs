@@ -72,7 +72,19 @@ namespace NOP
 			if (!(x is T))
 				throw new TestFailed (string.Format ("'{0}' should be of type '{1}'.", x, typeof(T)));
 		}
-		
+
+		public static void IsNull (object x)
+		{
+			if (x != null)
+				throw new TestFailed (string.Format ("'{0}' should be null'.", x));
+		}
+
+		public static void IsNotNull (object x)
+		{
+			if (x == null)
+				throw new TestFailed (string.Format ("'{0}' should not be null'.", x));
+		}
+
 		/// <summary>
 		/// Check that an action throws a specified exception.
 		/// </summary>

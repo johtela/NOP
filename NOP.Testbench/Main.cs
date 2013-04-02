@@ -20,6 +20,7 @@ namespace NOP.Testbench
 					//new InterpreterTests (),
 					new MapTests (),
 					new SetTests (),
+					new FingerTreeTests (),
 					new TypeDefinitionTests (),
 					new TypeCheckingTests (),
 					//new ParserTests (),
