@@ -9,12 +9,17 @@
 	public class FingerTreeTests
 	{
 		const int Count = 10000;
-		FingerTree<int> TestTree = FingerTree<int>.FromEnumerable (Enumerable.Range (1, Count));
+		FingerTree<Elem<int>, TreeSize> TestTree =
+			FingerTree<Elem<int>, TreeSize>.FromEnumerable (
+				Enumerable.Range (1, Count).Select (Elem.Create));
+		FingerTree<Elem<int>, TreeSize> OtherTree =
+			FingerTree<Elem<int>, TreeSize>.FromEnumerable (
+				Enumerable.Range (Count + 1, Count).Select (Elem.Create));
 
 		[Test]
 		public void TestLeftView ()
 		{
-			var viewl = TestTree.LeftView ();;
+			var viewl = TestTree.LeftView ();
 
 			for (int i = 1; i <= Count; i++)
 			{
@@ -52,7 +57,13 @@
 		[Test]
 		public void TestForeach ()
 		{
-			TestTree.Foreach (1, Check.AreEqual);
+			TestTree.Foreach (1, (e, i) => Check.AreEqual(e, i));
+		}
+
+		[Test]
+		public void TestAppend ()
+		{
+			TestTree.Append (OtherTree).Foreach (1, (e, i) => Check.AreEqual (e, i));
 		}
 	}
 }

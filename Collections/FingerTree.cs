@@ -16,26 +16,41 @@
 	/// <summary>
 	/// The inner node of the finger tree has either degree two or three.
 	/// </summary>
-	public abstract class Node<T> : IReducible<T>
+	public abstract class Node<T, V> : IReducible<T>, IMeasurable<V> 
+		where T : IMeasurable<V>
+		where V : IMonoid<V>, new ()
 	{
-		public abstract Digit<T> ToDigit ();
+		public readonly V Value;
+
+		public Node (V value)
+		{
+			Value = value;
+		}
+		
+		public V Measure ()
+		{
+			return Value;
+		}
+
+		public abstract Digit<T, V> ToDigit ();
 		public abstract U ReduceLeft<U> (U acc, Func<U, T, U> func);
 		public abstract U ReduceRight<U> (Func<T, U, U> func, U acc);
 
-		private sealed class Node2 : Node<T>
+		private sealed class Node2 : Node<T, V>
 		{
 			public readonly T Item1;
 			public readonly T Item2;
 
-			public Node2 (T item1, T item2)
+			public Node2 (T item1, T item2) :
+				base (item1.Measure ().Plus (item2.Measure ()))
 			{
 				Item1 = item1;
 				Item2 = item2;
 			}
 
-			public override Digit<T> ToDigit ()
+			public override Digit<T, V> ToDigit ()
 			{
-				return new Digit<T> (Item1, Item2);
+				return new Digit<T, V> (Item1, Item2);
 			}
 
 			public override U ReduceLeft<U> (U acc, Func<U, T, U> func)
@@ -49,22 +64,23 @@
 			}
 		}
 
-		private sealed class Node3 : Node<T>
+		private sealed class Node3 : Node<T, V>
 		{
 			public readonly T Item1;
 			public readonly T Item2;
 			public readonly T Item3;
 
-			public Node3 (T item1, T item2, T item3)
+			public Node3 (T item1, T item2, T item3) :
+				base (item1.Measure ().Plus (item2.Measure ()).Plus (item3.Measure ()))
 			{
 				Item1 = item1;
 				Item2 = item2;
 				Item3 = item3;
 			}
 
-			public override Digit<T> ToDigit ()
+			public override Digit<T, V> ToDigit ()
 			{
-				return new Digit<T> (Item1, Item2, Item3);
+				return new Digit<T, V> (Item1, Item2, Item3);
 			}
 
 			public override U ReduceLeft<U> (U acc, Func<U, T, U> func)
@@ -78,17 +94,17 @@
 			}
 		}
 
-		public static Node<T> Create (T item1, T item2)
+		public static Node<T, V> Create (T item1, T item2)
 		{
 			return new Node2 (item1, item2);
 		}
 
-		public static Node<T> Create (T item1, T item2, T item3)
+		public static Node<T, V> Create (T item1, T item2, T item3)
 		{
 			return new Node3 (item1, item2, item3);
 		}
 
-		public static NOPList<Node<T>> CreateMany (NOPList<T> items)
+		public static NOPList<Node<T, V>> CreateMany (NOPList<T> items)
 		{
 			switch (items.Length)
 			{
@@ -107,7 +123,9 @@
 	/// <summary>
 	/// The front and back parts of the tree have one to four items in an array.
 	/// </summary>
-	public class Digit<T> : IEnumerable<T>, IReducible<T>
+	public class Digit<T, V> : IEnumerable<T>, IReducible<T>, IMeasurable<V>
+		where T : IMeasurable<V>
+		where V : IMonoid<V>, new ()
 	{
 		private readonly T[] _items;
 
@@ -139,24 +157,24 @@
 			_items = new T[] { item1, item2, item3, item4 };
 		}
 
-		public static Digit<T> operator + (T item, Digit<T> digit)
+		public static Digit<T, V> operator + (T item, Digit<T, V> digit)
 		{
 			switch (digit._items.Length)
 			{
-				case 1: return new Digit<T> (item, digit._items[0]);
-				case 2: return new Digit<T> (item, digit._items[0], digit._items[1]);
-				case 3: return new Digit<T> (item, digit._items[0], digit._items[1], digit._items[2]);
+				case 1: return new Digit<T, V> (item, digit[0]);
+				case 2: return new Digit<T, V> (item, digit[0], digit[1]);
+				case 3: return new Digit<T, V> (item, digit[0], digit[1], digit[2]);
 				default: throw new ArgumentException ("Digit is full", "digit");
 			}
 		}
 
-		public static Digit<T> operator + (Digit<T> digit, T item)
+		public static Digit<T, V> operator + (Digit<T, V> digit, T item)
 		{
 			switch (digit._items.Length)
 			{
-				case 1: return new Digit<T> (digit._items[0], item);
-				case 2: return new Digit<T> (digit._items[0], digit._items[1], item);
-				case 3: return new Digit<T> (digit._items[0], digit._items[1], digit._items[2], item);
+				case 1: return new Digit<T, V> (digit[0], item);
+				case 2: return new Digit<T, V> (digit[0], digit[1], item);
+				case 3: return new Digit<T, V> (digit[0], digit[1], digit[2], item);
 				default: throw new ArgumentException ("Digit is full", "digit");
 			}
 		}
@@ -201,6 +219,15 @@
 			get { return Slice (1); }
 		}
 
+		#region IMeasurable<V> implementation
+
+		public V Measure ()
+		{
+			return ReduceLeft (new V (), (v, i) => v.Plus (i.Measure ()));
+		}
+		
+		#endregion
+
 		#region IEnumerable implementation
 
 		public IEnumerator<T> GetEnumerator ()
@@ -233,12 +260,14 @@
 	/// <summary>
 	/// Left view of the tree.
 	/// </summary>
-	public class ViewL<T>
+	public class ViewL<T, V>
+		where T : IMeasurable<V>
+		where V : IMonoid<V>, new ()
 	{
 		public readonly T First;
-		public readonly FingerTree<T> Rest;
+		public readonly FingerTree<T, V> Rest;
 
-		public ViewL (T first, FingerTree<T> rest)
+		public ViewL (T first, FingerTree<T, V> rest)
 		{
 			First = first;
 			Rest = rest;
@@ -248,12 +277,14 @@
 	/// <summary>
 	/// Rigth view of the tree.
 	/// </summary>
-	public class ViewR<T>
+	public class ViewR<T, V>
+		where T : IMeasurable<V>
+		where V : IMonoid<V>, new ()
 	{
 		public readonly T Last;
-		public readonly FingerTree<T> Rest;
+		public readonly FingerTree<T, V> Rest;
 
-		public ViewR (T last, FingerTree<T> rest)
+		public ViewR (T last, FingerTree<T, V> rest)
 		{
 			Last = last;
 			Rest = rest;
@@ -265,49 +296,51 @@
 	/// front, inner, and back parts where the inner part can be empty.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public abstract class FingerTree<T> : IReducible<T>
+	public abstract class FingerTree<T, V> : IReducible<T>
+		where T : IMeasurable<V>
+		where V : IMonoid<V>, new ()
 	{
-		public abstract FingerTree<T> AddLeft (T leftItem);
-		public abstract FingerTree<T> AddRight (T rightItem);
+		public abstract FingerTree<T, V> AddLeft (T leftItem);
+		public abstract FingerTree<T, V> AddRight (T rightItem);
 
-		public abstract ViewL<T> LeftView ();
-		public abstract ViewR<T> RightView ();
+		public abstract ViewL<T, V> LeftView ();
+		public abstract ViewR<T, V> RightView ();
 
-		public abstract FingerTree<T> AppendTree (IEnumerable<T> items, FingerTree<T> tree);
+		public abstract FingerTree<T, V> AppendTree (IEnumerable<T> items, FingerTree<T, V> tree);
 
 		public abstract U ReduceLeft<U> (U acc, Func<U, T, U> func);
 		public abstract U ReduceRight<U> (Func<T, U, U> func, U acc);
 
-		private static FingerTree<T> _empty = new _Empty ();
+		private static FingerTree<T, V> _empty = new _Empty ();
 
 		/// <summary>
 		/// An empty tree.
 		/// </summary>
-		private sealed class _Empty : FingerTree<T>
+		private sealed class _Empty : FingerTree<T, V>
 		{
 			public _Empty () { }
 
-			public override FingerTree<T> AddLeft (T leftItem)
+			public override FingerTree<T, V> AddLeft (T leftItem)
 			{
 				return new _Single (leftItem);
 			}
 
-			public override FingerTree<T> AddRight (T rightItem)
+			public override FingerTree<T, V> AddRight (T rightItem)
 			{
 				return new _Single (rightItem);
 			}
 
-			public override ViewL<T> LeftView ()
+			public override ViewL<T, V> LeftView ()
 			{
 				return null;
 			}
 
-			public override ViewR<T> RightView ()
+			public override ViewR<T, V> RightView ()
 			{
 				return null;
 			}
 
-			public override FingerTree<T> AppendTree (IEnumerable<T> items, FingerTree<T> tree)
+			public override FingerTree<T, V> AppendTree (IEnumerable<T> items, FingerTree<T, V> tree)
 			{
 				return tree.Prepend (items);
 			}
@@ -326,7 +359,7 @@
 		/// <summary>
 		/// Tree with a single item.
 		/// </summary>
-		private sealed class _Single : FingerTree<T>
+		private sealed class _Single : FingerTree<T, V>
 		{
 			public readonly T Item;
 
@@ -335,31 +368,32 @@
 				Item = item;
 			}
 
-			public override FingerTree<T> AddLeft (T leftItem)
+			public override FingerTree<T, V> AddLeft (T leftItem)
 			{
-				return new _Deep (new Digit<T> (leftItem),
-					new FingerTree<Node<T>>._Empty (),
-					new Digit<T> (Item));
+				return new _Deep (new Digit<T, V> (leftItem),
+					new FingerTree<Node<T, V>, V>._Empty (),
+					new Digit<T, V> (Item));
 			}
 
-			public override FingerTree<T> AddRight (T rightItem)
+			public override FingerTree<T, V> AddRight (T rightItem)
 			{
-				return new _Deep (new Digit<T> (Item),
-					new FingerTree<Node<T>>._Empty (),
-					new Digit<T> (rightItem));
+				return new _Deep (new Digit<T, V> (Item),
+					new FingerTree<Node<T, V>, V>._Empty (),
+					new Digit<T, V> (rightItem));
 			}
 
-			public override ViewL<T> LeftView ()
+			public override ViewL<T, V> LeftView ()
 			{
-				return new ViewL<T> (Item, _empty);
+				return new ViewL<T, V> (Item, _empty);
 			}
 
-			public override ViewR<T> RightView ()
+			public override ViewR<T, V> RightView ()
 			{
-				return new ViewR<T> (Item, _empty);
+				return new ViewR<T, V> (Item, _empty);
 			}
 
-			public override FingerTree<T> AppendTree (IEnumerable<T> items, FingerTree<T> tree)
+			public override FingerTree<T, V> AppendTree (IEnumerable<T> items, 
+				FingerTree<T, V> tree)
 			{
 				return tree.Prepend (items).AddLeft (Item);
 			}
@@ -378,48 +412,48 @@
 		/// <summary>
 		/// Deep tree with a front and back digits plus the inner tree.
 		/// </summary>
-		private sealed class _Deep : FingerTree<T>
+		private sealed class _Deep : FingerTree<T, V>
 		{
-			public readonly Digit<T> Front;
-			public readonly FingerTree<Node<T>> Inner;
-			public readonly Digit<T> Back;
+			public readonly Digit<T, V> Front;
+			public readonly FingerTree<Node<T, V>, V> Inner;
+			public readonly Digit<T, V> Back;
 
-			public _Deep (Digit<T> front, FingerTree<Node<T>> inner, Digit<T> back)
+			public _Deep (Digit<T, V> front, FingerTree<Node<T, V>, V> inner, Digit<T, V> back)
 			{
 				Front = front;
 				Inner = inner;
 				Back = back;
 			}
 
-			public override FingerTree<T> AddLeft (T leftItem)
+			public override FingerTree<T, V> AddLeft (T leftItem)
 			{
 				return Front.IsFull ?
-					new _Deep (new Digit<T> (leftItem, Front[0]),
-						Inner.AddLeft (Node<T>.Create (Front[1], Front[2], Front[3])),
+					new _Deep (new Digit<T, V> (leftItem, Front[0]),
+						Inner.AddLeft (Node<T, V>.Create (Front[1], Front[2], Front[3])),
 						Back) :
 					new _Deep (leftItem + Front, Inner, Back);
 			}
 
-			public override FingerTree<T> AddRight (T rightItem)
+			public override FingerTree<T, V> AddRight (T rightItem)
 			{
 				return Back.IsFull ?
 					new _Deep (Front,
-						Inner.AddRight (Node<T>.Create (Back[0], Back[1], Back[2])),
-						new Digit<T> (Back[3], rightItem)) :
+						Inner.AddRight (Node<T, V>.Create (Back[0], Back[1], Back[2])),
+						new Digit<T, V> (Back[3], rightItem)) :
 					new _Deep (Front, Inner, Back + rightItem);
 			}
 
-			public override ViewL<T> LeftView ()
+			public override ViewL<T, V> LeftView ()
 			{
-				return new ViewL<T> (Front.First, DeepL (Front.Suffix, Inner, Back));
+				return new ViewL<T, V> (Front.First, DeepL (Front.Suffix, Inner, Back));
 			}
 
-			public override ViewR<T> RightView ()
+			public override ViewR<T, V> RightView ()
 			{
-				return new ViewR<T> (Back.Last, DeepR (Front, Inner, Back.Prefix));
+				return new ViewR<T, V> (Back.Last, DeepR (Front, Inner, Back.Prefix));
 			}
 
-			public override FingerTree<T> AppendTree (IEnumerable<T> items, FingerTree<T> tree)
+			public override FingerTree<T, V> AppendTree (IEnumerable<T> items, FingerTree<T, V> tree)
 			{
 				if (tree is _Empty)
 					return Append (items);
@@ -428,7 +462,7 @@
 				var other = tree as _Deep;
 				var innerItems = List.Create (Back.Concat (items).Concat (other.Front));
 				return new _Deep (Front,
-					Inner.AppendTree (Node<T>.CreateMany (innerItems), other.Inner),
+					Inner.AppendTree (Node<T, V>.CreateMany (innerItems), other.Inner),
 					other.Back);
 			}
 
@@ -445,7 +479,7 @@
 			}
 		}
 
-		public FingerTree<T> Empty
+		public FingerTree<T, V> Empty
 		{
 			get { return _empty; }
 		}
@@ -465,73 +499,88 @@
 			get { return CheckView (RightView ()).Last; }
 		}
 
-		public FingerTree<T> RestL
+		public FingerTree<T, V> RestL
 		{
 			get { return CheckView (LeftView ()).Rest; }
 		}
 
-		public FingerTree<T> RestR
+		public FingerTree<T, V> RestR
 		{
 			get { return CheckView (RightView ()).Rest; }
 		}
 
-		public FingerTree<T> Prepend (IEnumerable<T> items)
+		public FingerTree<T, V> Prepend (IReducible<T> items)
 		{
-			var result = this;
-			foreach (T item in items.Reverse ())
-				result = result.AddLeft (item);
-			return result;
+			return items.ReduceRight ((i, t) => t.AddLeft (i), this);
 		}
 
-		public FingerTree<T> Append (IEnumerable<T> items)
+		public FingerTree<T, V> Prepend (IEnumerable<T> items)
 		{
-			var result = this;
-			foreach (T item in items)
-				result = result.AddRight (item);
-			return result;
+			return items.Reverse ().Aggregate (this, (t, i) => AddLeft (i));
 		}
 
-		public static FingerTree<T> FromEnumerable (IEnumerable<T> e)
+		public FingerTree<T, V> Append (IReducible<T> items)
 		{
-			return _empty.Append (e);
+			return items.ReduceLeft (this, (t, i) => t.AddRight (i));
 		}
 
-		private ViewL<T> CheckView (ViewL<T> viewl)
+		public FingerTree<T, V> Append (IEnumerable<T> items)
+		{
+			return items.Aggregate (this, (t, i) => t.AddRight (i));
+		}
+
+		public static FingerTree<T, V> FromReducible (IReducible<T> items)
+		{
+			return _empty.Append (items);
+		}
+
+		public static FingerTree<T, V> FromEnumerable (IEnumerable<T> items)
+		{
+			return _empty.Append (items);
+		}
+
+		public FingerTree<T, V> Concat (FingerTree<T, V> other)
+		{
+			return this.AppendTree (NOPList<T>.Empty, other);
+		}
+
+		private ViewL<T, V> CheckView (ViewL<T, V> viewl)
 		{
 			if (viewl == null)
 				throw new EmptyTreeException ();
 			return viewl;
 		}
 
-		private ViewR<T> CheckView (ViewR<T> viewr)
+		private ViewR<T, V> CheckView (ViewR<T, V> viewr)
 		{
 			if (viewr == null)
 				throw new EmptyTreeException ();
 			return viewr;
 		}
 
-		private static FingerTree<T> DeepL (T[] front, FingerTree<Node<T>> inner, Digit<T> back)
+		private static FingerTree<T, V> DeepL (T[] front, FingerTree<Node<T, V>, V> inner,
+			Digit<T, V> back)
 		{
 			if (front == null)
 			{
 				var viewl = inner.LeftView ();
 				return viewl == null ?
-					FromEnumerable (back) :
+					FromReducible (back) :
 					new _Deep (viewl.First.ToDigit (), viewl.Rest, back);
 			}
-			return new _Deep (new Digit<T> (front), inner, back);
+			return new _Deep (new Digit<T, V> (front), inner, back);
 		}
 
-		private static FingerTree<T> DeepR (Digit<T> front, FingerTree<Node<T>> inner, T[] back)
+		private static FingerTree<T, V> DeepR (Digit<T, V> front, FingerTree<Node<T, V>, V> inner, T[] back)
 		{
 			if (back == null)
 			{
 				var viewr = inner.RightView ();
 				return viewr == null ?
-					FromEnumerable (front) :
+					FromReducible (front) :
 					new _Deep (front, viewr.Rest, viewr.Last.ToDigit ());
 			}
-			return new _Deep (front, inner, new Digit<T> (back));
+			return new _Deep (front, inner, new Digit<T, V> (back));
 		}
 	}
 }
