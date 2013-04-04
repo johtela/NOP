@@ -12,6 +12,42 @@
 	}
 
 	/// <summary>
+	/// Split divides a reducible structure into three parts according to a predicate: 
+	/// - the left part is a reducible structure that contains all the items for whích 
+	///   the predicate is not true
+	/// - the first item for which the precicate is true
+	/// - the right part is a reducible structure that contains the rest of the items 
+	///   for which the predicate is true
+	/// </summary>
+	public class Split<T, U, V>
+		where T : IReducible<U>
+		where U : IMeasurable<V>
+		where V : IMonoid<V>, new ()
+	{
+		public readonly T Left;
+		public readonly U Item;
+		public readonly T Right;
+
+		public Split (T left, U item, T right)
+		{
+			Left = left;
+			Item = item;
+			Right = right;
+		}
+	}
+
+	/// <summary>
+	/// Interface for reducible structures that can be splitted.
+	/// </summary>
+	public interface ISplittable<T, U, V>
+		where T : IReducible<U>
+		where U : IMeasurable<V>
+		where V : IMonoid<V>, new ()
+	{
+		Split<T, U, V> Split (Func<V, bool> predicate, V acc);
+	}
+
+	/// <summary>
 	/// Extension  methods for IReducible interface. />
 	/// </summary>
 	public static class Reducible

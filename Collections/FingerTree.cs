@@ -123,7 +123,7 @@
 	/// <summary>
 	/// The front and back parts of the tree have one to four items in an array.
 	/// </summary>
-	public class Digit<T, V> : IEnumerable<T>, IReducible<T>, IMeasurable<V>
+	public class Digit<T, V> : IEnumerable<T>, IReducible<T>, IMeasurable<V>, ISplittable<NOPList<T>, T, V>
 		where T : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{
@@ -155,6 +155,21 @@
 		public Digit (T item1, T item2, T item3, T item4)
 		{
 			_items = new T[] { item1, item2, item3, item4 };
+		}
+
+		public Split<NOPList<T>, T, V> Split (Func<V, bool> predicate, V acc)
+		{
+			var list = List.FromArray (_items);
+			var right = list;
+
+			while (!right.IsEmpty)
+			{
+				acc = acc.Plus (right.First.Measure ());
+				if (predicate(acc)) break;
+				right = right.Rest;
+			}
+			return new Split<NOPList<T>, T, V> (list.CopyUpTo (right).Item1, 
+				right.First, right.Rest);
 		}
 
 		public static Digit<T, V> operator + (T item, Digit<T, V> digit)
@@ -296,20 +311,28 @@
 	/// front, inner, and back parts where the inner part can be empty.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public abstract class FingerTree<T, V> : IReducible<T>
+	public abstract class FingerTree<T, V> : IReducible<T>, IMeasurable<V>, ISplittable<FingerTree<T, V>, T, V>
 		where T : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{
 		public abstract FingerTree<T, V> AddLeft (T leftItem);
 		public abstract FingerTree<T, V> AddRight (T rightItem);
-
 		public abstract ViewL<T, V> LeftView ();
 		public abstract ViewR<T, V> RightView ();
-
 		public abstract FingerTree<T, V> AppendTree (IEnumerable<T> items, FingerTree<T, V> tree);
 
+		#region IReducible<T> implementation
 		public abstract U ReduceLeft<U> (U acc, Func<U, T, U> func);
 		public abstract U ReduceRight<U> (Func<T, U, U> func, U acc);
+		#endregion
+
+		#region IMeasurable<V> implementation
+		public abstract V Measure ();
+		#endregion
+
+		#region ISplittable<FingerTree<T, V>, T, V> implementation
+		public abstract Split<FingerTree<T, V>, T, V> Split (Func<V, bool> predicate, V acc);
+		#endregion
 
 		private static FingerTree<T, V> _empty = new _Empty ();
 
@@ -353,6 +376,16 @@
 			public override U ReduceRight<U> (Func<T, U, U> func, U acc)
 			{
 				return acc;
+			}
+
+			public override V Measure ()
+			{
+				return new V ();
+			}
+
+			public override Split<FingerTree<T, V>, T, V> Split (Func<V, bool> predicate, V acc)
+			{
+				throw new EmptyTreeException ();
 			}
 		}
 
@@ -407,6 +440,16 @@
 			{
 				return func (Item, acc);
 			}
+
+			public override V Measure ()
+			{
+				return Item.Measure ();
+			}
+
+			public override Split<FingerTree<T, V>, T, V> Split (Func<V, bool> predicate, V acc)
+			{
+				return new Split<FingerTree<T, V>, T, V> (_empty, Item, _empty);
+			}
 		}
 
 		/// <summary>
@@ -414,6 +457,7 @@
 		/// </summary>
 		private sealed class _Deep : FingerTree<T, V>
 		{
+			public readonly V Value;
 			public readonly Digit<T, V> Front;
 			public readonly FingerTree<Node<T, V>, V> Inner;
 			public readonly Digit<T, V> Back;
@@ -423,6 +467,7 @@
 				Front = front;
 				Inner = inner;
 				Back = back;
+				Value = Front.Measure ().Plus (Inner.Measure ().Plus (Back.Measure ()));
 			}
 
 			public override FingerTree<T, V> AddLeft (T leftItem)
@@ -476,6 +521,24 @@
 			{
 				return Front.ReduceRight (func, Inner.ReduceRight ((n, a) => n.ReduceRight(func, a), 
 					Back.ReduceRight (func, acc)));
+			}
+
+			public override V Measure ()
+			{
+				return Value;
+			}
+
+			public override Split<FingerTree<T, V>, T, V> Split (Func<V, bool> predicate, V acc)
+			{
+				var vfront = acc.Plus (Front.Measure ());
+				var vinner = vfront.Plus (Inner.Measure ());
+
+				if (predicate(vfront))
+				{
+					var split = Front.Split (predicate, acc);
+					return new Split<FingerTree<T,V>,T,V> ( FromReducible(split.Left), 
+						split.Item, DeepL (split.Right, )
+				}
 			}
 		}
 
