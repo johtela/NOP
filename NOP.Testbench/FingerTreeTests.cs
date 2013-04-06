@@ -9,22 +9,19 @@
 	public class FingerTreeTests
 	{
 		const int Count = 10000;
-		FingerTree<Sequence<int>.Elem, Sequence<int>.Size> TestTree =
-			FingerTree<Sequence<int>.Elem, Sequence<int>.Size>.FromEnumerable (
-				Enumerable.Range (1, Count).Select (i => new Sequence<int>.Elem (i)));
-		FingerTree<Sequence<int>.Elem, Sequence<int>.Size> OtherTree =
-			FingerTree<Sequence<int>.Elem, Sequence<int>.Size>.FromEnumerable (
-				Enumerable.Range (Count + 1, Count).Select (i => new Sequence<int>.Elem (i)));
+		Sequence<int> TestSeq = Sequence<int>.Create (Enumerable.Range (0, Count));
+		Sequence<int> OtherSeq = Sequence<int>.Create (Enumerable.Range (Count, Count));
+		
 
 		[Test]
 		public void TestLeftView ()
 		{
-			var viewl = TestTree.LeftView ();
+			var viewl = TestSeq.LeftView;
 
-			for (int i = 1; i <= Count; i++)
+			for (int i = 0; i < Count; i++)
 			{
-				Check.AreEqual (i, viewl.First);
-				viewl = viewl.Rest.LeftView ();	
+				Check.AreEqual (i, viewl.Item1);
+				viewl = viewl.Item2.LeftView;	
 			}
 			Check.IsNull (viewl);
 		}
@@ -32,12 +29,12 @@
 		[Test]
 		public void TestRightView ()
 		{
-			var viewr = TestTree.RightView ();
+			var viewr = TestSeq.RightView;
 
-			for (int i = Count; i > 0; i--)
+			for (int i = Count - 1; i >= 0; i--)
 			{
-				Check.AreEqual (i, viewr.Last);
-				viewr = viewr.Rest.RightView ();
+				Check.AreEqual (i, viewr.Item2);
+				viewr = viewr.Item1.RightView;
 			}
 			Check.IsNull (viewr);
 		}
@@ -47,23 +44,32 @@
 		{
 			var i = 0;
 
-			foreach (var item in List.FromReducible(TestTree))
+			foreach (var item in List.FromReducible(TestSeq))
 			{
-				Check.AreEqual (item, ++i);
+				Check.AreEqual (item, i++);
 			}
 			Check.AreEqual (Count, i);
 		}
 
 		[Test]
-		public void TestForeach ()
+		public void TestAppend ()
 		{
-			TestTree.Foreach (1, (e, i) => Check.AreEqual(e, i));
+			TestSeq.AppendWith (NOPList<int>.Empty, OtherSeq).Foreach (0, Check.AreEqual);
 		}
 
 		[Test]
-		public void TestAppend ()
+		public void TestSequenceIndexing ()
 		{
-			TestTree.Append (OtherTree).Foreach (1, (e, i) => Check.AreEqual (e, i));
+			for (int i = 0; i < Count; i++)	
+			{
+				Check.AreEqual (i, TestSeq[i]);
+			}
+		}
+
+		[Test]
+		public void TestSequenceReduction ()
+		{
+			TestSeq.Foreach (0, Check.AreEqual);
 		}
 	}
 }

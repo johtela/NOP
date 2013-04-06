@@ -15,7 +15,7 @@ namespace NOP.Testbench
 		public static void Main (string[] args)
 		{
 			Task.Factory.StartNew (() =>
-				Tester.RunTests (
+				Tester.RunTestsTimed (
 					new CollectionTests (),
 					//new InterpreterTests (),
 					new MapTests (),

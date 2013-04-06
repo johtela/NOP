@@ -104,7 +104,7 @@ namespace NOP.Collections
 		/// </summary>
 		public static Set<T> operator+ (Set<T> s1, Set<T> s2)
 		{
-			return Set<T>.Create (s1.Concat (s2));
+			return Set<T>.Create ((s1 as IEnumerable<T>).Concat (s2));
 		}
 		
 		/// <summary>

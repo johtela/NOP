@@ -90,5 +90,32 @@
 				return i + increment;
 			});
 		}
+
+		public static IReducible<T> Concat<T> (this IReducible<T> first, IReducible<T> second)
+		{
+			return new _Concat<T> (first, second);
+		}
+
+		private class _Concat<T> : IReducible<T>
+		{
+			public readonly IReducible<T> First;
+			public readonly IReducible<T> Second;
+
+			public _Concat (IReducible<T> first, IReducible<T> second)
+			{
+				First = first;
+				Second = second;
+			}
+
+			public U ReduceLeft<U> (U acc, Func<U, T, U> func)
+			{
+				return Second.ReduceLeft (First.ReduceLeft (acc, func), func);
+			}
+
+			public U ReduceRight<U> (Func<T, U, U> func, U acc)
+			{
+				return First.ReduceRight (func, Second.ReduceRight (func, acc));
+			}
+		}
 	}
 }

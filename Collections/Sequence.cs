@@ -5,7 +5,7 @@
 	using System.Linq;
 	using System.Text;
 
-	public struct Sequence<T>
+	public struct Sequence<T> : IReducible<T>
 	{
 		public struct Size : IMonoid<Size>
 		{
@@ -24,6 +24,11 @@
 			public Size Plus (Size other)
 			{
 				return new Size (_value + other._value);
+			}
+
+			public override string ToString ()
+			{
+				return _value.ToString ();
 			}
 		}
 
@@ -44,6 +49,11 @@
 			public Size Measure ()
 			{
 				return new Size (1);
+			}
+
+			public override string ToString ()
+			{
+				return Value.ToString ();
 			}
 		}
 
@@ -99,7 +109,8 @@
 			get 
 			{
 				var view = _tree.LeftView ();
-				return Tuple.Create ((T)view.First, new Sequence<T> (view.Rest));
+				return view == null ? null : 
+					Tuple.Create ((T)view.First, new Sequence<T> (view.Rest));
 			}
 		}
 
@@ -108,19 +119,29 @@
 			get
 			{
 				var view = _tree.RightView ();
-				return Tuple.Create (new Sequence<T> (view.Rest), (T)view.Last);
+				return view == null ? null : 
+					Tuple.Create (new Sequence<T> (view.Rest), (T)view.Last);
 			}
 		}
 
 		public T this[int index]
 		{
-			get { return _tree.Split (FindP (index), new Size ()).Item; }
+			get 
+			{
+				if (index < 0 || index >= Length)
+					throw new IndexOutOfRangeException ("Index was outside the bounds of the sequence.");
+				return _tree.Split (FindP (index), new Size ()).Item;
+			}
 		}
 
-		public Sequence<T> AppendWith (IEnumerable<T> items, Sequence<T> other)
+		public int Length
 		{
-			return new Sequence<T> (
-				_tree.AppendTree (items.Select (CreateElem), other._tree));
+			get { return _tree.Measure (); }
+		}
+
+		public Sequence<T> AppendWith (NOPList<T> items, Sequence<T> other)
+		{
+			return new Sequence<T> (_tree.AppendTree (items.Map (CreateElem), other._tree));
 		}
 
 		public Tuple<Sequence<T>, T, Sequence<T>> SplitAt (int index)
@@ -144,5 +165,19 @@
 		{
 			return new Sequence<T> (seq._tree.AppendTree (NOPList<Elem>.Empty, other._tree));
 		}
+
+		#region IReducible<T> implementation
+
+		public U ReduceLeft<U> (U acc, Func<U, T, U> func)
+		{
+			return _tree.ReduceLeft (acc, (a, e) => func (a, e.Value));
+		}
+
+		public U ReduceRight<U> (Func<T, U, U> func, U acc)
+		{
+			return _tree.ReduceRight ((e, a) => func (e.Value, a), acc);
+		}
+
+		#endregion	
 	}
 }

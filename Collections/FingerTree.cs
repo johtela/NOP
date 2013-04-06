@@ -123,7 +123,7 @@
 	/// <summary>
 	/// The front and back parts of the tree have one to four items in an array.
 	/// </summary>
-	public class Digit<T, V> : IEnumerable<T>, IReducible<T>, IMeasurable<V>, ISplittable<NOPList<T>, T, V>
+	public class Digit<T, V> : IReducible<T>, IMeasurable<V>, ISplittable<NOPList<T>, T, V>
 		where T : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{
@@ -170,11 +170,13 @@
 		public Split<NOPList<T>, T, V> Split (Func<V, bool> predicate, V acc)
 		{
 			var i = 0;
-			while (!predicate (acc) && i < _items.Length)
-				acc = acc.Plus (_items[i++].Measure ());
+			do { acc = acc.Plus (_items[i].Measure ()); }
+			while (!predicate (acc) && ++i < _items.Length);
 
-			return new Split<NOPList<T>, T, V> (Lazy.Create (() => Slice (0, i - 2)),
-				_items[i - 1], Lazy.Create (() => Slice (i, _items.Length)));
+			return new Split<NOPList<T>, T, V> (
+				Lazy.Create (() => Slice (0, i - 1)),
+				_items[i],
+				Lazy.Create (() => Slice (i + 1, _items.Length - 1)));
 		}
 
 		public static Digit<T, V> operator + (T item, Digit<T, V> digit)
@@ -234,20 +236,6 @@
 		public V Measure ()
 		{
 			return ReduceLeft (new V (), (v, i) => v.Plus (i.Measure ()));
-		}
-		
-		#endregion
-
-		#region IEnumerable implementation
-
-		public IEnumerator<T> GetEnumerator ()
-		{
-			return (_items as IEnumerable<T>).GetEnumerator ();
-		}
-
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
-		{
-			return _items.GetEnumerator ();
 		}
 
 		#endregion
@@ -314,7 +302,7 @@
 		public abstract FingerTree<T, V> AddRight (T rightItem);
 		public abstract ViewL<T, V> LeftView ();
 		public abstract ViewR<T, V> RightView ();
-		public abstract FingerTree<T, V> AppendTree (IEnumerable<T> items, FingerTree<T, V> tree);
+		public abstract FingerTree<T, V> AppendTree (IReducible<T> items, FingerTree<T, V> tree);
 
 		#region IReducible<T> implementation
 		public abstract U ReduceLeft<U> (U acc, Func<U, T, U> func);
@@ -358,7 +346,7 @@
 				return null;
 			}
 
-			public override FingerTree<T, V> AppendTree (IEnumerable<T> items, FingerTree<T, V> tree)
+			public override FingerTree<T, V> AppendTree (IReducible<T> items, FingerTree<T, V> tree)
 			{
 				return tree.Prepend (items);
 			}
@@ -420,7 +408,7 @@
 				return new ViewR<T, V> (Item, _empty);
 			}
 
-			public override FingerTree<T, V> AppendTree (IEnumerable<T> items, 
+			public override FingerTree<T, V> AppendTree (IReducible<T> items, 
 				FingerTree<T, V> tree)
 			{
 				return tree.Prepend (items).AddLeft (Item);
@@ -494,14 +482,14 @@
 				return new ViewR<T, V> (Back.Last, DeepR (Front, Inner, Back.Prefix));
 			}
 
-			public override FingerTree<T, V> AppendTree (IEnumerable<T> items, FingerTree<T, V> tree)
+			public override FingerTree<T, V> AppendTree (IReducible<T> items, FingerTree<T, V> tree)
 			{
 				if (tree is _Empty)
 					return Append (items);
 				if (tree is _Single)
 					return Append (items).AddRight ((tree as _Single).Item);
 				var other = tree as _Deep;
-				var innerItems = List.Create (Back.Concat (items).Concat (other.Front));
+				var innerItems = List.FromReducible (Back.Concat (items).Concat (other.Front));
 				return new _Deep (Front,
 					Inner.AppendTree (Node<T, V>.CreateMany (innerItems), other.Inner),
 					other.Back);
@@ -534,25 +522,25 @@
 					var split = Front.Split (predicate, acc);
 					return new Split<FingerTree<T, V>, T, V> (
 						Lazy.Create (() => FromReducible (split.Left)),
-						split.Item, 
+						split.Item,
 						Lazy.Create (() => DeepL (split.Right, Inner, Back)));
 				}
 				else if (predicate (vinner))
 				{
-					var treeSplit = Inner.Split (predicate, vfront);
-					var digitSplit = treeSplit.Item.ToDigit ().Split (
-						predicate, vfront.Plus (treeSplit.Left.Measure ()));
+					var innerSplit = Inner.Split (predicate, vfront);
+					var digitSplit = innerSplit.Item.ToDigit ().Split (
+						predicate, vfront.Plus (innerSplit.Left.Measure ()));
 					return new Split<FingerTree<T, V>, T, V> (
-						Lazy.Create (() => DeepR (Front, Inner, digitSplit.Left)),
-						digitSplit.Item, 
-						Lazy.Create (() => DeepL (digitSplit.Right, treeSplit.Right, Back)));
+						Lazy.Create (() => DeepR (Front, innerSplit.Left, digitSplit.Left)),
+						digitSplit.Item,
+						Lazy.Create (() => DeepL (digitSplit.Right, innerSplit.Right, Back)));
 				}
 				else
 				{
 					var split = Back.Split (predicate, vinner);
 					return new Split<FingerTree<T, V>, T, V> (
 						Lazy.Create (() => DeepR (Front, Inner, split.Left)),
-						split.Item, 
+						split.Item,
 						Lazy.Create (() => FromReducible (split.Right)));
 				}
 			}
@@ -595,7 +583,7 @@
 
 		public FingerTree<T, V> Prepend (IEnumerable<T> items)
 		{
-			return items.Reverse ().Aggregate (this, (t, i) => AddLeft (i));
+			return items.Reverse ().Aggregate (this, (t, i) => t.AddLeft (i));
 		}
 
 		public FingerTree<T, V> Append (IReducible<T> items)
