@@ -24,15 +24,30 @@
 		where U : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{
-		public readonly T Left;
-		public readonly U Item;
-		public readonly T Right;
+		private readonly Lazy<T> _left;
+		private readonly U _item;
+		private readonly Lazy<T> _right;
 
-		public Split (T left, U item, T right)
+		public Split (Lazy<T> left, U item, Lazy<T> right)
 		{
-			Left = left;
-			Item = item;
-			Right = right;
+			_left = left;
+			_item = item;
+			_right = right;
+		}
+
+		public T Left
+		{
+			get { return _left; }
+		}
+
+		public U Item
+		{
+			get { return _item; }
+		}
+
+		public T Right
+		{
+			get { return _right; }
 		}
 	}
 

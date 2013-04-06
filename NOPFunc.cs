@@ -17,7 +17,7 @@
 	/// The base class for functions with type: a -> b -> c
 	/// </summary>
 	public abstract class NOPFunc<TArg1, TArg2, TRes> : 
-        NOPFunc<TArg1, NOPFunc<TArg2, TRes>>
+		NOPFunc<TArg1, NOPFunc<TArg2, TRes>>
 	{
 		// Curried function fixes the first argument.
 		private class Curried : NOPFunc<TArg2, TRes>
@@ -56,7 +56,7 @@
 	/// The base class for functions with type: a -> b -> c -> d.
 	/// </summary>
 	public abstract class NOPFunc<TArg1, TArg2, TArg3, TRes> : 
-        NOPFunc<TArg1, NOPFunc<TArg2, NOPFunc<TArg3, TRes>>>
+		NOPFunc<TArg1, NOPFunc<TArg2, NOPFunc<TArg3, TRes>>>
 	{
 		// Curried function fixes the first argument.
 		private class Curried : NOPFunc<TArg2, TArg3, TRes>
@@ -95,7 +95,7 @@
 	/// The base class for functions with type: a -> b -> c -> d -> e.
 	/// </summary>
 	public abstract class NOPFunc<TArg1, TArg2, TArg3, TArg4, TRes> : 
-        NOPFunc<TArg1, NOPFunc<TArg2, NOPFunc<TArg3, NOPFunc<TArg4, TRes>>>>
+		NOPFunc<TArg1, NOPFunc<TArg2, NOPFunc<TArg3, NOPFunc<TArg4, TRes>>>>
 	{
 		// Curried function fixes the first argument.
 		private class Curried : NOPFunc<TArg2, TArg3, TArg4, TRes>

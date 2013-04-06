@@ -129,12 +129,14 @@
 	{
 		private readonly T[] _items;
 
-		public Digit (T[] items)
+		public Digit (NOPList<T> items)
 		{
 			var len = items.Length;
 			if (len < 1 || len > 4)
 				throw new ArgumentException ("Digit array must have length of 1..4");
-			_items = items;
+			_items = new T[len];
+			for (int i = 0; i < len; i++, items = items.Rest)
+				_items[i] = items.First;
 		}
 
 		public Digit (T item1)
@@ -157,19 +159,22 @@
 			_items = new T[] { item1, item2, item3, item4 };
 		}
 
+		private NOPList<T> Slice (int start, int end)
+		{
+			var result = NOPList<T>.Empty;
+			for (int i = end; i >= start; i--)
+				result = _items[i] | result;
+			return result;
+		}
+
 		public Split<NOPList<T>, T, V> Split (Func<V, bool> predicate, V acc)
 		{
-			var list = List.FromArray (_items);
-			var right = list;
+			var i = 0;
+			while (!predicate (acc) && i < _items.Length)
+				acc = acc.Plus (_items[i++].Measure ());
 
-			while (!right.IsEmpty)
-			{
-				acc = acc.Plus (right.First.Measure ());
-				if (predicate(acc)) break;
-				right = right.Rest;
-			}
-			return new Split<NOPList<T>, T, V> (list.CopyUpTo (right).Item1, 
-				right.First, right.Rest);
+			return new Split<NOPList<T>, T, V> (Lazy.Create (() => Slice (0, i - 2)),
+				_items[i - 1], Lazy.Create (() => Slice (i, _items.Length)));
 		}
 
 		public static Digit<T, V> operator + (T item, Digit<T, V> digit)
@@ -214,24 +219,14 @@
 			get { return _items[_items.Length - 1]; }
 		}
 
-		private T[] Slice (int start)
+		public NOPList<T> Prefix
 		{
-			var len = _items.Length - 1;
-			if (len == 0)
-				return null;
-			var result = new T[len];
-			Array.Copy (_items, start, result, 0, len);
-			return result;
+			get { return Slice (0, _items.Length - 2); }
 		}
 
-		public T[] Prefix
+		public NOPList<T> Suffix
 		{
-			get { return Slice (0); }
-		}
-
-		public T[] Suffix
-		{
-			get { return Slice (1); }
+			get { return Slice (1, _items.Length - 1); }
 		}
 
 		#region IMeasurable<V> implementation
@@ -448,7 +443,8 @@
 
 			public override Split<FingerTree<T, V>, T, V> Split (Func<V, bool> predicate, V acc)
 			{
-				return new Split<FingerTree<T, V>, T, V> (_empty, Item, _empty);
+				return new Split<FingerTree<T, V>, T, V> (Lazy.Create (_empty), Item,
+					Lazy.Create (_empty));
 			}
 		}
 
@@ -531,13 +527,33 @@
 			public override Split<FingerTree<T, V>, T, V> Split (Func<V, bool> predicate, V acc)
 			{
 				var vfront = acc.Plus (Front.Measure ());
-				var vinner = vfront.Plus (Inner.Measure ());
+				var vinner = vfront.Plus (Inner.Measure ());	
 
-				if (predicate(vfront))
+				if (predicate (vfront))
 				{
 					var split = Front.Split (predicate, acc);
-					return new Split<FingerTree<T,V>,T,V> ( FromReducible(split.Left), 
-						split.Item, DeepL (split.Right, )
+					return new Split<FingerTree<T, V>, T, V> (
+						Lazy.Create (() => FromReducible (split.Left)),
+						split.Item, 
+						Lazy.Create (() => DeepL (split.Right, Inner, Back)));
+				}
+				else if (predicate (vinner))
+				{
+					var treeSplit = Inner.Split (predicate, vfront);
+					var digitSplit = treeSplit.Item.ToDigit ().Split (
+						predicate, vfront.Plus (treeSplit.Left.Measure ()));
+					return new Split<FingerTree<T, V>, T, V> (
+						Lazy.Create (() => DeepR (Front, Inner, digitSplit.Left)),
+						digitSplit.Item, 
+						Lazy.Create (() => DeepL (digitSplit.Right, treeSplit.Right, Back)));
+				}
+				else
+				{
+					var split = Back.Split (predicate, vinner);
+					return new Split<FingerTree<T, V>, T, V> (
+						Lazy.Create (() => DeepR (Front, Inner, split.Left)),
+						split.Item, 
+						Lazy.Create (() => FromReducible (split.Right)));
 				}
 			}
 		}
@@ -621,10 +637,10 @@
 			return viewr;
 		}
 
-		private static FingerTree<T, V> DeepL (T[] front, FingerTree<Node<T, V>, V> inner,
+		private static FingerTree<T, V> DeepL (NOPList<T> front, FingerTree<Node<T, V>, V> inner,
 			Digit<T, V> back)
 		{
-			if (front == null)
+			if (front.IsEmpty)
 			{
 				var viewl = inner.LeftView ();
 				return viewl == null ?
@@ -634,9 +650,10 @@
 			return new _Deep (new Digit<T, V> (front), inner, back);
 		}
 
-		private static FingerTree<T, V> DeepR (Digit<T, V> front, FingerTree<Node<T, V>, V> inner, T[] back)
+		private static FingerTree<T, V> DeepR (Digit<T, V> front, FingerTree<Node<T, V>, V> inner, 
+			NOPList<T> back)
 		{
-			if (back == null)
+			if (back.IsEmpty)
 			{
 				var viewr = inner.RightView ();
 				return viewr == null ?
