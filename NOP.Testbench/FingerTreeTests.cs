@@ -40,14 +40,28 @@
 		}
 
 		[Test]
+		public void TestSequenceReduction ()
+		{
+			TestSeq.Foreach (0, Check.AreEqual);
+		}
+
+		[Test]
+		public void TestAsArray ()
+		{
+			TestEnumeration (TestSeq.AsArray ());
+		}
+
+		[Test]
 		public void TestEnumeration ()
 		{
-			var i = 0;
+			TestEnumeration (TestSeq);
+		}
 
-			foreach (var item in List.FromReducible(TestSeq))
-			{
+		private void TestEnumeration (IEnumerable<int> e)
+		{
+			var i = 0;
+			foreach (var item in e)
 				Check.AreEqual (item, i++);
-			}
 			Check.AreEqual (Count, i);
 		}
 
@@ -67,9 +81,10 @@
 		}
 
 		[Test]
-		public void TestSequenceReduction ()
+		public void TestReductionFromList ()
 		{
-			TestSeq.Foreach (0, Check.AreEqual);
+			TestEnumeration (List.FromReducible (TestSeq));
 		}
+
 	}
 }

@@ -16,7 +16,7 @@
 	/// <summary>
 	/// The inner node of the finger tree has either degree two or three.
 	/// </summary>
-	public abstract class Node<T, V> : IReducible<T>, IMeasurable<V> 
+	public abstract class Node<T, V> : IReducible<T>, IMeasurable<V>
 		where T : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{

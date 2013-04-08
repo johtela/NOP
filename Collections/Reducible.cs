@@ -3,7 +3,7 @@
 	using System;
 
 	/// <summary>
-	/// Interface for any structure that can be reduced to a single value.
+	/// Interface for any data structure that can be reduced to a single value.
 	/// </summary>
 	public interface IReducible<T>
 	{
@@ -12,13 +12,19 @@
 	}
 
 	/// <summary>
-	/// Split divides a reducible structure into three parts according to a predicate: 
-	/// - the left part is a reducible structure that contains all the items for whích 
-	///   the predicate is not true
-	/// - the first item for which the precicate is true
-	/// - the right part is a reducible structure that contains the rest of the items 
-	///   for which the predicate is true
+	/// Split divides a reducible structure into parts according to a predicate.
 	/// </summary>
+	/// <remarks>
+	/// The split consists of three parts:
+	/// <list type="bullet">
+	/// <item>the left part is a reducible structure that contains all the items for whích 
+	///   the predicate is not true</item>
+	/// <item>the first item for which the precicate is true</item>
+	/// <item>the right part is a reducible structure that contains the rest of the items 
+	///   for which the predicate is true</item>
+	/// </list>
+	/// The left and right parts are lazy.
+	/// </remarks>
 	public class Split<T, U, V>
 		where T : IReducible<U>
 		where U : IMeasurable<V>
@@ -52,7 +58,7 @@
 	}
 
 	/// <summary>
-	/// Interface for reducible structures that can be splitted.
+	/// Interface for reducible data structures that can be splitted.
 	/// </summary>
 	public interface ISplittable<T, U, V>
 		where T : IReducible<U>
@@ -63,7 +69,7 @@
 	}
 
 	/// <summary>
-	/// Extension  methods for IReducible interface. />
+	/// Extension  methods for reducibles. />
 	/// </summary>
 	public static class Reducible
 	{

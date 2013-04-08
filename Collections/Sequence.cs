@@ -5,8 +5,17 @@
 	using System.Linq;
 	using System.Text;
 
-	public struct Sequence<T> : IReducible<T>
+	/// <summary>
+	/// Random access sequence built on top of finger tree.
+	/// </summary>
+	/// <typeparam name="T">The item type of the sequence.</typeparam>
+	public struct Sequence<T> : IReducible<T>, IEnumerable<T>
 	{
+		/// <summary>
+		/// The size monoid defines how tree sizes are accumulated.
+		/// The size is just an integer and the plus operation is
+		/// the normal adition.
+		/// </summary>
 		public struct Size : IMonoid<Size>
 		{
 			private int _value;
@@ -32,6 +41,10 @@
 			}
 		}
 
+		/// <summary>
+		/// The wrapper structure for elemens of the sequence.
+		/// This is needed to implement the IMeasurable interface.
+		/// </summary>
 		public struct Elem : IMeasurable<Size>
 		{
 			public readonly T Value;
@@ -57,6 +70,7 @@
 			}
 		}
 
+		// The finger tree wrapped in the Sequence.
 		private FingerTree<Elem, Size> _tree;
 
 		private Sequence (FingerTree<Elem, Size> tree)
@@ -151,6 +165,17 @@
 				new Sequence<T> (split.Right));
 		}
 
+		public T[] AsArray ()
+		{
+			var result = new T[Length];
+			_tree.ReduceLeft (0, (i, e) =>
+			{
+				result[i] = e;
+				return i + 1;
+			});
+			return result;
+		}
+
 		public static Sequence<T> operator + (T item, Sequence<T> seq)
 		{
 			return new Sequence<T> (seq._tree.AddLeft (CreateElem (item)));
@@ -179,5 +204,20 @@
 		}
 
 		#endregion	
+	
+		#region IEnumerable<T> implementation
+
+		public IEnumerator<T> GetEnumerator ()
+		{
+			return _tree.ReduceRight ((e, l) => List.Cons (e, l), NOPList<T>.Empty)
+				.GetEnumerator ();
+		}
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+		{
+			return GetEnumerator ();
+		}
+
+		#endregion
 	}
 }
