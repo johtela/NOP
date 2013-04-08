@@ -86,5 +86,32 @@
 			TestEnumeration (List.FromReducible (TestSeq));
 		}
 
+		[Test]
+		public void TestSplitAt ()
+		{
+			var split = TestSeq.SplitAt (500);
+			var newSeq = split.Item1.AppendWith (List.Create (666), split.Item3);
+
+			newSeq.Foreach (0, (i, j) =>
+			{
+				if (j == 500) Check.AreEqual (666, i);
+				else Check.AreEqual (i, j);
+			});
+		}
+
+		[Test]
+		public void TestInsertion ()
+		{
+			var split = TestSeq.SplitAt (500);
+			var newSeq = split.Item1.AppendWith (List.Create (0, 1, 2), split.Item3);
+			Check.AreEqual (Count + 2, newSeq.Length);
+
+			newSeq.Foreach (0, (i, j) =>
+			{
+				if (j < 500) Check.AreEqual (i, j);
+				else if (j >= 500 && j < 503) Check.AreEqual (i, j - 500);
+				else Check.AreEqual (i, j - 2);
+			});
+		}
 	}
 }

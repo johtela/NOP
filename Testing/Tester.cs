@@ -150,6 +150,7 @@ namespace NOP
 				Console.ForegroundColor = ConsoleColor.Green;
 				System.Console.WriteLine ("All tests succeeded. {0} tests run.", run);
 			}
+			GC.Collect ();
 		}
 	
 		/// <summary>

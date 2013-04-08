@@ -23,7 +23,7 @@ namespace NOP.Testbench
 					new FingerTreeTests (),
 					new TypeDefinitionTests (),
 					new TypeCheckingTests (),
-					//new ParserTests (),
+					new ParserTests (),
 					new SExprPathTests ())
 			);
 			Application.Run (VConsole);
