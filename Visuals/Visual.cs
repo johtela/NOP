@@ -35,7 +35,7 @@
 	/// <summary>
 	/// Type of frame to be drawn.
 	/// </summary>
-	public enum FrameKind { Rectangle, Ellipse }
+	public enum FrameKind { Rectangle, Ellipse, RoundRectangle }
 		
 	/// <summary>
 	/// A visual is a drawable figure that knows how to calculate
@@ -426,7 +426,25 @@
 						context.Graphics.DrawEllipse (context.Style.Pen, 
 							0, 0, box.Width - 1, box.Height - 1);
 						break;
+					case FrameKind.RoundRectangle:
+						DrawRoundedRectangle(context.Graphics, context.Style.Pen,
+							new RectangleF(0, 0, box.Width - 1, box.Height - 1), 10);
+						break;
 				}
+			}
+		
+			private static void DrawRoundedRectangle (Graphics graphics, Pen pen,
+				RectangleF rect, float radius)
+			{
+				var gp = new GraphicsPath ();
+
+				gp.AddArc (rect.X, rect.Y, radius, radius, 180, 90);
+				gp.AddArc (rect.X + rect.Width - radius, rect.Y, radius, radius, 270, 90);
+				gp.AddArc (rect.X + rect.Width - radius, rect.Y + rect.Height - radius, radius, radius, 0, 90);
+				gp.AddArc (rect.X, rect.Y + rect.Height - radius, radius, radius, 90, 90);
+				gp.AddLine (rect.X, rect.Y + rect.Height - radius, rect.X, rect.Y + radius / 2);
+
+				graphics.DrawPath (pen, gp);
 			}
 		}
 
@@ -673,6 +691,18 @@
 			if (!(target is _Anchor))
 				throw new ArgumentException ("Target visual must be surronded by an anchor", "target");
 			return new _Connector(visual, target as _Anchor, horizAlign, vertAlign);
+		}
+
+		/// <summary>
+		/// Return the visualization of any object. This works by first chechking if the object
+		/// implements the IVisualizable interface; if not, a label is returned with value of the
+		/// object's ToString function.
+		/// </summary>
+		public static Visual Visualize (object obj)
+		{
+			return obj is IVisualizable ?
+				(obj as IVisualizable).ToVisual () :
+				Label (obj.ToString ());
 		}
 
 		/// <summary>

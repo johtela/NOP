@@ -4,12 +4,13 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
+	using NOP.Visuals;
 
 	/// <summary>
 	/// Random access sequence built on top of finger tree.
 	/// </summary>
 	/// <typeparam name="T">The item type of the sequence.</typeparam>
-	public struct Sequence<T> : IReducible<T>, IEnumerable<T>
+	public struct Sequence<T> : IReducible<T>, IEnumerable<T>, IVisualizable
 	{
 		/// <summary>
 		/// The size monoid defines how tree sizes are accumulated.
@@ -216,6 +217,15 @@
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
 		{
 			return GetEnumerator ();
+		}
+
+		#endregion
+
+		#region IVisualizable implementation
+	
+		public Visual ToVisual ()
+		{
+			return _tree.ToVisual ();
 		}
 
 		#endregion

@@ -683,6 +683,15 @@
 		{
 			return reducible.ReduceRight (NOPList<T>.Cons, NOPList<T>.Empty);
 		}
+
+		/// <summary>
+		/// Create a list from a reducible structure.
+		/// </summary>
+		public static NOPList<U> MapReducible<T, U> (IReducible<T> reducible, Func<T, U> map)
+		{
+			return reducible.ReduceRight ((t, l) => map(t) | l, NOPList<U>.Empty);
+		}
+
 		/// <summary>
 		/// Constructs a new list from a variable argument list.
 		/// </summary>

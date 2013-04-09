@@ -113,5 +113,13 @@
 				else Check.AreEqual (i, j - 2);
 			});
 		}
+
+		[Test]
+		public void TestVisualization ()
+		{
+			var seq = Sequence<int>.Create (Enumerable.Range (1, 64));
+
+			Runner.VConsole.ShowVisual (seq.ToVisual ());
+		}
 	}
 }

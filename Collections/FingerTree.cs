@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
+	using NOP.Visuals;
 
 	/// <summary>
 	/// Tree empty exception.
@@ -16,7 +17,7 @@
 	/// <summary>
 	/// The inner node of the finger tree has either degree two or three.
 	/// </summary>
-	public abstract class Node<T, V> : IReducible<T>, IMeasurable<V>
+	public abstract class Node<T, V> : IReducible<T>, IMeasurable<V>, IVisualizable
 		where T : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{
@@ -118,12 +119,28 @@
 					CreateMany (items.Rest.Rest.Rest);
 			}
 		}
+
+		#region IVisualizable implementation
+		
+		public Visual ToVisual ()
+		{
+			return Visual.HStack (VAlign.Top, List.MapReducible (this, FrameNode));
+		}
+
+		private Visual FrameNode (T value)
+		{
+			return Visual.Margin (Visual.Frame (Visual.Margin (Visual.Visualize (value), 2, 2, 2, 2),
+				FrameKind.RoundRectangle), 4, 4, 4, 4);
+		}
+
+		#endregion	
 	}
 
 	/// <summary>
 	/// The front and back parts of the tree have one to four items in an array.
 	/// </summary>
-	public class Digit<T, V> : IReducible<T>, IMeasurable<V>, ISplittable<NOPList<T>, T, V>
+	public class Digit<T, V> : IReducible<T>, IMeasurable<V>, ISplittable<NOPList<T>, T, V>, 
+		IVisualizable
 		where T : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{
@@ -253,6 +270,21 @@
 		}
 
 		#endregion
+
+		#region IVisualizable implementation
+
+		public Visual ToVisual ()
+		{
+			return Visual.HStack (VAlign.Top, List.MapReducible (this, FrameNode));
+		}
+
+		private Visual FrameNode (T value)
+		{
+			return Visual.Frame (Visual.Margin (Visual.Visualize (value), 2, 2, 2, 2),
+				FrameKind.Rectangle);
+		}
+
+		#endregion
 	}
 
 	/// <summary>
@@ -294,7 +326,8 @@
 	/// front, inner, and back parts where the inner part can be empty.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public abstract class FingerTree<T, V> : IReducible<T>, IMeasurable<V>, ISplittable<FingerTree<T, V>, T, V>
+	public abstract class FingerTree<T, V> : IReducible<T>, IMeasurable<V>, 
+		ISplittable<FingerTree<T, V>, T, V>, IVisualizable
 		where T : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{
@@ -315,6 +348,15 @@
 
 		#region ISplittable<FingerTree<T, V>, T, V> implementation
 		public abstract Split<FingerTree<T, V>, T, V> Split (Func<V, bool> predicate, V acc);
+		#endregion
+
+		#region IVisualizable implementation
+		public abstract Visual ToVisual ();
+
+		private Visual EmptyNode ()
+		{
+			return Visual.Margin (Visual.Frame (Visual.Label ("-"), FrameKind.Ellipse), 10, 10, 0, 0);
+		}
 		#endregion
 
 		private static FingerTree<T, V> _empty = new _Empty ();
@@ -369,6 +411,11 @@
 			public override Split<FingerTree<T, V>, T, V> Split (Func<V, bool> predicate, V acc)
 			{
 				throw new EmptyTreeException ();
+			}
+
+			public override Visual ToVisual ()
+			{
+				return EmptyNode ();
 			}
 		}
 
@@ -433,6 +480,12 @@
 			{
 				return new Split<FingerTree<T, V>, T, V> (Lazy.Create (_empty), Item,
 					Lazy.Create (_empty));
+			}
+
+			public override Visual ToVisual ()
+			{
+				return Visual.Frame (Visual.Margin (Visual.Visualize (Item), 2, 2, 2, 2), 
+					FrameKind.Ellipse);
 			}
 		}
 
@@ -543,6 +596,13 @@
 						split.Item,
 						Lazy.Create (() => FromReducible (split.Right)));
 				}
+			}
+
+			public override Visual ToVisual ()
+			{
+				return Visual.VStack (HAlign.Center,
+					Visual.HStack (VAlign.Center, Front.ToVisual (), EmptyNode (), Back.ToVisual ()),
+					Visual.Margin(Inner.ToVisual (), 0, 0, 10, 0));
 			}
 		}
 
