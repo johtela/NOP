@@ -65,6 +65,16 @@
 				return new Size (1);
 			}
 
+			public override bool Equals (object obj)
+			{
+				return Value.Equals (obj);
+			}
+
+			public override int GetHashCode ()
+			{
+				return Value.GetHashCode ();
+			}
+
 			public override string ToString ()
 			{
 				return Value.ToString ();
@@ -89,14 +99,14 @@
 			return sz => index < sz;
 		}
 
-		public static Sequence<T> Create (IEnumerable<T> items)
+		public static Sequence<T> FromEnumerable (IEnumerable<T> items)
 		{
-			return new Sequence<T> (FingerTree<Elem, Size>.FromEnumerable (items.Select(CreateElem)));
+			return new Sequence<T> (FingerTree<Elem, Size>.FromEnumerable (items.Select (CreateElem)));
 		}
 
-		public static Sequence<T> Create (params T[] items)
+		public bool IsEmpty
 		{
-			return new Sequence<T> (FingerTree<Elem, Size>.FromEnumerable (items.Select(CreateElem)));
+			get { return _tree.IsEmpty; }
 		}
 
 		public T First
@@ -177,6 +187,55 @@
 			return result;
 		}
 
+		public Sequence<U> Map<U> (Func<T, U> map)
+		{
+			return new Sequence<U> (_tree.ReduceLeft (FingerTree<Sequence<U>.Elem, Sequence<U>.Size>.Empty,
+				(t, e) => t.AddRight (Sequence<U>.CreateElem (map (e)))));
+		}
+
+		#region Overridden from Object
+
+		public override bool Equals (object obj)
+		{
+			if (!(obj is Sequence<T>)) return false;
+			var t1 = _tree;
+			var t2 = ((Sequence<T>)obj)._tree;
+
+			while (!(t1.IsEmpty || t2.IsEmpty))
+			{
+				if (!t1.First.Equals (t2.First)) return false;
+				t1 = t1.RestL;
+				t2 = t2.RestL;
+			}
+			return t1.IsEmpty && t2.IsEmpty;
+		}
+
+		public override int GetHashCode ()
+		{
+			return ReduceLeft (0, (h, e) => h ^ e.GetHashCode ());
+		}
+
+		public override string ToString ()
+		{
+			return ToString ("[", "]", ", ");
+		}
+
+		public string ToString (string openBracket, string closeBracket, string separator)
+		{
+			var sb = new StringBuilder (openBracket);
+			if (Length > 0)
+			{
+				sb.Append (First);
+				RestL.Foreach (e => sb.AppendFormat ("{0}{1}", separator, e));
+			}
+			sb.Append (closeBracket);
+			return sb.ToString ();
+		}
+
+		#endregion
+
+		#region Operator overloads
+
 		public static Sequence<T> operator + (T item, Sequence<T> seq)
 		{
 			return new Sequence<T> (seq._tree.AddLeft (CreateElem (item)));
@@ -192,6 +251,8 @@
 			return new Sequence<T> (seq._tree.AppendTree (NOPList<Elem>.Empty, other._tree));
 		}
 
+		#endregion
+
 		#region IReducible<T> implementation
 
 		public U ReduceLeft<U> (U acc, Func<U, T, U> func)
@@ -204,8 +265,8 @@
 			return _tree.ReduceRight ((e, a) => func (e.Value, a), acc);
 		}
 
-		#endregion	
-	
+		#endregion
+
 		#region IEnumerable<T> implementation
 
 		public IEnumerator<T> GetEnumerator ()
@@ -229,5 +290,21 @@
 		}
 
 		#endregion
+	}
+
+	/// <summary>
+	/// Static helper class for creating sequences.
+	/// </summary>
+	public static class Sequence
+	{
+		public static Sequence<T> Create<T> (IEnumerable<T> items)
+		{
+			return Sequence<T>.FromEnumerable (items);
+		}
+
+		public static Sequence<T> Create<T> (params T[] items)
+		{
+			return Sequence<T>.FromEnumerable (items);
+		}
 	}
 }

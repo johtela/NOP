@@ -153,14 +153,14 @@
 				return List.Create (0);
 			if (!(root is SExpr.List))
 				return NOPList<int>.Empty;
-			var node = root.AsList;
+			var node = root.AsSequence;
 			var path = List.Create (Tuple.Create (0, node));
 
 			while (node.NotEmpty && path.NotEmpty && !ReferenceEquals(node.First, target))
 			{
 				if (node.First is SExpr.List)
 				{
-					node = node.First.AsList;
+					node = node.First.AsSequence;
 					path = Tuple.Create (0, node) | path;
 				}
 				else if (node.Rest.NotEmpty)
@@ -213,7 +213,7 @@
 						list = list.Rest;
 				}
 				if (list.NotEmpty && list.First is SExpr.List)
-					list = list.First.AsList;
+					list = list.First.AsSequence;
 				inds = inds.Rest;
 				parent = node;
 			}

@@ -1,8 +1,9 @@
 namespace NOP
 {
 	using System;
+	using System.Linq;
 	using System.Reflection;
-	using SysColl = System.Collections.Generic;
+	using System.Collections.Generic;
 	using NOP.Collections;
 
 	/// <summary>
@@ -61,7 +62,7 @@ namespace NOP
 		{
 			private readonly NOPList<ExprBuilder> _items;
 			
-			public ListBuilder (SysColl.IEnumerable<ExprBuilder> items)
+			public ListBuilder (IEnumerable<ExprBuilder> items)
 			{
 				_items = List.Create (items);
 			}
@@ -73,7 +74,7 @@ namespace NOP
 
 			public override SExpr Build ()
 			{
-				return new SExpr.List (_items.Map (eb => eb.Build ()));
+				return new SExpr.List (Sequence.Create (_items.Select (eb => eb.Build ())));
 			}
 		}
 		

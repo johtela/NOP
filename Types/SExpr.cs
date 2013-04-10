@@ -79,9 +79,9 @@ namespace NOP
 		/// </summary>
 		public class List : SExpr
 		{
-			public readonly NOPList<SExpr> Items;
+			public readonly Sequence<SExpr> Items;
 
-			public List (NOPList<SExpr> items)
+			public List (Sequence<SExpr> items)
 			{
 				Items = items;
 				Depiction = Visual.Parenthesize (Visual.HList (Items));
@@ -104,7 +104,7 @@ namespace NOP
 			}
 		}
 
-		public NOPList<SExpr> AsList
+		public Sequence<SExpr> AsSequence
 		{
 			get { return (this as List).Items; }
 		}

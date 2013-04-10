@@ -14,7 +14,7 @@ namespace NOP
 		
 		public IfExpression (SExpr.List ifExpr) : base (ifExpr)
 		{
-			var sexps = ifExpr.Items.Rest;
+			var sexps = ifExpr.Items.RestL;
 			Condition = Parse (Expect<SExpr> (ref sexps, "condition"));
 			ThenExpression = Parse (Expect<SExpr> (ref sexps, "then expression"));
 			ElseExpression = Parse (Expect<SExpr> (ref sexps, "else expression"));

@@ -581,7 +581,7 @@
 		public string ToString (string openBracket, string closeBracket, string separator)
 		{
 			StringBuilder sb = new StringBuilder (openBracket);
-			NOPList<T > list = this;
+			NOPList<T> list = this;
 			
 			while (!list.IsEmpty)
 			{

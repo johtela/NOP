@@ -16,7 +16,7 @@ namespace NOP
 		{
 			var sexps = funcExpr.Items;
 			FuncName = Parse (Expect<SExpr> (ref sexps, "function name or lambda expression"));
-			Parameters = sexps.Map (sexp => Parse (sexp));
+			Parameters = List.MapReducible (sexps, sexp => Parse (sexp));
 		}
 		
 		public override TypeExpr GetTypeExpr ()
@@ -42,7 +42,7 @@ namespace NOP
 			var sexps = ((SExpr.List)SExp).Items;
 
 			return V.HStack (VAlign.Top, V.Depiction (sexps.First),
-				V.Parenthesize (V.HList (sexps.Rest)));
+				V.Parenthesize (V.HList (sexps.RestL)));
 		}
 	}
 }

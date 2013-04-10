@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 	using NOP.Collections;
-    using System.Collections.Generic;
+	using System.Collections.Generic;
 
 	public class TypeDefinition : Definition
 	{
@@ -11,15 +11,15 @@ namespace NOP
 		
 		public TypeDefinition (SExpr.List typeDef) : base (typeDef)
 		{
-			var sexps = typeDef.Items.Rest;
+			var sexps = typeDef.Items.RestL;
 			Name = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "type name"));
-			Members = sexps.Map (sexp => Parse (sexp));
+			Members = List.MapReducible (sexps, sexp => Parse (sexp));
 		}
 
-        protected override IEnumerable<AstNode> GetChildNodes ()
-        {
-            return Members.Prepend<AstNode> (Name);
-        }
+		protected override IEnumerable<AstNode> GetChildNodes ()
+		{
+			return Members.Prepend<AstNode> (Name);
+		}
 	}
 }
 

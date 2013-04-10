@@ -13,18 +13,14 @@
 
 	/// <summary>
 	/// Split divides a reducible structure into parts according to a predicate.
-	/// </summary>
-	/// <remarks>
 	/// The split consists of three parts:
-	/// <list type="bullet">
-	/// <item>the left part is a reducible structure that contains all the items for whích 
-	///   the predicate is not true</item>
-	/// <item>the first item for which the precicate is true</item>
-	/// <item>the right part is a reducible structure that contains the rest of the items 
-	///   for which the predicate is true</item>
-	/// </list>
+	/// - the left part is a reducible structure that contains all the items for whích 
+	///   the predicate is not true
+	/// - the first item for which the precicate is true
+	/// - the right part is a reducible structure that contains the rest of the items 
+	///   for which the predicate is true
 	/// The left and right parts are lazy.
-	/// </remarks>
+	/// </summary>
 	public class Split<T, U, V>
 		where T : IReducible<U>
 		where U : IMeasurable<V>
@@ -69,7 +65,7 @@
 	}
 
 	/// <summary>
-	/// Extension  methods for reducibles. />
+	/// Extension  methods for reducibles.
 	/// </summary>
 	public static class Reducible
 	{
@@ -102,6 +98,9 @@
 			return new _Concat<T> (first, second);
 		}
 
+		/// <summary>
+		/// Concatenation composition of two reducibles.
+		/// </summary>
 		private class _Concat<T> : IReducible<T>
 		{
 			public readonly IReducible<T> First;

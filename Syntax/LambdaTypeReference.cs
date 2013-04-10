@@ -9,15 +9,15 @@ namespace NOP
 
 		public LambdaTypeReference (SExpr.List typeExpr) : base (typeExpr)
 		{
-			var sexps = typeExpr.Items.Rest;
+			var sexps = typeExpr.Items.RestL;
 			ArgumentType = ParseTypeExpression (Expect<SExpr> (ref sexps, "type"));
 			ResultType = ParseTypeExpression (Expect<SExpr> (ref sexps, "type"));
 		}
 
-        protected override System.Collections.Generic.IEnumerable<AstNode> GetChildNodes ()
-        {
-            return List.Create<AstNode> (ArgumentType, ResultType);
-        }
+		protected override System.Collections.Generic.IEnumerable<AstNode> GetChildNodes ()
+		{
+			return List.Create<AstNode> (ArgumentType, ResultType);
+		}
 	}
 }
 

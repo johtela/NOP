@@ -17,7 +17,7 @@ namespace NOP
 
 			var sexps = lst.Items;
 			var keyword = sexps.First as SExpr.Symbol;
-			if (sexps == null)
+			if (keyword == null)
 				ParseError (sexps.First, "Expected a symbol");
 
 			// Check if we have any of the special forms as first item.

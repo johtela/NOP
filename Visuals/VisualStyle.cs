@@ -3,6 +3,10 @@
 	using System.Drawing;
 	using System.Drawing.Drawing2D;
 
+	/// <summary>
+	/// A style object that contains the brushes, pens, and fonts
+	/// used for drawing visuals.
+	/// </summary>
 	public class VisualStyle
 	{
 		private readonly VisualStyle _parent;

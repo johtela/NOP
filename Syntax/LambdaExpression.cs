@@ -13,9 +13,9 @@ namespace NOP
 		
 		public LambdaExpression (SExpr.List lambdaExpr) : base (lambdaExpr)
 		{
-			var sexps = lambdaExpr.Items.Rest;
+			var sexps = lambdaExpr.Items.RestL;
 			var pars = Expect<SExpr.List> (ref sexps, "list of parameters");
-			Parameters = pars.Items.Map (sexp =>
+			Parameters = List.MapReducible (pars.Items, sexp =>
 			{
 				var par = sexp as SExpr.Symbol;
 				if (par == null)
@@ -43,8 +43,8 @@ namespace NOP
 		{
 			var sexps = ((SExpr.List)SExp).Items;
 			var slambda = sexps.First;
-			var sparams = sexps.Rest.First;
-			var sbody = sexps.Rest.Rest.First;
+			var sparams = sexps.RestL.First;
+			var sbody = sexps.RestL.RestL.First;
 
 			return V.VStack (HAlign.Left,
 				V.HStack (VAlign.Top, V.Frame (V.Depiction (slambda), FrameKind.Rectangle), V.Depiction (sparams)),

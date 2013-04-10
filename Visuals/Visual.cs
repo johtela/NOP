@@ -618,7 +618,7 @@
 		/// <summary>
 		/// Create a horizontal list of S-expressions.
 		/// </summary>
-		public static Visual HList (NOPList<SExpr> sexps)
+		public static Visual HList (IEnumerable<SExpr> sexps)
 		{
 			return HStack (VAlign.Top, FromSExpList (sexps));
 		}
@@ -626,7 +626,7 @@
 		/// <summary>
 		/// Return a vertical list of S-expressions.
 		/// </summary>
-		public static Visual VList (NOPList<SExpr> sexps)
+		public static Visual VList (IEnumerable<SExpr> sexps)
 		{
 			return VStack (HAlign.Left, FromSExpList (sexps));
 		}
@@ -708,9 +708,9 @@
 		/// <summary>
 		/// Map a list of S-expressions to a sequence of visuals.
 		/// </summary>
-		private static IEnumerable<Visual> FromSExpList (NOPList<SExpr> sexps)
+		private static IEnumerable<Visual> FromSExpList (IEnumerable<SExpr> sexps)
 		{
-			return sexps.Map (se => Depiction (se));
+			return sexps.Select (se => Depiction (se));
 		}
 	}
 }

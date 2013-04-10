@@ -17,7 +17,7 @@
 		{
 			var prog = TestPrograms.NestedLambdas ().Build ();
 			var path = new SExprPath (List.Create (0));
-			Check.AreEqual (path.Target (prog), prog.AsList.First);
+			Check.AreEqual (path.Target (prog), prog.AsSequence.First);
 		}
 
 		[Test]
@@ -25,7 +25,7 @@
 		{
 			var prog = TestPrograms.NestedLambdas ().Build ();
 			var path = new SExprPath (List.Create (10));
-			Check.AreEqual (path.Target (prog), prog.AsList.Last);
+			Check.AreEqual (path.Target (prog), prog.AsSequence.Last);
 		}
 
 		[Test]
@@ -68,7 +68,7 @@
 		{
 			var prog = TestPrograms.NestedLambdas ().Build ();
 			var path = new SExprPath (prog, 
-				prog.AsList.First.AsList.RestNth(2).First.AsList.Rest.First);
+				prog.AsSequence.First.AsSequence.RestNth(2).First.AsSequence.Rest.First);
 			Check.AreEqual (path.Path, List.Create (0, 2, 1));
 		}
 	}

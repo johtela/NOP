@@ -606,7 +606,7 @@
 			}
 		}
 
-		public FingerTree<T, V> Empty
+		public static FingerTree<T, V> Empty
 		{
 			get { return _empty; }
 		}

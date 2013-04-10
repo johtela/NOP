@@ -11,7 +11,7 @@ namespace NOP
 		
 		public SetExpression (SExpr.List setExpr) : base (setExpr)
 		{
-			var sexps = setExpr.Items.Rest;
+			var sexps = setExpr.Items.RestL;
 			Variable = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "variable"));
 			Value = Parse (Expect<SExpr> (ref sexps, "right hand side of set! clause"));			
 		}

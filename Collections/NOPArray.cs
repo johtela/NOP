@@ -3,6 +3,9 @@ namespace NOP.Collections
 	using System;
 	using System.Collections.Generic;
 
+	/// <summary>
+	/// An immutable view of a regular System.Array.
+	/// </summary>
 	public class NOPArray<T> : IEnumerable<T>, IReducible<T>
 	{
 		private readonly T[] _array;

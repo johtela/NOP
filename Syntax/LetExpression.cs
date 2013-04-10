@@ -14,7 +14,7 @@ namespace NOP
 		
 		public LetExpression (SExpr.List letExpr) : base (letExpr)
 		{
-			var sexps = letExpr.Items.Rest;
+			var sexps = letExpr.Items.RestL;
 			Variable = new SymbolExpression (Expect<SExpr.Symbol> (ref sexps, "variable"));
 			Value = Parse (Expect<SExpr> (ref sexps, "variable value"));
 			Body = Parse (Expect<SExpr> (ref sexps, "body of let expression"));		

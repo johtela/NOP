@@ -35,6 +35,9 @@
 		}
 	}
 
+	/// <summary>
+	/// Static helper class for creating lazy values.
+	/// </summary>
 	public static class Lazy
 	{
 		public static Lazy<T> Create<T> (Func<T> evaluate)

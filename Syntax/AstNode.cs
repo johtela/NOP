@@ -37,7 +37,7 @@ namespace NOP
 		/// is exhausted or the type of the token does not match, an error is raised. Advances 
 		/// the list of S-expressions to the next item.
 		/// </summary>
-		protected T Expect<T> (ref NOPList<SExpr> sexps, string token) where T: SExpr
+		protected T Expect<T> (ref Sequence<SExpr> sexps, string token) where T: SExpr
 		{
 			if (sexps.IsEmpty)
 				ParseError (SExp, string.Format ("Expected {0} but reached the end of list.", 
@@ -48,7 +48,7 @@ namespace NOP
 				ParseError (sexps.First, string.Format ("Expected {0} but got {1}.", 
 					token, sexps.First)
 				);
-			sexps = sexps.Rest;
+			sexps = sexps.RestL;
 			return sexp;
 		}
 		
@@ -57,14 +57,14 @@ namespace NOP
 		/// Raises an error if the list is exhausted. If the specified S-expression is 
 		/// read the list is advanced to the next item. Otherwise the list remains the same.
 		/// </summary>
-		protected bool NextSExp<T> (ref NOPList<SExpr> sexps, out T sexp) where T: SExpr
+		protected bool NextSExp<T> (ref Sequence<SExpr> sexps, out T sexp) where T: SExpr
 		{
 			if (sexps.IsEmpty)
 				ParseError (SExp, string.Format ("Unexpected end of list."));
 			sexp = sexps.First as T;
 			if (sexp != null)
 			{
-				sexps = sexps.Rest;
+				sexps = sexps.RestL;
 				return true;
 			}
 			return false;

@@ -12,7 +12,7 @@ namespace NOP
 		public GenericTypeReference (SExpr.List typeExpr) : base (typeExpr)
 		{
 			TypeName = new SymbolExpression ((SExpr.Symbol)typeExpr.Items.First);
-			TypeParams = typeExpr.Items.Rest.Map (sexp => ParseTypeExpression (sexp));
+			TypeParams = List.MapReducible (typeExpr.Items.RestL, sexp => ParseTypeExpression (sexp));
 		}
 
         protected override IEnumerable<AstNode> GetChildNodes ()
