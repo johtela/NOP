@@ -18,119 +18,15 @@
 	public class SExprPath
 	{
 		/// <summary>
-		/// When a S-expression referred by the path is searched for, a graph of
-		/// SExprNodes is created. The SExprNode class makes navigation in a sexp 
-		/// tree easier by storing explicitly the previous and parent expressions.
-		/// </summary>
-		/// <remarks>
-		/// Note that SExprNode works on NOPList{SExpr} objects instead of SExpr
-		/// objects. This is because we need to be able to move in the sexp list
-		/// where the sexps reside. The assumption is that all S-expression except
-		/// the root expression is inside a list.
-		/// </remarks>
-		private class SExprNode
-		{
-			/// <summary>
-			/// Create a new SExprNode.
-			/// </summary>
-			/// <param name="current">The current item in the sexp list.</param>
-			/// <param name="index">The index of the sexp in the list.</param>
-			/// <param name="previous">The previous SExprNode in the list, or null
-			/// if the sexp is the first in the list.</param>
-			/// <param name="parent">The parent SExprNode, or null if the sexp is
-			/// the root.</param>
-			public SExprNode (NOPList<SExpr> current, int index, 
-				SExprNode previous, SExprNode parent)
-			{
-				Current = current;
-				Index = index;
-				Previous = previous;
-				Parent = parent;
-			}
-
-			/// <summary>
-			/// The current sexp in the list.
-			/// </summary>
-			public NOPList<SExpr> Current { get; private set; }
-
-			/// <summary>
-			/// The index of the current sexp.
-			/// </summary>
-			public int Index { get; private set; }
-			
-			/// <summary>
-			/// The SExprNode representing the previous sexp in the list.
-			/// </summary>
-			public SExprNode Previous { get; private set; }
-			
-			/// <summary>
-			/// The SExprNode representing the parent sexp.
-			/// </summary>
-			public SExprNode Parent { get; private set; }
-
-			private SExprNode _next;
-			private SExprNode _firstChild;
-
-			/// <summary>
-			/// The SExprNode representing the next sexp in the list.
-			/// </summary>
-			public SExprNode Next
-			{
-				get
-				{
-					if (_next == null && !Current.Rest.IsEmpty)
-						_next = new SExprNode (Current.Rest, Index + 1, this, Parent);
-					return _next; 
-				}
-			}
-
-			/// <summary>
-			/// The SExprNode representing the first child sexp.
-			/// </summary>
-			public SExprNode FirstChild
-			{
-				get
-				{ 
-					if (_firstChild == null)
-					{
-						var lst = Current.First as SExpr.List;
-						if (lst != null && !lst.Items.IsEmpty)
-							_firstChild = new SExprNode (lst.Items, 0, null, this);
-					}
-					return _firstChild; 
-				}
-			}
-
-			/// <summary>
-			/// The path from this SExprNode to the root sexp.
-			/// </summary>
-			public SExprPath Path
-			{
-				get
-				{
-					var result = NOPList<int>.Empty;
-					var node = this;
-
-					while (node != null)
-					{
-						result = node.Index | result;
-						node = node.Parent;
-					}
-					return new SExprPath (result);
-				}
-			}
-		}
-
-		/// <summary>
 		/// The path is represented by a list of indices.
 		/// </summary>
-		public readonly NOPList<int> Path;
+		public readonly Sequence<int> Path;
 
 		/// <summary>
 		/// Create a SExprPath from a list of indices.
 		/// </summary>
 		/// <param name="path"></param>
-		public SExprPath (NOPList<int> path)
+		public SExprPath (Sequence<int> path)
 		{
 			Path = path;
 		}
@@ -138,123 +34,124 @@
 		/// <summary>
 		/// Create an empty SExprPath.
 		/// </summary>
-		public SExprPath () : this (List.Create(0))
-		{
-		}
+		public SExprPath () : this (Sequence.Create (0)) {}
 
 		public SExprPath (SExpr root, SExpr target)
 		{
-			Path = FindNode (root, target);
+			//Path = FindNode (root, target);
 		}
 
-		private NOPList<int> FindNode (SExpr root, SExpr target)
-		{
-			if (root == target)
-				return List.Create (0);
-			if (!(root is SExpr.List))
-				return NOPList<int>.Empty;
-			var node = root.AsSequence;
-			var path = List.Create (Tuple.Create (0, node));
+		//private NOPList<int> FindNode (SExpr root, SExpr target)
+		//{
+		//    if (root == target)
+		//        return List.Create (0);
+		//    if (!(root is SExpr.List))
+		//        return NOPList<int>.Empty;
+		//    var node = root.AsSequence;
+		//    var path = List.Create (Tuple.Create (0, node));
 
-			while (node.NotEmpty && path.NotEmpty && !ReferenceEquals(node.First, target))
+		//    while (node.NotEmpty && path.NotEmpty && !ReferenceEquals(node.First, target))
+		//    {
+		//        if (node.First is SExpr.List)
+		//        {
+		//            node = node.First.AsSequence;
+		//            path = Tuple.Create (0, node) | path;
+		//        }
+		//        else if (node.Rest.NotEmpty)
+		//        {
+		//            node = node.Rest;
+		//            path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
+		//        }
+		//        else if (path.Rest.NotEmpty)
+		//        {
+		//            do
+		//            {
+		//                path = path.Rest;
+		//                node = path.First.Item2.Rest;
+		//            }
+		//            while (node.IsEmpty && path.Rest.NotEmpty);
+		//            path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
+		//        }
+		//    }
+		//    return node.IsEmpty ? 
+		//        NOPList<int>.Empty :
+		//        path.Map (t => t.Item1).Reverse ();
+		//}
+		private class StackItem
+		{
+			public readonly int Ind;
+			public readonly Sequence<SExpr> Seq;
+
+			public StackItem (int i, Sequence<SExpr> s)
 			{
-				if (node.First is SExpr.List)
-				{
-					node = node.First.AsSequence;
-					path = Tuple.Create (0, node) | path;
-				}
-				else if (node.Rest.NotEmpty)
-				{
-					node = node.Rest;
-					path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
-				}
-				else if (path.Rest.NotEmpty)
-				{
-					do
-					{
-						path = path.Rest;
-						node = path.First.Item2.Rest;
-					}
-					while (node.IsEmpty && path.Rest.NotEmpty);
-					path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
-				}
+				Ind = i;
+				Seq = s;
 			}
-			return node.IsEmpty ? 
-				NOPList<int>.Empty :
-				path.Map (t => t.Item1).Reverse ();
+		}
+
+		private Sequence<StackItem> PathToStack (SExpr root)
+		{
+			var result = Sequence<StackItem>.Empty;
+			var sexp = root;
+
+			for (var p = Path; !p.IsEmpty; p = p.RestL)
+			{
+				var lst = sexp as SExpr.List;
+				if (lst == null) break;
+				var i = p.First;
+				var l = lst.Items.Length;
+				if (l <= i)
+					return result + new StackItem (l - 1, lst.Items);
+				sexp = lst.Items[i];
+				result = result + new StackItem (i, lst.Items);
+			}
+			return result;
+		}
+
+		private Tuple<SExpr, SExprPath> StackToPath (SExpr root, Sequence<StackItem> stack)
+		{
+			return stack.IsEmpty ?
+				Tuple.Create (root, new SExprPath (Sequence.Create (int.MaxValue))) :
+				Tuple.Create (stack.Last.Seq[stack.Last.Ind],
+					new SExprPath (stack.Map (t => t.Ind)));
+		}
+
+		private bool NextSexp (ref Sequence<StackItem> stack)
+		{
+			var top = stack.Last;
+			if (top.Ind >= top.Seq.Length - 1)
+				return false;
+			stack = stack.RestR + new StackItem (top.Ind + 1, top.Seq);
+			return true;
+		}
+
+		private bool PrevSexp (ref Sequence<StackItem> stack)
+		{
+			var top = stack.Last;
+			if (top.Ind == 0)
+				return false;
+			stack = stack.RestR + new StackItem (top.Ind - 1, top.Seq);
+			return true;
+		}
+
+		private bool ChildSexp (SExpr root, ref Sequence<StackItem> stack)
+		{
+			var sexp = stack.IsEmpty ? root : stack.Last.Seq[stack.Last.Ind];
+			var list = sexp as SExpr.List;
+			if (list == null)
+				return false;
+			stack = stack + new StackItem (0, list.Items);
+			return true;
 		}
 
 		/// <summary>
-		/// Return the graph of SExprNodes based on the path.
-		/// </summary>
-		/// <param name="root">The root sexp.</param>
-		/// <returns>The SExprNode representing the target of the path.
-		/// If the actual target is not found, then SExprNode of the 
-		/// closest previous sexp is returned.</returns>
-		private SExprNode NodeOfPath (SExpr root)
-		{
-			var slist = root as SExpr.List;
-			if (slist == null)
-				return null;
-			var list = slist.Items;
-			var inds = Path;
-			SExprNode parent = null;
-
-			while (list.NotEmpty && inds.NotEmpty)
-			{
-				SExprNode node = null, prev = null;
-				var i = 0;
-
-				while (list.NotEmpty && i <= inds.First)
-				{
-					node = new SExprNode (list, i++, prev, parent);
-					prev = node;
-					if (i <= inds.First)
-						list = list.Rest;
-				}
-				if (list.NotEmpty && list.First is SExpr.List)
-					list = list.First.AsSequence;
-				inds = inds.Rest;
-				parent = node;
-			}
-			return parent;
-		}
-
-		private Tuple<SExpr, SExprPath> CurrentOrEmpty (SExprNode node, SExpr root)
-		{
-			return node != null ?
-				Tuple.Create (node.Current.First, node.Path) :
-				Tuple.Create (root, new SExprPath ());
-		}
-
-		private Tuple<SExpr, SExprPath> NextOrEmpty (SExprNode node, SExpr root)
-		{
-			while (node != null && node.Next == null)
-				node = node.Parent;
-			return node != null ?
-				Tuple.Create (node.Next.Current.First, node.Next.Path) :
-				Tuple.Create (root, new SExprPath (List.Create (int.MaxValue)));
-		}
-
-		private bool TryMove (ref SExprNode node, SExprNode newNode)
-		{
-			if (newNode != null)
-			{
-				node = newNode;
-				return true;
-			}
-			return false;
-		}
-
-		/// <summary>
-		/// Return the sexp list item pointed by the path, or the
-		/// closest previous sexp item, if the path refers to a
-		/// non-existent S-expression.
+		/// Return the sexp list item pointed by the path, or the closest previous 
+		/// sexp item, if the path refers to a non-existent S-expression.
 		/// </summary>
 		public SExpr Target (SExpr root)
 		{
-			var node = NodeOfPath (root);
-			return node != null ? node.Current.First : root;
+			var stack = PathToStack (root);
+			return stack.IsEmpty ? root : stack.Last.Seq[stack.Last.Ind];
 		}
 
 		/// <summary>
@@ -263,7 +160,13 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> NextSibling (SExpr root)
 		{
-			return NextOrEmpty (NodeOfPath (root), root);
+			var stack = PathToStack (root);
+			if (stack.Length == Path.Length)
+			{
+				while (!stack.IsEmpty && !NextSexp (ref stack))
+					stack = stack.RestR;
+			}
+			return StackToPath (root, stack);
 		}
 
 		/// <summary>
@@ -272,10 +175,13 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> PrevSibling (SExpr root)
 		{
-			var node = NodeOfPath (root);
-			if (node != null)
-				node = node.Previous ?? node.Parent;
-			return CurrentOrEmpty (node, root);
+			var stack = PathToStack (root);
+			if (!stack.IsEmpty && stack.Length == Path.Length)
+			{
+				if (!PrevSexp (ref stack))
+					stack = stack.RestR;
+			}
+			return StackToPath (root, stack);
 		}
 
 		/// <summary>
@@ -284,10 +190,16 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> Next (SExpr root)
 		{
-			var node = NodeOfPath (root);
-			return node.FirstChild != null ?
-				CurrentOrEmpty (node.FirstChild, root) :
-				NextOrEmpty (node, root);
+			var stack = PathToStack (root);
+			if (stack.Length == Path.Length)
+			{
+				if (!ChildSexp (root, ref stack))
+				{
+					while (!stack.IsEmpty && !NextSexp (ref stack))
+						stack = stack.RestR;
+				}
+			}
+			return StackToPath (root, stack);
 		}
 
 		/// <summary>
@@ -296,19 +208,17 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> Previous (SExpr root)
 		{
-			var node = NodeOfPath (root);
-			if (node != null)
+			var stack = PathToStack (root);
+			if (!stack.IsEmpty && stack.Length == Path.Length)
 			{
-				if (TryMove (ref node, node.Previous))
+				if (PrevSexp (ref stack))
 				{
-					if (TryMove (ref node, node.FirstChild))
-						while (!(node.Next == null && node.FirstChild == null))
-							node = node.Next ?? node.FirstChild;
+					if (ChildSexp (root, ref stack))
+						while (NextSexp (ref stack) || ChildSexp (root, ref stack)) ;
 				}
-				else
-					node = node.Parent;
+				else stack = stack.RestR;
 			}
-			return CurrentOrEmpty (node, root);
+			return StackToPath (root, stack);
 		}
 
 		/// <summary>

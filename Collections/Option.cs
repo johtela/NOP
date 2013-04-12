@@ -5,20 +5,21 @@ using System.Text;
 
 namespace NOP.Collections
 {
-    public class Option<T>
-    {
-        public readonly bool HasValue;
-        public readonly T Value;
+	public class Option<T>
+	{
+		public readonly bool HasValue;
+		public readonly T Value;
 
-        public Option()
-        {
-            HasValue = false;
-        }
+		public Option()
+		{
+			HasValue = false;
+		}
 
-        public Option(T value)
-        {
-            HasValue = true;
-            Value = value;
-        }
-    }
+		public Option(T value)
+		{
+			HasValue = true;
+			Value = value;
+		}
+
+	}
 }

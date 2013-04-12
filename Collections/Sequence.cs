@@ -67,7 +67,7 @@
 
 			public override bool Equals (object obj)
 			{
-				return Value.Equals (obj);
+				return obj is Elem && Value.Equals (((Elem)obj).Value);
 			}
 
 			public override int GetHashCode ()
@@ -102,6 +102,11 @@
 		public static Sequence<T> FromEnumerable (IEnumerable<T> items)
 		{
 			return new Sequence<T> (FingerTree<Elem, Size>.FromEnumerable (items.Select (CreateElem)));
+		}
+
+		public static Sequence<T> Empty
+		{
+			get { return new Sequence<T> (FingerTree<Elem, Size>.Empty); }
 		}
 
 		public bool IsEmpty
