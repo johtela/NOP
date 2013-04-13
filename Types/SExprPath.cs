@@ -18,6 +18,21 @@
 	public class SExprPath
 	{
 		/// <summary>
+		/// Item of the stack of expressions.
+		/// </summary>
+		private class StackItem
+		{
+			public readonly int Ind;
+			public readonly Sequence<SExpr> Seq;
+
+			public StackItem (int i, Sequence<SExpr> s)
+			{
+				Ind = i;
+				Seq = s;
+			}
+		}
+
+		/// <summary>
 		/// The path is represented by a list of indices.
 		/// </summary>
 		public readonly Sequence<int> Path;
@@ -38,55 +53,42 @@
 
 		public SExprPath (SExpr root, SExpr target)
 		{
-			//Path = FindNode (root, target);
+			Path = FindSexp (root, target);
 		}
 
-		//private NOPList<int> FindNode (SExpr root, SExpr target)
-		//{
-		//    if (root == target)
-		//        return List.Create (0);
-		//    if (!(root is SExpr.List))
-		//        return NOPList<int>.Empty;
-		//    var node = root.AsSequence;
-		//    var path = List.Create (Tuple.Create (0, node));
-
-		//    while (node.NotEmpty && path.NotEmpty && !ReferenceEquals(node.First, target))
-		//    {
-		//        if (node.First is SExpr.List)
-		//        {
-		//            node = node.First.AsSequence;
-		//            path = Tuple.Create (0, node) | path;
-		//        }
-		//        else if (node.Rest.NotEmpty)
-		//        {
-		//            node = node.Rest;
-		//            path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
-		//        }
-		//        else if (path.Rest.NotEmpty)
-		//        {
-		//            do
-		//            {
-		//                path = path.Rest;
-		//                node = path.First.Item2.Rest;
-		//            }
-		//            while (node.IsEmpty && path.Rest.NotEmpty);
-		//            path = Tuple.Create (path.First.Item1 + 1, node) | path.Rest;
-		//        }
-		//    }
-		//    return node.IsEmpty ? 
-		//        NOPList<int>.Empty :
-		//        path.Map (t => t.Item1).Reverse ();
-		//}
-		private class StackItem
+		private Sequence<int> FindSexp (SExpr root, SExpr target)
 		{
-			public readonly int Ind;
-			public readonly Sequence<SExpr> Seq;
+			if (root == target)
+				return Sequence.Create (0);
+			if (!(root is SExpr.List))
+				return Sequence<int>.Empty;
+			var node = root.AsSequence;
+			var stack = Sequence.Create (new StackItem (0, node));
 
-			public StackItem (int i, Sequence<SExpr> s)
+			while (!node.IsEmpty && !stack.IsEmpty && !ReferenceEquals (node.First, target))
 			{
-				Ind = i;
-				Seq = s;
+				if (node.First is SExpr.List)
+				{
+					node = node.First.AsSequence;
+					stack = stack + new StackItem (0, node);
+				}
+				else if (!node.RestL.IsEmpty)
+				{
+					node = node.RestL;
+					stack = stack.RestR + new StackItem (stack.Last.Ind + 1, node);
+				}
+				else if (!stack.RestR.IsEmpty)
+				{
+					do
+					{
+						stack = stack.RestR;
+						node = stack.Last.Seq.RestL;
+					}
+					while (node.IsEmpty && !stack.RestR.IsEmpty);
+					stack = stack.RestR + new StackItem (stack.Last.Ind + 1, node);
+				}
 			}
+			return node.IsEmpty ? Sequence<int>.Empty : stack.Map (i => i.Ind);
 		}
 
 		private Sequence<StackItem> PathToStack (SExpr root)
