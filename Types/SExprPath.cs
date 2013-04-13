@@ -18,7 +18,7 @@
 	public class SExprPath
 	{
 		/// <summary>
-		/// Item of the stack of expressions.
+		/// Item of the stack of SExps.
 		/// </summary>
 		private class StackItem
 		{
@@ -40,22 +40,27 @@
 		/// <summary>
 		/// Create a SExprPath from a list of indices.
 		/// </summary>
-		/// <param name="path"></param>
 		public SExprPath (Sequence<int> path)
 		{
 			Path = path;
 		}
 
 		/// <summary>
-		/// Create an empty SExprPath.
+		/// Create a SExprPath that points to root.
 		/// </summary>
 		public SExprPath () : this (Sequence.Create (0)) {}
 
+		/// <summary>
+		/// Create a SExprPath that is pointig to a given node.
+		/// </summary>
 		public SExprPath (SExpr root, SExpr target)
 		{
 			Path = FindSexp (root, target);
 		}
 
+		/// <summary>
+		/// Find the path to the given node.
+		/// </summary>
 		private Sequence<int> FindSexp (SExpr root, SExpr target)
 		{
 			if (root == target)
@@ -91,6 +96,9 @@
 			return node.IsEmpty ? Sequence<int>.Empty : stack.Map (i => i.Ind);
 		}
 
+		/// <summary>
+		/// Convert a path to s-exp stack.
+		/// </summary>
 		private Sequence<StackItem> PathToStack (SExpr root)
 		{
 			var result = Sequence<StackItem>.Empty;
@@ -110,6 +118,9 @@
 			return result;
 		}
 
+		/// <summary>
+		/// Convert a stack of s-exps to path.
+		/// </summary>
 		private Tuple<SExpr, SExprPath> StackToPath (SExpr root, Sequence<StackItem> stack)
 		{
 			return stack.IsEmpty ?
@@ -118,6 +129,9 @@
 					new SExprPath (stack.Map (t => t.Ind)));
 		}
 
+		/// <summary>
+		/// Helper function to move the stack to next s-exp, if one exists.
+		/// </summary>
 		private bool NextSexp (ref Sequence<StackItem> stack)
 		{
 			var top = stack.Last;
@@ -127,6 +141,9 @@
 			return true;
 		}
 
+		/// <summary>
+		/// Helper function to move the stack to previous s-exp, if one exists.
+		/// </summary>
 		private bool PrevSexp (ref Sequence<StackItem> stack)
 		{
 			var top = stack.Last;
@@ -136,6 +153,9 @@
 			return true;
 		}
 
+		/// <summary>
+		/// Helper function to move the stack to child s-exp, if one exists.
+		/// </summary>
 		private bool ChildSexp (SExpr root, ref Sequence<StackItem> stack)
 		{
 			var sexp = stack.IsEmpty ? root : stack.Last.Seq[stack.Last.Ind];

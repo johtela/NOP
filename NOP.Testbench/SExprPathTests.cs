@@ -69,7 +69,7 @@
 			var prog = TestPrograms.NestedLambdas ().Build ();
 			var path = new SExprPath (prog, 
 				prog.AsSequence.First.AsSequence[2].AsSequence.RestL.First);
-			//Check.AreEqual (path.Path, Sequence.Create (0, 2, 1));
+			Check.AreEqual (path.Path, Sequence.Create (0, 2, 1));
 		}
 	}
 }
