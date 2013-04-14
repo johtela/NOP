@@ -1,5 +1,7 @@
 ﻿namespace NOP.Testbench
 {
+	using System.Web.Script.Serialization;
+
 	public class TestPrograms : ExprUser
 	{
 		public static ExprBuilder SimpleLet ()
@@ -42,6 +44,13 @@
 					Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
 					Call ("bar", S ("foo"), A (3)))
 			), A (4));
+		}
+
+		public static string Serialize (SExpr expr)
+		{
+			var s = new JavaScriptSerializer ();
+
+			return s.Serialize (expr);
 		}
 	}
 }

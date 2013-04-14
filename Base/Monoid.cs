@@ -1,4 +1,4 @@
-﻿namespace NOP.Collections
+﻿namespace NOP
 {
 	using System;
 

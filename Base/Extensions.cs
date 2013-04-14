@@ -1,9 +1,10 @@
-namespace NOP.Collections
+namespace NOP
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
+	using Collections;
 	
 	/// <summary>
 	/// Extension methods for .NET framework classes.
@@ -152,6 +153,15 @@ namespace NOP.Collections
 			return sb.ToString ();
 		}
 
-		#endregion    
+		#endregion
+
+		#region SExpr extensions
+
+		public static Sequence<SExpr> AsSequence (this SExpr sexp)
+		{
+			return (sexp as SExpr.List).Items;
+		}
+
+		#endregion
 	}
 }

@@ -1,7 +1,8 @@
-using System;
-
 namespace NOP.Testbench
 {
+	using System;
+	using NOP;
+
 	public class Arithmetic
 	{
 		public static readonly double Pi = Math.PI;
@@ -31,22 +32,6 @@ namespace NOP.Testbench
 		public object ValueSquared
 		{
 			get { return Value * Value; }
-		}
-	}
-
-	public class Bingo
-	{
-		public class Bango : NOPFunc<int, int, int>
-		{
-			public override int Invoke (int arg1, int arg2)
-			{
-				return Call (arg1, arg2);
-			}
-
-			public static int Call (int x, int y)
-			{
-				return x + y;
-			}
 		}
 	}
 

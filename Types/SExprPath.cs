@@ -67,14 +67,14 @@
 				return Sequence.Create (0);
 			if (!(root is SExpr.List))
 				return Sequence<int>.Empty;
-			var node = root.AsSequence;
+			var node = root.AsSequence ();
 			var stack = Sequence.Create (new StackItem (0, node));
 
 			while (!node.IsEmpty && !stack.IsEmpty && !ReferenceEquals (node.First, target))
 			{
 				if (node.First is SExpr.List)
 				{
-					node = node.First.AsSequence;
+					node = node.First.AsSequence ();
 					stack = stack + new StackItem (0, node);
 				}
 				else if (!node.RestL.IsEmpty)

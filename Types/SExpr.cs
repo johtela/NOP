@@ -103,10 +103,5 @@ namespace NOP
 				return Items.ToString ();
 			}
 		}
-
-		public Sequence<SExpr> AsSequence
-		{
-			get { return (this as List).Items; }
-		}
 	}
 }

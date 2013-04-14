@@ -191,9 +191,9 @@
 			while (!predicate (acc) && ++i < _items.Length);
 
 			return new Split<NOPList<T>, T, V> (
-				Lazy.Create (() => Slice (0, i - 1)),
+				Lazy.Create (Fun.Partial (Slice, 0, i - 1)),
 				_items[i],
-				Lazy.Create (() => Slice (i + 1, _items.Length - 1)));
+				Lazy.Create (Fun.Partial (Slice, i + 1, _items.Length - 1)));
 		}
 
 		public static Digit<T, V> operator + (T item, Digit<T, V> digit)
@@ -574,9 +574,9 @@
 				{
 					var split = Front.Split (predicate, acc);
 					return new Split<FingerTree<T, V>, T, V> (
-						Lazy.Create (() => FromReducible (split.Left)),
+						Lazy.Create (Fun.Partial (FromReducible, split.Left)),
 						split.Item,
-						Lazy.Create (() => DeepL (split.Right, Inner, Back)));
+						Lazy.Create (Fun.Partial (DeepL, split.Right, Inner, Back)));
 				}
 				else if (predicate (vinner))
 				{
@@ -584,17 +584,17 @@
 					var digitSplit = innerSplit.Item.ToDigit ().Split (
 						predicate, vfront.Plus (innerSplit.Left.Measure ()));
 					return new Split<FingerTree<T, V>, T, V> (
-						Lazy.Create (() => DeepR (Front, innerSplit.Left, digitSplit.Left)),
+						Lazy.Create (Fun.Partial (DeepR, Front, innerSplit.Left, digitSplit.Left)),
 						digitSplit.Item,
-						Lazy.Create (() => DeepL (digitSplit.Right, innerSplit.Right, Back)));
+						Lazy.Create (Fun.Partial (DeepL, digitSplit.Right, innerSplit.Right, Back)));
 				}
 				else
 				{
 					var split = Back.Split (predicate, vinner);
 					return new Split<FingerTree<T, V>, T, V> (
-						Lazy.Create (() => DeepR (Front, Inner, split.Left)),
+						Lazy.Create (Fun.Partial (DeepR, Front, Inner, split.Left)),
 						split.Item,
-						Lazy.Create (() => FromReducible (split.Right)));
+						Lazy.Create (Fun.Partial (FromReducible, split.Right)));
 				}
 			}
 
