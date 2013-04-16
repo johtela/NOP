@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Either.cs" />
     <Compile Include="Parsing\Parser.cs" />
     <Compile Include="Collections\FingerTree.cs" />
     <Compile Include="Base\Lazy.cs" />
