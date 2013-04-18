@@ -17,7 +17,7 @@
 	/// An immutable linked list.
 	/// </summary>
 	/// <typeparam name="T">The item type of the list.</typeparam>
-	public class NOPList<T> : IEnumerable<T>, IReducible<T>, IVisualizable
+	public class NOPList<T> : ISequence<T>, IEnumerable<T>, IReducible<T>, IVisualizable
 	{
 		private static readonly NOPList<T> _empty = new NOPList<T> (default(T), null);
 		private T _first;
@@ -52,6 +52,11 @@
 				if (this != _empty)
 					_rest = value;
 			}
+		}
+
+		ISequence<T> ISequence<T>.Rest
+		{
+			get { return Rest; }
 		}
 		
 		private NOPList (T first, NOPList<T> rest)
@@ -108,33 +113,6 @@
 		}
 
 		/// <summary>
-		/// Is the list non-empty.
-		/// </summary>
-		public bool NotEmpty
-		{
-			get { return this != Empty; }
-		}
-
-		/// <summary>
-		/// Count the length, i.e. the number of items, in the list.
-		/// </summary>
-		public int Length
-		{
-			get
-			{
-				int result = 0;
-				NOPList<T > list = this;
-				
-				while (!list.IsEmpty)
-				{
-					result++;
-					list = list.Rest;
-				}
-				return result;
-			}
-		}
-
-		/// <summary>
 		/// The last cons cell of the list. 
 		/// </summary>
 		public NOPList<T> End
@@ -154,107 +132,6 @@
 		public T Last
 		{
 			get { return End.First; }
-		}
-
-		/// <summary>
-		/// Search for an item in the list.
-		/// </summary>
-		/// <param name="item">The item searched for.</param>
-		/// <returns>The tail of the list from the point where the item is found, 
-		/// or an empty list if the item is not found.</returns>
-		public NOPList<T> FindNext (T item)
-		{
-			NOPList<T> list = this;
-			
-			while (!list.IsEmpty && !list.First.Equals (item))
-				list = list.Rest;
-			return list;
-		}
-
-		/// <summary>
-		/// Find an item in the list that matches a predicate.
-		/// </summary>
-		/// <param name="predicate">The predicate that defines what to look for.</param>
-		/// <returns>The tail of the list from the point where the predicate returned true, 
-		/// or an empty list if none of the items matched the predicate.</returns>
-		public NOPList<T> FindNext (Predicate<T> predicate)
-		{
-			NOPList<T> list = this;
-			
-			while (!list.IsEmpty && !predicate (list.First))
-				list = list.Rest;
-			return list;
-		}
-
-		/// <summary>
-		/// Returns an item of the list that occurs in a given position.
-		/// </summary>
-		/// <param name="n">The position from the start of the item to be returned. 
-		/// Zero returns the first element.</param>
-		/// <returns>The item in the nth position.</returns>
-		/// <exception cref="IndexOutOfRangeException">If n is negative the length of the list is less than n.
-		/// </exception>
-		public T Nth (int n)
-		{
-			var list = this;
-			
-			while (!list.IsEmpty && n-- > 0)
-				list = list.Rest;
-			if (list.IsEmpty)
-				throw new IndexOutOfRangeException ("The specified index is beyond the list end.");
-			return list.First;
-		}
-
-		/// <summary>
-		/// Returns an item of the list that occurs in a given position
-		/// or default value if the position is beyond the end of the list.
-		/// </summary>
-		/// <param name="n">The position from the start of the item to be returned. 
-		/// Zero returns the first element.</param>
-		/// <returns>The item in the nth position, or default(T) if the position
-		/// is beyond list end.</returns>
-		public T NthOrDefault (int n)
-		{
-			var list = this;
-
-			while (!list.IsEmpty && n-- > 0)
-				list = list.Rest;
-			return list.IsEmpty ? default (T) : list.First;
-		}
-
-		/// <summary>
-		/// Return the Nth tail of the list.
-		/// </summary>
-		/// <param name="n">The index of the tail to be returned.</param>
-		/// <returns>The nth tail of the list.</returns>
-		public NOPList<T> RestNth (int n)
-		{
-			var list = this;
-
-			while (n-- > 0)
-				list = list.Rest;
-			return list;
-		}
-
-		/// <summary>
-		/// Return the position of the specified item.
-		/// </summary>
-		/// <param name="item">The item to be searched for.</param>
-		/// <returns>The zero-based position of the item, or -1, if
-		/// the item was not found.</returns>
-		public int IndexOf (T item)
-		{
-			var i = 0;
-			var list = this;
-
-			while (!list.IsEmpty)
-			{
-				if (list.First.Equals (item)) 
-					return i;
-				list = list.Rest;
-				i++;
-			}
-			return -1;
 		}
 
 		/// <summary>
@@ -304,7 +181,7 @@
 		/// is not found; the new item is added at the end of the list.</returns>
 		public NOPList<T> InsertBefore (T item, T before)
 		{
-			var tail = FindNext (before);
+			var tail = this.FindNext (before) as NOPList<T>;
 			
 			return CopyUpTo (tail).Bind ((prefixFirst, prefixLast) =>
 			{
@@ -321,7 +198,7 @@
 		/// <returns>A new list without the given item.</returns>
 		public NOPList<T> Remove (T item)
 		{
-			var tail = FindNext (item);
+			var tail = this.FindNext (item) as NOPList<T>;
 			
 			return CopyUpTo (tail).Bind ((prefixFirst, prefixLast) =>
 			{
@@ -343,38 +220,6 @@
 				result = Cons (list.First, result);
 			return result;
 		}
-
-		/// <summary>
-		/// Check if two lists are equal, that is contain the same items in
-		/// the same order, and have equal lengths.
-		/// </summary>
-		/// <param name="other">The other list that the list is compared with.</param>
-		/// <param name="equals">The function that compares if two items are equal.</param>
-		/// <returns>True, if the two lists contain the same items in the same order, 
-		/// and have equal lengths.</returns>
-		public bool EqualTo (NOPList<T> other, Func<T, T, bool> equals)
-		{
-			NOPList<T > list = this;
-			
-			while (!list.IsEmpty && !other.IsEmpty && equals (list.First, other.First))
-			{
-				list = list.Rest;
-				other = other.Rest;
-			}
-			return list.IsEmpty && other.IsEmpty;
-		}
-		
-		/// <summary>
-		/// Check if two lists are equal, that is contain the same items in
-		/// the same order, and have equal lengths.
-		/// </summary>
-		/// <param name="other">The other list that the list is compared with.</param>
-		/// <returns>True, if the two lists contain the same items in the same order, 
-		/// and have equal lengths.</returns>
-		public bool EqualTo (NOPList<T> other)
-		{
-			return this.EqualTo (other, (i1, i2) => i1.Equals (i2));
-		}	
 
 		/// <summary>
 		/// Collect the list of lists into another list.
@@ -551,7 +396,7 @@
 		public override bool Equals (object obj)
 		{
 			var otherList = obj as NOPList<T>;
-			return (otherList != null) && EqualTo (otherList);
+			return (otherList != null) && this.EqualTo (otherList);
 		}
 		
 		/// <summary>
@@ -571,30 +416,9 @@
 		/// </summary>
 		public override string ToString ()
 		{
-			return ToString ("[", "]", ", ");
+			return this.ToString ("[", "]", ", ");
 		}
 		
-		/// <summary>
-		/// Returns a string representing the list. Gets open, close bracket, and separtor as
-		/// an argument.
-		/// </summary>
-		public string ToString (string openBracket, string closeBracket, string separator)
-		{
-			StringBuilder sb = new StringBuilder (openBracket);
-			NOPList<T> list = this;
-			
-			while (!list.IsEmpty)
-			{
-				sb.Append (list.First);
-				list = list.Rest;
-				
-				if (list != Empty)
-					sb.Append (separator);
-			}
-			sb.Append (closeBracket);
-			return sb.ToString ();			
-		}
-
 		#region IEnumerable<T> Members
 
 		/// <summary>

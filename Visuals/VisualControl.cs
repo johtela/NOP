@@ -113,7 +113,7 @@
 			var point = new PointF (e.X, e.Y);
 
 			var hitRect = _hitRects.FindNext (hr => hr.Rect.Contains (point));
-			if (hitRect.NotEmpty)
+			if (!hitRect.IsEmpty)
 			{
 				_focusedPath = new SExprPath (_code, hitRect.First.SExp);
 				Invalidate ();

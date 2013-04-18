@@ -5,7 +5,7 @@
 	using System.Linq;
 	using System.Text;
 
-	public abstract class Parser <TSource, TTarget>
+	public abstract class Parser <TToken, TResult>
 	{
 
 	}

@@ -107,7 +107,7 @@
 
 		public static NOPList<Node<T, V>> CreateMany (NOPList<T> items)
 		{
-			switch (items.Length)
+			switch (items.Length ())
 			{
 				case 0:
 				case 1: throw new ArgumentException ("List should contain at least two items.");
@@ -148,7 +148,7 @@
 
 		public Digit (NOPList<T> items)
 		{
-			var len = items.Length;
+			var len = items.Length ();
 			if (len < 1 || len > 4)
 				throw new ArgumentException ("Digit array must have length of 1..4");
 			_items = new T[len];

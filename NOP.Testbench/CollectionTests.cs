@@ -28,8 +28,8 @@ namespace NOP.Testbench
 			Check.AreEqual (2, list.Rest.First);
 			Check.AreEqual (3, list.Rest.Rest.First);
 			Check.IsTrue (list.Rest.Rest.Rest.IsEmpty);
-
-			Check.AreEqual (3, list.Length);
+			  
+			Check.AreEqual (3, list.Length ());
 		}
 		
 		[Test]
@@ -42,7 +42,7 @@ namespace NOP.Testbench
 			Check.AreEqual (3, list.Rest.Rest.First);
 			Check.IsTrue (list.Rest.Rest.Rest.IsEmpty);
 
-			Check.AreEqual (3, list.Length);
+			Check.AreEqual (3, list.Length ());
 			Runner.VConsole.ShowVisual (list.ToVisual ());
 		}
 		
@@ -64,14 +64,14 @@ namespace NOP.Testbench
 		[Test]
 		public void TestGetNthItem ()
 		{
-			Check.Throws<IndexOutOfRangeException> (() =>
+			Check.Throws<EmptyListException> (() =>
 			{
 				var list = List.FromArray (new int[] { 1, 2, 3 });
 
-				Check.AreEqual (1, list.Nth (0));
-				Check.AreEqual (2, list.Nth (1));
-				Check.AreEqual (3, list.Nth (2));
-				list.Nth (3);
+				Check.AreEqual (1, list.Drop (0).First);
+				Check.AreEqual (2, list.Drop (1).First);
+				Check.AreEqual (3, list.Drop (2).First);
+				var i = list.Drop (3).First;
 			});
 		}
 		
@@ -147,11 +147,11 @@ namespace NOP.Testbench
 			var listShorter = List.Create (1.0, 2.0, 3.0);
 
 			var zipped2 = listLonger.ZipWith (listShorter);
-			Check.AreEqual (listShorter.Length, zipped2.Length);
+			Check.AreEqual (listShorter.Length (), zipped2.Length ());
 			Check.AreEqual (Tuple.Create ("three", 3.0), zipped2.Last);
 
 			var zipped3 = listLonger.ZipExtendingWith (listShorter);
-			Check.AreEqual (listLonger.Length, zipped3.Length);
+			Check.AreEqual (listLonger.Length (), zipped3.Length ());
 			Check.AreEqual (Tuple.Create ("four", 0.0), zipped3.Last);
 		}
 		

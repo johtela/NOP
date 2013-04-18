@@ -160,13 +160,13 @@ namespace NOP
 		/// </summary>
 		static internal EvalResult EvalIf (Environment env, ExprList exprs)
 		{
-			if (exprs.Length != 3)
+			if (exprs.Length () != 3)
 				Error (exprs.First, "Invalid number of expressions in an 'if' clause");
 			var condRes = Eval (env, exprs.First);
 			if ((bool)condRes.Result)
-				return new EvalResult (env, Eval (condRes.Env, exprs.Nth (1)).Result);
+				return new EvalResult (env, Eval (condRes.Env, exprs.Drop (1).First).Result);
 			else
-				return new EvalResult (env, Eval (condRes.Env, exprs.Nth (2)).Result);
+				return new EvalResult (env, Eval (condRes.Env, exprs.Drop (2).First).Result);
 		}
 
 		/// <summary>
@@ -230,7 +230,7 @@ namespace NOP
 			}
 			);
 			var dot = parameters.FindNext (".");
-			if (!dot.IsEmpty && dot.Length != 2)
+			if (!dot.IsEmpty && dot.Length () != 2)
 				Interpreter.Error ("There should be only one parameter after '.'");
 			if (definition.IsEmpty)
 				Interpreter.Error (definition, "Function body is missing");
