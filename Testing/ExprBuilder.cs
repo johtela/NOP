@@ -74,7 +74,7 @@ namespace NOP
 
 			public override SExpr Build ()
 			{
-				return new SExpr.List (Sequence.Create (_items.Select (eb => eb.Build ())));
+				return new SExpr.List (Sequence.Create<SExpr> (_items.Map (eb => eb.Build ())));
 			}
 		}
 		

@@ -16,9 +16,10 @@ namespace NOP
 			Value = Expression.Parse (sexps.First);
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return List.Create<AstNode> (Variable, Value);
+			action (Variable);
+			action (Value);
 		}
 	}
 }

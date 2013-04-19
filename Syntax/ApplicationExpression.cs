@@ -32,9 +32,10 @@ namespace NOP
 			return te;
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return FuncName | Parameters;
+			action (FuncName);
+			Parameters.Foreach (action);
 		}
 
 		protected override Visual GetVisual ()

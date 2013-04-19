@@ -13,9 +13,9 @@ namespace NOP
 			TypeName = new SymbolExpression (typeName);
 		}
 
-        protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
         {
-            return List.Cons (TypeName);
+			action (TypeName);
         }
 	}
 }

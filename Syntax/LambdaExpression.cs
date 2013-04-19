@@ -34,9 +34,10 @@ namespace NOP
 				FunctionBody.GetTypeExpr ());
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return Parameters.Append<AstNode> (FunctionBody);
+			Parameters.Foreach (action);
+			action (FunctionBody);
 		}
 
 		protected override Visual GetVisual ()

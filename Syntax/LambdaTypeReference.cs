@@ -1,6 +1,7 @@
 namespace NOP
 {
 	using System;
+	using System.Collections.Generic;
 	using NOP.Collections;
 
 	public class LambdaTypeReference : TypeReference
@@ -14,9 +15,10 @@ namespace NOP
 			ResultType = ParseTypeExpression (Expect<SExpr> (ref sexps, "type"));
 		}
 
-		protected override System.Collections.Generic.IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return List.Create<AstNode> (ArgumentType, ResultType);
+			action (ArgumentType);
+			action (ResultType);
 		}
 	}
 }

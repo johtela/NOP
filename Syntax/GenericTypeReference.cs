@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 	using NOP.Collections;
-    using System.Collections.Generic;
+	using System.Collections.Generic;
 
 	public class GenericTypeReference : TypeReference
 	{
@@ -15,9 +15,10 @@ namespace NOP
 			TypeParams = List.MapReducible (typeExpr.Items.RestL, sexp => ParseTypeExpression (sexp));
 		}
 
-        protected override IEnumerable<AstNode> GetChildNodes ()
-        {
-            return TypeParams.Prepend<AstNode> (TypeName);
-        }
+		protected override void DoForChildNodes (Action<AstNode> action)
+		{
+			action (TypeName);
+			TypeParams.Foreach (action);
+		}
 	}
 }

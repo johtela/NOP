@@ -41,9 +41,11 @@ namespace NOP
 										ElseExpression.GetTypeExpr ());
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return List.Create (Condition, ThenExpression, ElseExpression);
+			action (Condition);
+			action (ThenExpression);
+			action (ElseExpression);
 		}
 	}
 }

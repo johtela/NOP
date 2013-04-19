@@ -66,6 +66,11 @@
 			return new LazyList<T> (first, getRest);
 		}
 
+		public static LazyList<T> Cons (T first, LazyList<T> rest)
+		{
+			return new LazyList<T> (first, rest);
+		}
+
 		private static LazyList<T> Enumerate (IEnumerator<T> e)
 		{
 			return !e.MoveNext () ? _empty :
@@ -113,6 +118,23 @@
 				func (First).Concat (Rest.Collect (func));
 		}
 
+		public LazyList<T> Reverse ()
+		{
+			var result = Empty;
+			for (var list = this; !list.IsEmpty; list = list.Rest)
+				result = new LazyList<T> (list.First, result);
+			return result;
+		}
+
+		public LazyList<Tuple<T, U>> ZipWith<U> (LazyList<U> other)
+		{
+			return IsEmpty || other.IsEmpty ? LazyList<Tuple<T, U>>.Empty :
+				new LazyList<Tuple<T, U>> (Tuple.Create (First, other.First), 
+					Fun.Partial (Rest.ZipWith, other.Rest));
+		}
+
+		#region IFunctor<T> implementation
+
 		/// <summary>
 		/// Map list to another list. 
 		/// </summary>
@@ -122,6 +144,31 @@
 				new LazyList<U> (func (First), Fun.Partial (Rest.Map, func));
 		}
 
+		IFunctor<U> IFunctor<T>.Map<U> (Func<T, U> map)
+		{
+			return Map (map);
+		}
+
+		#endregion
+
+		#region IReducible<T> implementation
+		
+		public U ReduceLeft<U> (U acc, Func<U, T, U> func)
+		{
+			for (var list = this; !list.IsEmpty; list = list.Rest)
+				acc = func (acc, list.First);
+			return acc;
+		}
+
+		public U ReduceRight<U> (Func<T, U, U> func, U acc)
+		{
+			for (var list = Reverse (); !list.IsEmpty; list = list.Rest)
+				acc = func (list.First, acc);
+			return acc;
+		}
+
+		#endregion		
+
 		#region Operator overloads
 
 		public static LazyList<T> operator | (T first, LazyList<T> rest)
@@ -130,5 +177,58 @@
 		}
 
 		#endregion
+
+		#region Overridden methods from Object
+
+		public override bool Equals (object obj)
+		{
+			var otherList = obj as LazyList<T>;
+			return (otherList != null) && this.EqualTo (otherList);
+		}
+
+		/// <summary>
+		/// Serves as a hash function for a <see cref="NOP.Collections.List`1"/> object.
+		/// </summary>
+		public override int GetHashCode ()
+		{
+			return ReduceLeft (0, (h, e) => h ^ e.GetHashCode ());
+		}
+
+		/// <summary>
+		/// Returns a string representing the list.
+		/// </summary>
+		public override string ToString ()
+		{
+			return this.ToString ("[", "]", ", ");
+		}
+
+		#endregion		
+	}
+
+	public static class LazyList
+	{
+		/// <summary>
+		/// Constructs a new list from an array.
+		/// </summary>
+		public static LazyList<T> FromArray<T> (T[] array)
+		{
+			return array.ReduceRight (LazyList<T>.Cons, LazyList<T>.Empty);
+		}
+
+		/// <summary>
+		/// Constructs a new list from a variable argument list.
+		/// </summary>
+		public static LazyList<T> Create<T> (params T[] items)
+		{
+			return FromArray (items);
+		}
+
+		/// <summary>
+		/// Constructs a new list from IEnumerable.
+		/// </summary>
+		public static LazyList<T> Create<T> (IEnumerable<T> items)
+		{
+			return LazyList<T>.FromEnumerable (items);
+		}
 	}
 }

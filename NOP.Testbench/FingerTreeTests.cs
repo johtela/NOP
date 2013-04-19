@@ -54,7 +54,7 @@
 		[Test]
 		public void TestEnumeration ()
 		{
-			TestEnumeration (TestSeq);
+			TestEnumeration (TestSeq.ToEnumerable ());
 		}
 
 		private void TestEnumeration (IEnumerable<int> e)
@@ -83,7 +83,7 @@
 		[Test]
 		public void TestReductionFromList ()
 		{
-			TestEnumeration (List.FromReducible (TestSeq));
+			TestEnumeration (List.FromReducible (TestSeq).ToEnumerable ());
 		}
 
 		[Test]

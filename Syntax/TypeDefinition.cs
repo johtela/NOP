@@ -16,9 +16,10 @@ namespace NOP
 			Members = List.MapReducible (sexps, sexp => Parse (sexp));
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return Members.Prepend<AstNode> (Name);
+			action (Name);
+			Members.Foreach (action);
 		}
 	}
 }

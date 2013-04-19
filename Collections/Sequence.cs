@@ -10,7 +10,7 @@
 	/// Random access sequence built on top of finger tree.
 	/// </summary>
 	/// <typeparam name="T">The item type of the sequence.</typeparam>
-	public struct Sequence<T> : IReducible<T>, IEnumerable<T>, IVisualizable
+	public struct Sequence<T> : ISequence<T>, IVisualizable
 	{
 		/// <summary>
 		/// The size monoid defines how tree sizes are accumulated.
@@ -104,6 +104,11 @@
 			return new Sequence<T> (FingerTree<Elem, Size>.FromEnumerable (items.Select (CreateElem)));
 		}
 
+		public static Sequence<T> FromSequence (ISequence<T> seq)
+		{
+			return new Sequence<T> (FingerTree<Elem, Size>.FromReducible ((IReducible<Elem>)seq.Map (CreateElem)));
+		}
+
 		public static Sequence<T> Empty
 		{
 			get { return new Sequence<T> (FingerTree<Elem, Size>.Empty); }
@@ -132,6 +137,11 @@
 		public Sequence<T> RestR
 		{
 			get { return new Sequence<T> (_tree.RestR); }
+		}
+
+		public ISequence<T> Rest
+		{
+			get { return RestL; }
 		}
 
 		public Tuple<T, Sequence<T>> LeftView
@@ -192,27 +202,11 @@
 			return result;
 		}
 
-		public Sequence<U> Map<U> (Func<T, U> map)
-		{
-			return new Sequence<U> (_tree.ReduceLeft (FingerTree<Sequence<U>.Elem, Sequence<U>.Size>.Empty,
-				(t, e) => t.AddRight (Sequence<U>.CreateElem (map (e)))));
-		}
-
 		#region Overridden from Object
 
 		public override bool Equals (object obj)
 		{
-			if (!(obj is Sequence<T>)) return false;
-			var t1 = _tree;
-			var t2 = ((Sequence<T>)obj)._tree;
-
-			while (!(t1.IsEmpty || t2.IsEmpty))
-			{
-				if (!t1.First.Equals (t2.First)) return false;
-				t1 = t1.RestL;
-				t2 = t2.RestL;
-			}
-			return t1.IsEmpty && t2.IsEmpty;
+			return (obj is Sequence<T>) && this.EqualTo ((Sequence<T>)obj);
 		}
 
 		public override int GetHashCode ()
@@ -222,19 +216,7 @@
 
 		public override string ToString ()
 		{
-			return ToString ("[", "]", ", ");
-		}
-
-		public string ToString (string openBracket, string closeBracket, string separator)
-		{
-			var sb = new StringBuilder (openBracket);
-			if (Length > 0)
-			{
-				sb.Append (First);
-				RestL.Foreach (e => sb.AppendFormat ("{0}{1}", separator, e));
-			}
-			sb.Append (closeBracket);
-			return sb.ToString ();
+			return this.ToString ("[", "]", ", ");
 		}
 
 		#endregion
@@ -258,6 +240,21 @@
 
 		#endregion
 
+		#region IFunctor<T> implementation
+
+		public Sequence<U> Map<U> (Func<T, U> map)
+		{
+			return new Sequence<U> (_tree.ReduceLeft (FingerTree<Sequence<U>.Elem, Sequence<U>.Size>.Empty,
+				(t, e) => t.AddRight (Sequence<U>.CreateElem (map (e)))));
+		}
+
+		IFunctor<U> IFunctor<T>.Map<U> (Func<T, U> map)
+		{
+			return Map (map);
+		}
+
+		#endregion
+
 		#region IReducible<T> implementation
 
 		public U ReduceLeft<U> (U acc, Func<U, T, U> func)
@@ -268,21 +265,6 @@
 		public U ReduceRight<U> (Func<T, U, U> func, U acc)
 		{
 			return _tree.ReduceRight ((e, a) => func (e.Value, a), acc);
-		}
-
-		#endregion
-
-		#region IEnumerable<T> implementation
-
-		public IEnumerator<T> GetEnumerator ()
-		{
-			return _tree.ReduceRight ((e, l) => List.Cons (e, l), NOPList<T>.Empty)
-				.GetEnumerator ();
-		}
-
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
-		{
-			return GetEnumerator ();
 		}
 
 		#endregion
@@ -302,6 +284,11 @@
 	/// </summary>
 	public static class Sequence
 	{
+		public static Sequence<T> Create<T> (ISequence<T> seq)
+		{
+			return Sequence<T>.FromSequence (seq);
+		}
+
 		public static Sequence<T> Create<T> (IEnumerable<T> items)
 		{
 			return Sequence<T>.FromEnumerable (items);

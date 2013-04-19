@@ -2,6 +2,7 @@ namespace NOP
 {
 	using System.Collections.Generic;
 	using Collections;
+	using System;
 	
 	public class QuoteExpression : Expression
 	{
@@ -19,9 +20,9 @@ namespace NOP
 			return TypeExpr.Builder.Lit (SExp);
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return List.Cons (QuotedExpression);
+			action (QuotedExpression);
 		}
 	}
 }

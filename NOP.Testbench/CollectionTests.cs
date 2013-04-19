@@ -81,7 +81,7 @@ namespace NOP.Testbench
 			var list = List.Create (1, 2, 3);
 			int i = 1;
 
-			foreach (int item in list)
+			foreach (int item in list.ToEnumerable ())
 			{
 				Check.AreEqual (i++, item);
 			}

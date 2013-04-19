@@ -17,7 +17,7 @@
 	/// An immutable linked list.
 	/// </summary>
 	/// <typeparam name="T">The item type of the list.</typeparam>
-	public class NOPList<T> : ISequence<T>, IEnumerable<T>, IReducible<T>, IVisualizable
+	public class NOPList<T> : ISequence<T>, IReducible<T>, IVisualizable
 	{
 		private static readonly NOPList<T> _empty = new NOPList<T> (default(T), null);
 		private T _first;
@@ -382,17 +382,15 @@
 				last.Rest = List.Cons (func (list.First));
 			return result;
 		}
+
+		IFunctor<U> IFunctor<T>.Map<U> (Func<T, U> map)
+		{
+			return Map (map);
+		}
 		
 		/// <summary>
 		/// Determines whether the specified object is equal to the current list.
 		/// </summary>
-		/// <param name='obj'>
-		/// The <see cref="System.Object"/> to compare with the current <see cref="NOP.Collections.List`1"/>.
-		/// </param>
-		/// <returns>
-		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
-		/// <see cref="NOP.Collections.List`1"/>; otherwise, <c>false</c>.
-		/// </returns>
 		public override bool Equals (object obj)
 		{
 			var otherList = obj as NOPList<T>;
@@ -402,10 +400,6 @@
 		/// <summary>
 		/// Serves as a hash function for a <see cref="NOP.Collections.List`1"/> object.
 		/// </summary>
-		/// <returns>
-		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such 
-		/// as a hash table.
-		/// </returns>
 		public override int GetHashCode ()
 		{
 			return ReduceLeft (0, (h, e) => h ^ e.GetHashCode ());
@@ -419,35 +413,6 @@
 			return this.ToString ("[", "]", ", ");
 		}
 		
-		#region IEnumerable<T> Members
-
-		/// <summary>
-		/// Returns a new generic enumarator that can be used to iterate over the
-		/// items in the list.
-		/// </summary>
-		/// <returns>An enumerator containing the items of the list.</returns>
-		public IEnumerator<T> GetEnumerator ()
-		{
-			for (NOPList<T> list = this; !list.IsEmpty; list = list.Rest)
-				yield return list.First;
-		}
-
-		#endregion
-
-		#region IEnumerable Members
-
-		/// <summary>
-		/// Returns a new non-generic enumarator that can be used to iterate over the
-		/// items in the list.
-		/// </summary>
-		/// <returns>An enumerator containing the items of the list.</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
-		{
-			return this.GetEnumerator ();
-		}
-		
-		#endregion
-
 		#region IVisualizable members
 
 		public Visual ToVisual ()

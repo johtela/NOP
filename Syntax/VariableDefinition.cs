@@ -29,9 +29,10 @@ namespace NOP
 			}
 		}
 
-        protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
         {
-            return List.Create<AstNode> (Name, Type);
+			action (Name);
+			action (Type);
         }
 	}
 }

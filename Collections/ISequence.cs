@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NOP.Collections
 {
-	public interface ISequence<T>
+	public interface ISequence<T> : IFunctor<T>, IReducible<T>
 	{
 		T First { get; }
 		ISequence<T> Rest { get; }
@@ -119,6 +119,16 @@ namespace NOP.Collections
 			return sb.ToString ();
 		}
 
-
+		/// <summary>
+		/// Convert sequence to IEnumerable.
+		/// </summary>
+		public static IEnumerable<T> ToEnumerable<T> (this ISequence<T> seq)
+		{
+			while (!seq.IsEmpty)
+			{
+				yield return seq.First;
+				seq = seq.Rest;
+			}
+		}
 	}
 }

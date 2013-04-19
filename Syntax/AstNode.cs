@@ -74,9 +74,8 @@ namespace NOP
 		/// Return the list of abstract syntax tree nodes under this node.
 		/// Must be overridden by AST nodes that have children.
 		/// </summary>
-		protected virtual IEnumerable<AstNode> GetChildNodes ()
+		protected virtual void DoForChildNodes (Action<AstNode> action)
 		{
-			return NOPList<AstNode>.Empty;
 		}
 
 		/// <summary>
@@ -93,8 +92,7 @@ namespace NOP
 		/// </summary>
 		public void WalkTreeDepthFirst (Action<AstNode> action)
 		{
-			foreach (var child in GetChildNodes ())
-				child.WalkTreeDepthFirst (action);
+			DoForChildNodes (node => node.WalkTreeDepthFirst (action));
 			action (this);
 		}
 
