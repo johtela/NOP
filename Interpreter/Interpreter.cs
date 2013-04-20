@@ -6,7 +6,7 @@ namespace NOP
 	using System;
 	using NOP.Framework;
 	using NOP.Collections;
-	using ExprList = NOP.Collections.NOPList<object>;
+	using ExprList = NOP.Collections.StrictList<object>;
 
 	/// <summary>
 	/// Result of the interpreter evaluation.
@@ -191,7 +191,7 @@ namespace NOP
 		/// </summary>
 		/// <param name="values">The parameter values given.</param>
 		/// <returns>The updated environment that has the parameters defined.</returns>
-		private static Environment BindParams (Environment env, NOPList<string> names, 
+		private static Environment BindParams (Environment env, StrictList<string> names, 
 			ExprList values)
 		{
 			while (true)

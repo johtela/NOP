@@ -183,15 +183,15 @@
 		public class Con : MonoType
 		{
 			public readonly string Name;
-			public readonly NOPList<MonoType> TypeArgs;
+			public readonly StrictList<MonoType> TypeArgs;
 
-			public Con (string name, NOPList<MonoType> typeArgs)
+			public Con (string name, StrictList<MonoType> typeArgs)
 			{
 				Name = name;
 				TypeArgs = typeArgs;
 			}
 			
-			public Con (string name) : this (name, NOPList<MonoType>.Empty)
+			public Con (string name) : this (name, StrictList<MonoType>.Empty)
 			{
 			}
 			
@@ -312,7 +312,7 @@
 			/// <summary>
 			/// Builder method for creating lambdas with multiple parameters.
 			/// </summary>
-			public static MonoType Lambda (NOPList<MonoType> parameters, MonoType result)
+			public static MonoType Lambda (StrictList<MonoType> parameters, MonoType result)
 			{
 				return  parameters.IsEmpty ? 
 				result : 

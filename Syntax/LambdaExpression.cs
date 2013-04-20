@@ -8,7 +8,7 @@ namespace NOP
 
 	public class LambdaExpression : Expression
 	{
-		public readonly NOPList<SymbolExpression> Parameters;
+		public readonly StrictList<SymbolExpression> Parameters;
 		public readonly Expression FunctionBody;
 		
 		public LambdaExpression (SExpr.List lambdaExpr) : base (lambdaExpr)

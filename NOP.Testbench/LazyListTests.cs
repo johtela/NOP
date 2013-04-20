@@ -3,6 +3,7 @@ namespace NOP.Testbench
 	using System;
 	using NOP;
 	using NOP.Collections;
+	using System.Linq;
 
 	public class LazyListTests
 	{
@@ -132,6 +133,30 @@ namespace NOP.Testbench
 			Check.IsTrue (LazyList.Create (1, 2, 3).Map (timesTwo).EqualTo (List.Create (2, 4, 6)));
 			Check.IsTrue (LazyList<int>.Empty.Map (timesTwo).EqualTo (LazyList<int>.Empty));
 			Check.IsTrue (LazyList.Create (1).Map (timesTwo).EqualTo (List.Create (2)));
+		}
+	
+		[Test]
+		public void TestLinq ()
+		{
+			var list = LazyList.Create (Enumerable.Range (0, 10));
+
+			var simple = from i in list
+						 select i.ToString ();
+
+			var num = 0;
+			simple.Foreach (str => Check.AreEqual (num++.ToString (), str));
+
+			var query = from i in list
+						from j in list
+						where i < 5 && j < 5
+						select Tuple.Create(i, j);
+
+			for (int i = 0; i < 5; i++)
+				for (int j = 0; j < 5; j++)
+				{
+					Check.AreEqual (Tuple.Create (i, j), query.First);
+					query = query.Rest;
+				}
 		}
 	}
 }

@@ -7,7 +7,7 @@ namespace NOP
 	public class GenericTypeReference : TypeReference
 	{
 		public readonly SymbolExpression TypeName;
-		public readonly NOPList<TypeReference> TypeParams;
+		public readonly StrictList<TypeReference> TypeParams;
 
 		public GenericTypeReference (SExpr.List typeExpr) : base (typeExpr)
 		{

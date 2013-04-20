@@ -10,7 +10,7 @@ namespace NOP
 	public class ApplicationExpression : Expression
 	{
 		public readonly Expression FuncName;
-		public readonly NOPList<Expression> Parameters;
+		public readonly StrictList<Expression> Parameters;
 		
 		public ApplicationExpression (SExpr.List funcExpr) : base (funcExpr)
 		{

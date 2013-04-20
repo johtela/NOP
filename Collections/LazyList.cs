@@ -84,6 +84,15 @@
 			return Enumerate (values.GetEnumerator ());
 		}
 
+		/// Construct a list from an enumerable.
+		/// </summary>
+		public static LazyList<T> FromSequence (ISequence<T> seq)
+		{
+			return seq is LazyList<T> ? seq as LazyList<T> :
+				seq.IsEmpty ? Empty :
+				new LazyList<T> (seq.First, () => FromSequence (seq.Rest));
+		}
+
 		/// <summary>
 		/// Return an empty list, i.e. null.
 		/// </summary>
@@ -114,8 +123,17 @@
 		/// </summary>
 		public LazyList<U> Collect<U> (Func<T, LazyList<U>> func)
 		{
-			return IsEmpty ? LazyList<U>.Empty :
-				func (First).Concat (Rest.Collect (func));
+			if (IsEmpty) 
+				return LazyList<U>.Empty;
+			var lst = func (First);
+			return lst.IsEmpty ? 
+				Rest.Collect (func) :
+				new LazyList<U> (lst.First, () => lst.Rest.Concat (Rest.Collect (func)));
+		}
+
+		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
+		{
+			return Collect (e => LazyList<U>.FromSequence (func (e)));
 		}
 
 		public LazyList<T> Reverse ()
@@ -130,23 +148,37 @@
 		{
 			return IsEmpty || other.IsEmpty ? LazyList<Tuple<T, U>>.Empty :
 				new LazyList<Tuple<T, U>> (Tuple.Create (First, other.First), 
-					Fun.Partial (Rest.ZipWith, other.Rest));
+					() => Rest.ZipWith (other.Rest));
 		}
 
-		#region IFunctor<T> implementation
+		#region ISequence<T> implementation
 
 		/// <summary>
 		/// Map list to another list. 
 		/// </summary>
-		public LazyList<U> Map<U> (Func<T, U> func)
+		public LazyList<U> Map<U> (Func<T, U> map)
 		{
 			return IsEmpty ? LazyList<U>.Empty :
-				new LazyList<U> (func (First), Fun.Partial (Rest.Map, func));
+				new LazyList<U> (map (First), Fun.Partial (Rest.Map, map));
 		}
 
-		IFunctor<U> IFunctor<T>.Map<U> (Func<T, U> map)
+		ISequence<U> ISequence<T>.Map<U> (Func<T, U> map)
 		{
 			return Map (map);
+		}
+
+		public LazyList<T> Filter (Func<T, bool> predicate)
+		{
+			var list = this;
+			while (!list.IsEmpty && !predicate (list.First))
+				list = list.Rest;
+			return list.IsEmpty ? Empty :
+				new LazyList<T> (list.First, Fun.Partial (list.Rest.Filter, predicate));
+		}
+
+		ISequence<T> ISequence<T>.Filter (Func<T, bool> predicate)
+		{
+			return Filter (predicate);
 		}
 
 		#endregion

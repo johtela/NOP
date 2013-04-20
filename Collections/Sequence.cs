@@ -106,7 +106,8 @@
 
 		public static Sequence<T> FromSequence (ISequence<T> seq)
 		{
-			return new Sequence<T> (FingerTree<Elem, Size>.FromReducible ((IReducible<Elem>)seq.Map (CreateElem)));
+			return seq is Sequence<T> ? (Sequence<T>)seq : 
+				new Sequence<T> (FingerTree<Elem, Size>.FromReducible ((IReducible<Elem>)seq.Map (CreateElem)));
 		}
 
 		public static Sequence<T> Empty
@@ -179,7 +180,7 @@
 			get { return _tree.Measure (); }
 		}
 
-		public Sequence<T> AppendWith (NOPList<T> items, Sequence<T> other)
+		public Sequence<T> AppendWith (StrictList<T> items, Sequence<T> other)
 		{
 			return new Sequence<T> (_tree.AppendTree (items.Map (CreateElem), other._tree));
 		}
@@ -235,22 +236,41 @@
 
 		public static Sequence<T> operator + (Sequence<T> seq, Sequence<T> other)
 		{
-			return new Sequence<T> (seq._tree.AppendTree (NOPList<Elem>.Empty, other._tree));
+			return new Sequence<T> (seq._tree.AppendTree (StrictList<Elem>.Empty, other._tree));
 		}
 
 		#endregion
 
-		#region IFunctor<T> implementation
+		#region ISequence<T> implementation
 
 		public Sequence<U> Map<U> (Func<T, U> map)
 		{
-			return new Sequence<U> (_tree.ReduceLeft (FingerTree<Sequence<U>.Elem, Sequence<U>.Size>.Empty,
-				(t, e) => t.AddRight (Sequence<U>.CreateElem (map (e)))));
+			return ReduceLeft (Sequence<U>.Empty, (s, e) => s + map (e));
 		}
 
-		IFunctor<U> IFunctor<T>.Map<U> (Func<T, U> map)
+		ISequence<U> ISequence<T>.Map<U> (Func<T, U> map)
 		{
 			return Map (map);
+		}
+
+		public Sequence<T> Filter (Func<T, bool> predicate)
+		{
+			return ReduceLeft (Empty, (s, e) => predicate (e) ? s + e : s);
+		}
+
+		ISequence<T> ISequence<T>.Filter (Func<T, bool> predicate)
+		{
+			return Filter (predicate);
+		}
+
+		public Sequence<U> Collect<U> (Func<T, Sequence<U>> func)
+		{
+			return ReduceLeft (Sequence<U>.Empty, (s, e) => s + func (e));
+		}
+
+		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
+		{
+			return Collect (e => Sequence<U>.FromSequence (func (e)));
 		}
 
 		#endregion

@@ -7,7 +7,7 @@ namespace NOP
 	public class TypeDefinition : Definition
 	{
 		public readonly SymbolExpression Name;
-		public readonly NOPList<Definition> Members;
+		public readonly StrictList<Definition> Members;
 		
 		public TypeDefinition (SExpr.List typeDef) : base (typeDef)
 		{

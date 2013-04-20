@@ -6,19 +6,19 @@ namespace NOP.Collections
 	/// <summary>
 	/// An immutable view of a regular System.Array.
 	/// </summary>
-	public class NOPArray<T> : IEnumerable<T>, IReducible<T>
+	public class ArraySegment<T> : IEnumerable<T>, IReducible<T>
 	{
 		private readonly T[] _array;
 		private readonly int _first, _count;
 		
-		public NOPArray (T[] array)
+		public ArraySegment (T[] array)
 		{
 			_array = array;
 			_first = 0;
 			_count = array.Length;
 		}
 		
-		public NOPArray (T[] array, int count)
+		public ArraySegment (T[] array, int count)
 		{
 			if (count < 0 || count > array.Length)
 				throw new ArgumentException ("Count is out of array index range", "count");
@@ -27,7 +27,7 @@ namespace NOP.Collections
 			_count = count;
 		}
 		
-		public NOPArray (T[] array, int first, int count)
+		public ArraySegment (T[] array, int first, int count)
 		{
 			if (first < 0 || first >= array.Length)
 				throw new ArgumentException ("First is out of array index range", "first");

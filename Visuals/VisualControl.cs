@@ -13,7 +13,7 @@
 		private VBox _size;
 		private SExpr _code;
 		private SExprPath _focusedPath;
-		private NOPList<HitRect> _hitRects;
+		private StrictList<HitRect> _hitRects;
 		private bool _editing;
 
 		public VisualControl ()
@@ -129,7 +129,7 @@
 			{
 				pe.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 				var ctx = new GraphicsContext (pe.Graphics, focused, VisualStyle.Default);
-				GraphicsContext.HitRects = NOPList<HitRect>.Empty;
+				GraphicsContext.HitRects = StrictList<HitRect>.Empty;
 				_visual.Render (ctx, _size);
 				_hitRects = GraphicsContext.HitRects;
 			}
