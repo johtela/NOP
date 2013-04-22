@@ -66,5 +66,25 @@
 		{
 			return () => func (arg1, arg2, arg3, arg4);
 		}
+
+		public static Func<T1, TRes> Compose<T1, T2, TRes> (this Func<T1, T2> func1, Func<T2, TRes> func2)
+		{
+			return arg1 => func2 (func1 (arg1));
+		}
+
+		public static Func<T1, Func<T2, TRes>> Curry<T1, T2, TRes> (this Func<T1, T2, TRes> func)
+		{
+			return arg1 => (arg2 => func (arg1, arg2));
+		}
+
+		public static Func<T1, Func<T2, Func<T3, TRes>>> Curry<T1, T2, T3, TRes> (this Func<T1, T2, T3, TRes> func)
+		{
+			return arg1 => (arg2 => (arg3 => func (arg1, arg2, arg3)));
+		}
+
+		public static Func<T1, Func<T2, Func<T3, Func<T4, TRes>>>> Curry<T1, T2, T3, T4, TRes> (this Func<T1, T2, T3, T4, TRes> func)
+		{
+			return arg1 => (arg2 => (arg3 => (arg4 => func (arg1, arg2, arg3, arg4))));
+		}
 	}
 }

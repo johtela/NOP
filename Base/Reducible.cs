@@ -75,7 +75,8 @@
 			{
 				action (item);
 				return null;
-			});
+			}
+			);
 		}
 
 		public static void Foreach<T> (this IReducible<T> reducible, int initial, Action<T, int> action)
@@ -90,7 +91,8 @@
 			{
 				action (item, i);
 				return i + increment;
-			});
+			}
+			);
 		}
 
 		public static IReducible<T> Concat<T> (this IReducible<T> first, IReducible<T> second)

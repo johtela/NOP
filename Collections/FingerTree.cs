@@ -11,7 +11,9 @@
 	/// </summary>
 	public class EmptyTreeException : Exception
 	{
-		public EmptyTreeException () : base ("Tree is empty.") { }
+		public EmptyTreeException () : base ("Tree is empty.")
+		{
+		}
 	}
 
 	/// <summary>
@@ -110,13 +112,18 @@
 			switch (items.Length)
 			{
 				case 0:
-				case 1: throw new ArgumentException ("List should contain at least two items.");
-				case 2: return List.Cons (Create (items.First, items.Rest.First));
-				case 3: return List.Cons (Create (items.First, items.Rest.First, items.Rest.Rest.First));
-				case 4: return List.Create (Create (items.First, items.Rest.First), 
+				case 1:
+					throw new ArgumentException ("List should contain at least two items.");
+				case 2:
+					return List.Cons (Create (items.First, items.Rest.First));
+				case 3:
+					return List.Cons (Create (items.First, items.Rest.First, items.Rest.Rest.First));
+				case 4:
+					return List.Create (Create (items.First, items.Rest.First), 
 					Create (items.Rest.Rest.First, items.Rest.Rest.Rest.First));
-				default: return Create (items.First, items.Rest.First, items.Rest.Rest.First) |
-					CreateMany (items.Rest.Rest.Rest);
+				default:
+					return Create (items.First, items.Rest.First, items.Rest.Rest.First) |
+						CreateMany (items.Rest.Rest.Rest);
 			}
 		}
 
@@ -153,7 +160,7 @@
 				throw new ArgumentException ("Digit array must have length of 1..4");
 			_items = new T[len];
 			for (int i = 0; i < len; i++, items = items.Rest)
-				_items[i] = items.First;
+				_items [i] = items.First;
 		}
 
 		public Digit (T item1)
@@ -180,19 +187,22 @@
 		{
 			var result = NOPList<T>.Empty;
 			for (int i = end; i >= start; i--)
-				result = _items[i] | result;
+				result = _items [i] | result;
 			return result;
 		}
 
 		public Split<NOPList<T>, T, V> Split (Func<V, bool> predicate, V acc)
 		{
 			var i = 0;
-			do { acc = acc.Plus (_items[i].Measure ()); }
+			do
+			{
+				acc = acc.Plus (_items [i].Measure ());
+			}
 			while (!predicate (acc) && ++i < _items.Length);
 
 			return new Split<NOPList<T>, T, V> (
 				Lazy.Create (Fun.Partial (Slice, 0, i - 1)),
-				_items[i],
+				_items [i],
 				Lazy.Create (Fun.Partial (Slice, i + 1, _items.Length - 1)));
 		}
 
@@ -200,10 +210,14 @@
 		{
 			switch (digit._items.Length)
 			{
-				case 1: return new Digit<T, V> (item, digit[0]);
-				case 2: return new Digit<T, V> (item, digit[0], digit[1]);
-				case 3: return new Digit<T, V> (item, digit[0], digit[1], digit[2]);
-				default: throw new ArgumentException ("Digit is full", "digit");
+				case 1:
+					return new Digit<T, V> (item, digit [0]);
+				case 2:
+					return new Digit<T, V> (item, digit [0], digit [1]);
+				case 3:
+					return new Digit<T, V> (item, digit [0], digit [1], digit [2]);
+				default:
+					throw new ArgumentException ("Digit is full", "digit");
 			}
 		}
 
@@ -211,16 +225,20 @@
 		{
 			switch (digit._items.Length)
 			{
-				case 1: return new Digit<T, V> (digit[0], item);
-				case 2: return new Digit<T, V> (digit[0], digit[1], item);
-				case 3: return new Digit<T, V> (digit[0], digit[1], digit[2], item);
-				default: throw new ArgumentException ("Digit is full", "digit");
+				case 1:
+					return new Digit<T, V> (digit [0], item);
+				case 2:
+					return new Digit<T, V> (digit [0], digit [1], item);
+				case 3:
+					return new Digit<T, V> (digit [0], digit [1], digit [2], item);
+				default:
+					throw new ArgumentException ("Digit is full", "digit");
 			}
 		}
 
-		public T this[int index]
+		public T this [int index]
 		{
-			get { return _items[index]; }
+			get { return _items [index]; }
 		}
 
 		public bool IsFull
@@ -230,12 +248,12 @@
 
 		public T First
 		{
-			get { return _items[0]; }
+			get { return _items [0]; }
 		}
 
 		public T Last
 		{
-			get { return _items[_items.Length - 1]; }
+			get { return _items [_items.Length - 1]; }
 		}
 
 		public NOPList<T> Prefix
@@ -366,7 +384,9 @@
 		/// </summary>
 		private sealed class _Empty : FingerTree<T, V>
 		{
-			public _Empty () { }
+			public _Empty ()
+			{
+			}
 
 			public override FingerTree<T, V> AddLeft (T leftItem)
 			{
@@ -510,8 +530,8 @@
 			public override FingerTree<T, V> AddLeft (T leftItem)
 			{
 				return Front.IsFull ?
-					new _Deep (new Digit<T, V> (leftItem, Front[0]),
-						Inner.AddLeft (Node<T, V>.Create (Front[1], Front[2], Front[3])),
+					new _Deep (new Digit<T, V> (leftItem, Front [0]),
+						Inner.AddLeft (Node<T, V>.Create (Front [1], Front [2], Front [3])),
 						Back) :
 					new _Deep (leftItem + Front, Inner, Back);
 			}
@@ -520,8 +540,8 @@
 			{
 				return Back.IsFull ?
 					new _Deep (Front,
-						Inner.AddRight (Node<T, V>.Create (Back[0], Back[1], Back[2])),
-						new Digit<T, V> (Back[3], rightItem)) :
+						Inner.AddRight (Node<T, V>.Create (Back [0], Back [1], Back [2])),
+						new Digit<T, V> (Back [3], rightItem)) :
 					new _Deep (Front, Inner, Back + rightItem);
 			}
 
@@ -542,7 +562,7 @@
 				if (tree is _Single)
 					return Append (items).AddRight ((tree as _Single).Item);
 				var other = tree as _Deep;
-				var innerItems = List.FromReducible (Back.Concat (items).Concat (other.Front));
+				var innerItems = List.FromReducible (Reducible.Concat (Reducible.Concat (Back, items), other.Front));
 				return new _Deep (Front,
 					Inner.AppendTree (Node<T, V>.CreateMany (innerItems), other.Inner),
 					other.Back);
@@ -550,14 +570,15 @@
 
 			public override U ReduceLeft<U> (U acc, Func<U, T, U> func)
 			{
-				return Back.ReduceLeft(Inner.ReduceLeft(
-					Front.ReduceLeft (acc, func), (a, n) => n.ReduceLeft(a, func)), func);
+				return Back.ReduceLeft (Inner.ReduceLeft (
+					Front.ReduceLeft (acc, func), (a, n) => n.ReduceLeft (a, func)), func);
 			}
 
 			public override U ReduceRight<U> (Func<T, U, U> func, U acc)
 			{
-				return Front.ReduceRight (func, Inner.ReduceRight ((n, a) => n.ReduceRight(func, a), 
-					Back.ReduceRight (func, acc)));
+				return Front.ReduceRight (func, Inner.ReduceRight ((n, a) => n.ReduceRight (func, a), 
+					Back.ReduceRight (func, acc))
+				);
 			}
 
 			public override V Measure ()
@@ -602,7 +623,7 @@
 			{
 				return Visual.VStack (HAlign.Center,
 					Visual.HStack (VAlign.Center, Front.ToVisual (), EmptyNode (), Back.ToVisual ()),
-					Visual.Margin(Inner.ToVisual (), 0, 0, 10, 0));
+					Visual.Margin (Inner.ToVisual (), 0, 0, 10, 0));
 			}
 		}
 
