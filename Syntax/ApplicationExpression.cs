@@ -10,7 +10,7 @@ namespace NOP
 	public class ApplicationExpression : Expression
 	{
 		public readonly Expression FuncName;
-		public readonly NOPList<Expression> Parameters;
+		public readonly StrictList<Expression> Parameters;
 		
 		public ApplicationExpression (SExpr.List funcExpr) : base (funcExpr)
 		{
@@ -32,9 +32,10 @@ namespace NOP
 			return te;
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return FuncName | Parameters;
+			action (FuncName);
+			Parameters.Foreach (action);
 		}
 
 		protected override Visual GetVisual ()

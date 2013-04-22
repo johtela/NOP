@@ -46,6 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Either.cs" />
+    <Compile Include="Base\Functor.cs" />
+    <Compile Include="Collections\ISequence.cs" />
+    <Compile Include="Collections\LazyList.cs" />
     <Compile Include="Parsing\Parser.cs" />
     <Compile Include="Collections\FingerTree.cs" />
     <Compile Include="Base\Lazy.cs" />
@@ -55,11 +59,11 @@
     <Compile Include="Base\Option.cs" />
     <Compile Include="Collections\Sequence.cs" />
     <Compile Include="Collections\Tree.cs" />
-    <Compile Include="Collections\NOPList.cs" />
+    <Compile Include="Collections\StrictList.cs" />
     <Compile Include="Base\NOPException.cs" />
     <Compile Include="Base\Fun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Collections\NOPArray.cs" />
+    <Compile Include="Collections\ArraySegment.cs" />
     <Compile Include="Base\Extensions.cs" />
     <Compile Include="Testing\VisualConsole.cs">
       <SubType>Form</SubType>

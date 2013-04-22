@@ -60,21 +60,21 @@ namespace NOP
 		/// </summary>
 		private class ListBuilder : ExprBuilder
 		{
-			private readonly NOPList<ExprBuilder> _items;
+			private readonly StrictList<ExprBuilder> _items;
 			
 			public ListBuilder (IEnumerable<ExprBuilder> items)
 			{
 				_items = List.Create (items);
 			}
 			
-			public ListBuilder (NOPList<ExprBuilder> items)
+			public ListBuilder (StrictList<ExprBuilder> items)
 			{
 				_items = items;
 			}
 
 			public override SExpr Build ()
 			{
-				return new SExpr.List (Sequence.Create (_items.Select (eb => eb.Build ())));
+				return new SExpr.List (Sequence.Create<SExpr> (_items.Map (eb => eb.Build ())));
 			}
 		}
 		
@@ -107,7 +107,7 @@ namespace NOP
 		/// <summary>
 		/// Create a list expression builder
 		/// </summary>
-		public static ExprBuilder L (NOPList<ExprBuilder> items)
+		public static ExprBuilder L (StrictList<ExprBuilder> items)
 		{
 			return new ListBuilder (items);
 		}
@@ -155,7 +155,7 @@ namespace NOP
 		/// <summary>
 		/// Create a list of parameter names.
 		/// </summary>
-		public static NOPList<string> P (params string[] args)
+		public static StrictList<string> P (params string[] args)
 		{
 			return List.Create (args);
 		}
@@ -163,7 +163,7 @@ namespace NOP
 		/// <summary>
 		/// Create a builder for the "lambda" expression.
 		/// </summary>
-		public static ExprBuilder Lambda (NOPList<string> args, ExprBuilder body)
+		public static ExprBuilder Lambda (StrictList<string> args, ExprBuilder body)
 		{
 			return new ListBuilder (S ("lambda") | (L (args.Map (arg => S (arg))) | List.Cons (body)));
 		}

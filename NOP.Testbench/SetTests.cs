@@ -41,7 +41,6 @@ namespace NOP.Testbench
 		public void TestBalancing ()
 		{
 			var s = Set<int>.Empty;
-			var rnd = new Random ();
 
 			for (int i = 0; i < 80; i++)
 			{
@@ -111,10 +110,10 @@ namespace NOP.Testbench
 		[Test]
 		public void TestDuplicatesAreIgnored ()
 		{
-			var s = Set<string>.Create("foo", "bar", "cool", "bar");
+			var s = Set<string>.Create ("foo", "bar", "cool", "bar");
 			Check.AreEqual (3, s.Count);
 			
-			s = s.Add("foo");
+			s = s.Add ("foo");
 			Check.AreEqual (3, s.Count);
 			Runner.VConsole.ShowVisual (s.ToVisual ());
 		}
@@ -122,14 +121,14 @@ namespace NOP.Testbench
 		[Test]
 		public void TestUnion ()
 		{
-			var s1 = CreateTestSet();
-			var s2 = Set<int>.Create(-1, -2, -3);
+			var s1 = CreateTestSet ();
+			var s2 = Set<int>.Create (-1, -2, -3);
 			s1 = s1 + s2;
-			Check.AreEqual(_itemCount + 3, s1.Count);
+			Check.AreEqual (_itemCount + 3, s1.Count);
 			
 			for (int i = -3; i < _itemCount; i++)
 			{
-				Check.IsTrue(s1.Contains(i));
+				Check.IsTrue (s1.Contains (i));
 			}
 		}
 		

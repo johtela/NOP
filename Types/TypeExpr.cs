@@ -43,7 +43,7 @@ namespace NOP
 			
 			private MonoType GetMonoType ()
 			{
-				return new MonoType.Con (Value.GetType ().ToString (), NOPList<MonoType>.Empty);
+				return new MonoType.Con (Value.GetType ().ToString (), StrictList<MonoType>.Empty);
 			}
 			
 			public override void TypeCheck (TypeEnv env, MonoType expected)
@@ -238,7 +238,7 @@ namespace NOP
 			/// <summary>
 			/// Construct a lambda expression that has zero or more arguments.
 			/// </summary>
-			public static TypeExpr MultiLam (NOPList<string> args, TypeExpr body)
+			public static TypeExpr MultiLam (StrictList<string> args, TypeExpr body)
 			{
 				if (args.IsEmpty)
 					return Lam (null, body);

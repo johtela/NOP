@@ -1,12 +1,8 @@
 ﻿namespace NOP.Base
 {
 	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Text;
+	using NOP.Collections;
 
-	public abstract class Parser <TSource, TTarget>
-	{
+	public delegate Either<TResult, string> Parser <TToken, TResult> (ISequence<TToken> stream);
 
-	}
 }

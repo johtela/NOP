@@ -35,6 +35,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LazyListTests.cs" />
     <Compile Include="FingerTreeTests.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />

@@ -59,11 +59,5 @@ namespace NOP.Testbench
 		{
 			AssertParsesTo<ApplicationExpression> ("System.Boolean", TestPrograms.NestedLambdas ());
 		}
-
-		[Test]
-		public void TestSerialization ()
-		{
-			var s = TestPrograms.Serialize (TestPrograms.NestedLambdas ().Build ());	
-		}
 	}
 }

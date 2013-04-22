@@ -54,7 +54,7 @@
 		[Test]
 		public void TestEnumeration ()
 		{
-			TestEnumeration (TestSeq);
+			TestEnumeration (TestSeq.ToEnumerable ());
 		}
 
 		private void TestEnumeration (IEnumerable<int> e)
@@ -68,7 +68,7 @@
 		[Test]
 		public void TestAppend ()
 		{
-			TestSeq.AppendWith (NOPList<int>.Empty, OtherSeq).Foreach (0, Check.AreEqual);
+			TestSeq.AppendWith (StrictList<int>.Empty, OtherSeq).Foreach (0, Check.AreEqual);
 		}
 
 		[Test]
@@ -83,7 +83,7 @@
 		[Test]
 		public void TestReductionFromList ()
 		{
-			TestEnumeration (List.FromReducible (TestSeq));
+			TestEnumeration (List.FromReducible (TestSeq).ToEnumerable ());
 		}
 
 		[Test]

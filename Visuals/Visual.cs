@@ -181,7 +181,7 @@
 			/// <summary>
 			/// The visuals in the stack.
 			/// </summary>
-			public readonly NOPList<Visual> Items;
+			public readonly ISequence<Visual> Items;
 			
 			/// <summary>
 			/// The direction of the stack (horizontal or vertical)
@@ -205,7 +205,7 @@
 			/// <summary>
 			/// Initializes a new stack.
 			/// </summary>
-			public _Stack (NOPList<Visual> items, VisualDirection direction, HAlign horizAlign,
+			public _Stack (ISequence<Visual> items, VisualDirection direction, HAlign horizAlign,
 				VAlign vertAlign)
 			{
 				Items = items;
@@ -227,7 +227,7 @@
 			/// </description>
 			protected override VBox CalculateSize (GraphicsContext context)
 			{
-				return Items.ReduceLeft (VBox.Empty, (acc, v) => 
+				return ((IReducible<Visual>)Items).ReduceLeft (VBox.Empty, (acc, v) => 
 				{
 					var box = v.CalculateSize (context);
 					return Direction == VisualDirection.Horizontal ?
@@ -275,22 +275,22 @@
 			protected override void Draw (GraphicsContext context, VBox availableSize)
 			{
 				var stack = GetSize (context);
-				
-				foreach (Visual visual in Items)
+
+				Items.Foreach (visual =>
 				{
 					if (availableSize.IsEmpty)
-						break;
-					
+						return;
+
 					var inner = visual.GetSize (context);
 					var outer = Direction == VisualDirection.Horizontal ?
 						new VBox (inner.Width, stack.Height) :
 						new VBox (stack.Width, inner.Height);
 					var st = context.Graphics.Save ();
-					context.Graphics.TranslateTransform (DeltaX (outer.Width, inner.Width), 
+					context.Graphics.TranslateTransform (DeltaX (outer.Width, inner.Width),
 						DeltaY (outer.Height, inner.Height));
 					visual.Render (context, outer);
 					context.Graphics.Restore (st);
-					
+
 					if (Direction == VisualDirection.Horizontal)
 					{
 						context.Graphics.TranslateTransform (outer.Width, 0);
@@ -301,7 +301,7 @@
 						context.Graphics.TranslateTransform (0, outer.Height);
 						availableSize = availableSize.VSub (outer);
 					}
-				}
+				});
 			}
 		}
 
@@ -554,9 +554,9 @@
 		/// <summary>
 		/// Create a horizontal stack.
 		/// </summary>
-		public static Visual HStack (VAlign alignment, IEnumerable<Visual> visuals)
+		public static Visual HStack (VAlign alignment, ISequence<Visual> visuals)
 		{
-			return new _Stack (List.Create (visuals), VisualDirection.Horizontal, HAlign.Left, alignment);
+			return new _Stack (visuals, VisualDirection.Horizontal, HAlign.Left, alignment);
 		}
 		
 		/// <summary>
@@ -570,9 +570,9 @@
 		/// <summary>
 		/// Create a vertical stack.
 		/// </summary>
-		public static Visual VStack (HAlign alignment, IEnumerable<Visual> visuals)
+		public static Visual VStack (HAlign alignment, ISequence<Visual> visuals)
 		{
-			return new _Stack (List.Create (visuals), VisualDirection.Vertical, alignment, VAlign.Top);
+			return new _Stack (visuals, VisualDirection.Vertical, alignment, VAlign.Top);
 		}
 		
 		/// <summary>
@@ -618,7 +618,7 @@
 		/// <summary>
 		/// Create a horizontal list of S-expressions.
 		/// </summary>
-		public static Visual HList (IEnumerable<SExpr> sexps)
+		public static Visual HList (ISequence<SExpr> sexps)
 		{
 			return HStack (VAlign.Top, FromSExpList (sexps));
 		}
@@ -626,7 +626,7 @@
 		/// <summary>
 		/// Return a vertical list of S-expressions.
 		/// </summary>
-		public static Visual VList (IEnumerable<SExpr> sexps)
+		public static Visual VList (ISequence<SExpr> sexps)
 		{
 			return VStack (HAlign.Left, FromSExpList (sexps));
 		}
@@ -708,9 +708,9 @@
 		/// <summary>
 		/// Map a list of S-expressions to a sequence of visuals.
 		/// </summary>
-		private static IEnumerable<Visual> FromSExpList (IEnumerable<SExpr> sexps)
+		private static ISequence<Visual> FromSExpList (ISequence<SExpr> sexps)
 		{
-			return sexps.Select (se => Depiction (se));
+			return (ISequence<Visual>)sexps.Map (se => Depiction (se));
 		}
 	}
 }

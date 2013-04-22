@@ -7,7 +7,7 @@ namespace NOP
 	public class TypeDefinition : Definition
 	{
 		public readonly SymbolExpression Name;
-		public readonly NOPList<Definition> Members;
+		public readonly StrictList<Definition> Members;
 		
 		public TypeDefinition (SExpr.List typeDef) : base (typeDef)
 		{
@@ -16,9 +16,10 @@ namespace NOP
 			Members = List.MapReducible (sexps, sexp => Parse (sexp));
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return Members.Prepend<AstNode> (Name);
+			action (Name);
+			Members.Foreach (action);
 		}
 	}
 }

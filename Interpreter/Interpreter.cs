@@ -6,7 +6,7 @@ namespace NOP
 	using System;
 	using NOP.Framework;
 	using NOP.Collections;
-	using ExprList = NOP.Collections.NOPList<object>;
+	using ExprList = NOP.Collections.StrictList<object>;
 
 	/// <summary>
 	/// Result of the interpreter evaluation.
@@ -160,13 +160,13 @@ namespace NOP
 		/// </summary>
 		static internal EvalResult EvalIf (Environment env, ExprList exprs)
 		{
-			if (exprs.Length != 3)
+			if (exprs.Length () != 3)
 				Error (exprs.First, "Invalid number of expressions in an 'if' clause");
 			var condRes = Eval (env, exprs.First);
 			if ((bool)condRes.Result)
-				return new EvalResult (env, Eval (condRes.Env, exprs.Nth (1)).Result);
+				return new EvalResult (env, Eval (condRes.Env, exprs.Drop (1).First).Result);
 			else
-				return new EvalResult (env, Eval (condRes.Env, exprs.Nth (2)).Result);
+				return new EvalResult (env, Eval (condRes.Env, exprs.Drop (2).First).Result);
 		}
 
 		/// <summary>
@@ -191,7 +191,7 @@ namespace NOP
 		/// </summary>
 		/// <param name="values">The parameter values given.</param>
 		/// <returns>The updated environment that has the parameters defined.</returns>
-		private static Environment BindParams (Environment env, NOPList<string> names, 
+		private static Environment BindParams (Environment env, StrictList<string> names, 
 			ExprList values)
 		{
 			while (true)
@@ -230,7 +230,7 @@ namespace NOP
 			}
 			);
 			var dot = parameters.FindNext (".");
-			if (!dot.IsEmpty && dot.Length != 2)
+			if (!dot.IsEmpty && dot.Length () != 2)
 				Interpreter.Error ("There should be only one parameter after '.'");
 			if (definition.IsEmpty)
 				Interpreter.Error (definition, "Function body is missing");

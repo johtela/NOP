@@ -10,7 +10,7 @@ namespace NOP.Visuals
 		public readonly SExpr FocusedExpr;
 		public readonly bool EditMode;
 		public readonly VisualStyle Style;
-		public static NOPList<HitRect> HitRects;
+		public static StrictList<HitRect> HitRects;
 
 		public GraphicsContext (Graphics gr, SExpr focused, VisualStyle style)
 		{

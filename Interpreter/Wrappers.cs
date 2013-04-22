@@ -6,7 +6,7 @@
 	using LinqExpr = System.Linq.Expressions;
 	using LExpr = System.Linq.Expressions.Expression;
 	using SysColl = System.Collections.Generic;
-	using ExprList = NOP.Collections.NOPList<object>;
+	using ExprList = NOP.Collections.StrictList<object>;
 	using NOP.Collections;
 	using NOP.Framework;
 	

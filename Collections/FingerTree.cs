@@ -107,9 +107,9 @@
 			return new Node3 (item1, item2, item3);
 		}
 
-		public static NOPList<Node<T, V>> CreateMany (NOPList<T> items)
+		public static StrictList<Node<T, V>> CreateMany (StrictList<T> items)
 		{
-			switch (items.Length)
+			switch (items.Length ())
 			{
 				case 0:
 				case 1:
@@ -146,16 +146,16 @@
 	/// <summary>
 	/// The front and back parts of the tree have one to four items in an array.
 	/// </summary>
-	public class Digit<T, V> : IReducible<T>, IMeasurable<V>, ISplittable<NOPList<T>, T, V>, 
+	public class Digit<T, V> : IReducible<T>, IMeasurable<V>, ISplittable<StrictList<T>, T, V>, 
 		IVisualizable
 		where T : IMeasurable<V>
 		where V : IMonoid<V>, new ()
 	{
 		private readonly T[] _items;
 
-		public Digit (NOPList<T> items)
+		public Digit (StrictList<T> items)
 		{
-			var len = items.Length;
+			var len = items.Length ();
 			if (len < 1 || len > 4)
 				throw new ArgumentException ("Digit array must have length of 1..4");
 			_items = new T[len];
@@ -183,15 +183,15 @@
 			_items = new T[] { item1, item2, item3, item4 };
 		}
 
-		private NOPList<T> Slice (int start, int end)
+		private StrictList<T> Slice (int start, int end)
 		{
-			var result = NOPList<T>.Empty;
+			var result = StrictList<T>.Empty;
 			for (int i = end; i >= start; i--)
 				result = _items [i] | result;
 			return result;
 		}
 
-		public Split<NOPList<T>, T, V> Split (Func<V, bool> predicate, V acc)
+		public Split<StrictList<T>, T, V> Split (Func<V, bool> predicate, V acc)
 		{
 			var i = 0;
 			do
@@ -200,7 +200,7 @@
 			}
 			while (!predicate (acc) && ++i < _items.Length);
 
-			return new Split<NOPList<T>, T, V> (
+			return new Split<StrictList<T>, T, V> (
 				Lazy.Create (Fun.Partial (Slice, 0, i - 1)),
 				_items [i],
 				Lazy.Create (Fun.Partial (Slice, i + 1, _items.Length - 1)));
@@ -256,12 +256,12 @@
 			get { return _items [_items.Length - 1]; }
 		}
 
-		public NOPList<T> Prefix
+		public StrictList<T> Prefix
 		{
 			get { return Slice (0, _items.Length - 2); }
 		}
 
-		public NOPList<T> Suffix
+		public StrictList<T> Suffix
 		{
 			get { return Slice (1, _items.Length - 1); }
 		}
@@ -689,7 +689,7 @@
 
 		public FingerTree<T, V> Concat (FingerTree<T, V> other)
 		{
-			return this.AppendTree (NOPList<T>.Empty, other);
+			return this.AppendTree (StrictList<T>.Empty, other);
 		}
 
 		private ViewL<T, V> CheckView (ViewL<T, V> viewl)
@@ -706,7 +706,7 @@
 			return viewr;
 		}
 
-		private static FingerTree<T, V> DeepL (NOPList<T> front, FingerTree<Node<T, V>, V> inner,
+		private static FingerTree<T, V> DeepL (StrictList<T> front, FingerTree<Node<T, V>, V> inner,
 			Digit<T, V> back)
 		{
 			if (front.IsEmpty)
@@ -720,7 +720,7 @@
 		}
 
 		private static FingerTree<T, V> DeepR (Digit<T, V> front, FingerTree<Node<T, V>, V> inner, 
-			NOPList<T> back)
+			StrictList<T> back)
 		{
 			if (back.IsEmpty)
 			{

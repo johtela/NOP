@@ -27,9 +27,11 @@ namespace NOP
 										 Body.GetTypeExpr ());
 		}
 
-		protected override IEnumerable<AstNode> GetChildNodes ()
+		protected override void DoForChildNodes (Action<AstNode> action)
 		{
-			return List.Create<AstNode> (Variable, Value, Body);
+			action (Variable);
+			action (Value);
+			action (Body);
 		}
 
 		protected override Visual GetVisual ()

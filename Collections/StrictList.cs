@@ -17,11 +17,11 @@
 	/// An immutable linked list.
 	/// </summary>
 	/// <typeparam name="T">The item type of the list.</typeparam>
-	public class NOPList<T> : IEnumerable<T>, IReducible<T>, IVisualizable
+	public class StrictList<T> : ISequence<T>, IReducible<T>, IVisualizable
 	{
-		private static readonly NOPList<T> _empty = new NOPList<T> (default(T), null);
+		private static readonly StrictList<T> _empty = new StrictList<T> (default(T), null);
 		private T _first;
-		private NOPList<T> _rest;
+		private StrictList<T> _rest;
 		
 		/// <summary>
 		/// The first item in the list.
@@ -39,7 +39,7 @@
 		/// <summary>
 		/// The rest of the list.
 		/// </summary>
-		public NOPList<T> Rest
+		public StrictList<T> Rest
 		{ 
 			get
 			{
@@ -53,8 +53,13 @@
 					_rest = value;
 			}
 		}
+
+		ISequence<T> ISequence<T>.Rest
+		{
+			get { return Rest; }
+		}
 		
-		private NOPList (T first, NOPList<T> rest)
+		private StrictList (T first, StrictList<T> rest)
 		{
 			_first = first;
 			_rest = rest;
@@ -65,16 +70,16 @@
 		/// </summary>
 		/// <param name="head">The new head item.</param>
 		/// <param name="tail">The tail of the list.</param>
-		public static NOPList<T> Cons (T first, NOPList<T> rest)
+		public static StrictList<T> Cons (T first, StrictList<T> rest)
 		{
-			return new NOPList<T> (first, rest);
+			return new StrictList<T> (first, rest);
 		}
 		
 		/// <summary>
 		/// Construct a list from an enumerable.
 		/// </summary>
 		/// <param name='values'>The enumeration of values.</param>
-		public static NOPList<T> FromEnumerable (IEnumerable<T> values)
+		public static StrictList<T> FromEnumerable (IEnumerable<T> values)
 		{
 			var result = Empty;
 			var last = result;
@@ -91,10 +96,28 @@
 			return result;
 		}
 
+		public static StrictList<T> FromSequence (ISequence<T> seq)
+		{
+			if (seq is StrictList<T>)
+				return seq as StrictList<T>;
+			var result = Empty;
+
+			for (var last = result; !seq.IsEmpty; seq = seq.Rest)
+			{
+				var cons = Cons (seq.First, Empty);
+				if (result.IsEmpty)
+					result = cons;
+				else
+					last.Rest = cons;
+				last = cons;
+			}
+			return result;
+		}
+
 		/// <summary>
 		/// Return an empty list, i.e. null.
 		/// </summary>
-		public static NOPList<T> Empty
+		public static StrictList<T> Empty
 		{
 			get { return _empty; }
 		}
@@ -108,36 +131,9 @@
 		}
 
 		/// <summary>
-		/// Is the list non-empty.
-		/// </summary>
-		public bool NotEmpty
-		{
-			get { return this != Empty; }
-		}
-
-		/// <summary>
-		/// Count the length, i.e. the number of items, in the list.
-		/// </summary>
-		public int Length
-		{
-			get
-			{
-				int result = 0;
-				NOPList<T > list = this;
-				
-				while (!list.IsEmpty)
-				{
-					result++;
-					list = list.Rest;
-				}
-				return result;
-			}
-		}
-
-		/// <summary>
 		/// The last cons cell of the list. 
 		/// </summary>
-		public NOPList<T> End
+		public StrictList<T> End
 		{
 			get
 			{
@@ -157,116 +153,15 @@
 		}
 
 		/// <summary>
-		/// Search for an item in the list.
-		/// </summary>
-		/// <param name="item">The item searched for.</param>
-		/// <returns>The tail of the list from the point where the item is found, 
-		/// or an empty list if the item is not found.</returns>
-		public NOPList<T> FindNext (T item)
-		{
-			NOPList<T> list = this;
-			
-			while (!list.IsEmpty && !list.First.Equals (item))
-				list = list.Rest;
-			return list;
-		}
-
-		/// <summary>
-		/// Find an item in the list that matches a predicate.
-		/// </summary>
-		/// <param name="predicate">The predicate that defines what to look for.</param>
-		/// <returns>The tail of the list from the point where the predicate returned true, 
-		/// or an empty list if none of the items matched the predicate.</returns>
-		public NOPList<T> FindNext (Predicate<T> predicate)
-		{
-			NOPList<T> list = this;
-			
-			while (!list.IsEmpty && !predicate (list.First))
-				list = list.Rest;
-			return list;
-		}
-
-		/// <summary>
-		/// Returns an item of the list that occurs in a given position.
-		/// </summary>
-		/// <param name="n">The position from the start of the item to be returned. 
-		/// Zero returns the first element.</param>
-		/// <returns>The item in the nth position.</returns>
-		/// <exception cref="IndexOutOfRangeException">If n is negative the length of the list is less than n.
-		/// </exception>
-		public T Nth (int n)
-		{
-			var list = this;
-			
-			while (!list.IsEmpty && n-- > 0)
-				list = list.Rest;
-			if (list.IsEmpty)
-				throw new IndexOutOfRangeException ("The specified index is beyond the list end.");
-			return list.First;
-		}
-
-		/// <summary>
-		/// Returns an item of the list that occurs in a given position
-		/// or default value if the position is beyond the end of the list.
-		/// </summary>
-		/// <param name="n">The position from the start of the item to be returned. 
-		/// Zero returns the first element.</param>
-		/// <returns>The item in the nth position, or default(T) if the position
-		/// is beyond list end.</returns>
-		public T NthOrDefault (int n)
-		{
-			var list = this;
-
-			while (!list.IsEmpty && n-- > 0)
-				list = list.Rest;
-			return list.IsEmpty ? default (T) : list.First;
-		}
-
-		/// <summary>
-		/// Return the Nth tail of the list.
-		/// </summary>
-		/// <param name="n">The index of the tail to be returned.</param>
-		/// <returns>The nth tail of the list.</returns>
-		public NOPList<T> RestNth (int n)
-		{
-			var list = this;
-
-			while (n-- > 0)
-				list = list.Rest;
-			return list;
-		}
-
-		/// <summary>
-		/// Return the position of the specified item.
-		/// </summary>
-		/// <param name="item">The item to be searched for.</param>
-		/// <returns>The zero-based position of the item, or -1, if
-		/// the item was not found.</returns>
-		public int IndexOf (T item)
-		{
-			var i = 0;
-			var list = this;
-
-			while (!list.IsEmpty)
-			{
-				if (list.First.Equals (item)) 
-					return i;
-				list = list.Rest;
-				i++;
-			}
-			return -1;
-		}
-
-		/// <summary>
 		/// Copy the list upto the given element. 
 		/// </summary>
 		/// <param name="stop">The tail of the list that, when encountered, will 
 		/// stop the copying. If that tail is not found, the entire list is copied.</param>
 		/// <returns>The copied list upto the given tail; or the entire source
 		/// list, if the tail is not found.</returns>
-		public Tuple<NOPList<T>, NOPList<T>> CopyUpTo (NOPList<T> stop)
+		public Tuple<StrictList<T>, StrictList<T>> CopyUpTo (StrictList<T> stop)
 		{
-			NOPList<T> list = this, last = Empty, first = Empty, prevLast;
+			StrictList<T> list = this, last = Empty, first = Empty, prevLast;
 			
 			while (!list.IsEmpty && list != stop)
 			{
@@ -277,7 +172,7 @@
 					first = last;
 				list = list.Rest;
 			}
-			return new Tuple<NOPList<T>, NOPList<T>> (first, last);
+			return new Tuple<StrictList<T>, StrictList<T>> (first, last);
 		}
 
 		/// <summary>
@@ -285,7 +180,7 @@
 		/// </summary>
 		/// <param name="item">Item to be appended.</param>
 		/// <returns>A new list with <paramref name="item"/> as its last element.</returns>
-		public NOPList<T> Append(T item)
+		public StrictList<T> Append(T item)
 		{
 			return CopyUpTo (Empty).Bind ((prefixFirst, prefixLast) =>
 			{
@@ -302,9 +197,9 @@
 		/// <param name="before">The item before which the new item is inserted.</param>
 		/// <returns>A new list with the item inserted before the specified item. If the before item
 		/// is not found; the new item is added at the end of the list.</returns>
-		public NOPList<T> InsertBefore (T item, T before)
+		public StrictList<T> InsertBefore (T item, T before)
 		{
-			var tail = FindNext (before);
+			var tail = this.FindNext (before) as StrictList<T>;
 			
 			return CopyUpTo (tail).Bind ((prefixFirst, prefixLast) =>
 			{
@@ -319,9 +214,9 @@
 		/// </summary>
 		/// <param name="item">The item to be removed.</param>
 		/// <returns>A new list without the given item.</returns>
-		public NOPList<T> Remove (T item)
+		public StrictList<T> Remove (T item)
 		{
-			var tail = FindNext (item);
+			var tail = this.FindNext (item) as StrictList<T>;
 			
 			return CopyUpTo (tail).Bind ((prefixFirst, prefixLast) =>
 			{
@@ -335,7 +230,7 @@
 		/// Reverses the list making the first item the last one, and vice versa. 
 		/// </summary>
 		/// <returns>This list in reverse order.</returns>
-		public NOPList<T> Reverse ()
+		public StrictList<T> Reverse ()
 		{
 			var result = Empty;
 			
@@ -345,89 +240,48 @@
 		}
 
 		/// <summary>
-		/// Check if two lists are equal, that is contain the same items in
-		/// the same order, and have equal lengths.
-		/// </summary>
-		/// <param name="other">The other list that the list is compared with.</param>
-		/// <param name="equals">The function that compares if two items are equal.</param>
-		/// <returns>True, if the two lists contain the same items in the same order, 
-		/// and have equal lengths.</returns>
-		public bool EqualTo (NOPList<T> other, Func<T, T, bool> equals)
-		{
-			NOPList<T > list = this;
-			
-			while (!list.IsEmpty && !other.IsEmpty && equals (list.First, other.First))
-			{
-				list = list.Rest;
-				other = other.Rest;
-			}
-			return list.IsEmpty && other.IsEmpty;
-		}
-		
-		/// <summary>
-		/// Check if two lists are equal, that is contain the same items in
-		/// the same order, and have equal lengths.
-		/// </summary>
-		/// <param name="other">The other list that the list is compared with.</param>
-		/// <returns>True, if the two lists contain the same items in the same order, 
-		/// and have equal lengths.</returns>
-		public bool EqualTo (NOPList<T> other)
-		{
-			return this.EqualTo (other, (i1, i2) => i1.Equals (i2));
-		}	
-
-		/// <summary>
 		/// Collect the list of lists into another list.
 		/// </summary>
-		public NOPList<U> Collect<U> (Func<T, NOPList<U>> func)
+		public StrictList<U> Collect<U> (Func<T, ISequence<U>> func)
 		{
-			var result = NOPList<U>.Empty;
+			var result = StrictList<U>.Empty;
 			var resultLast = result;
 			
 			for (var list = this; !list.IsEmpty; list = list.Rest)
 			{
-				var funcRes = func (list.First);
-				if (list.Rest.IsEmpty)
+				for (var inner = func (list.First); !inner.IsEmpty; inner = inner.Rest)
 				{
+					var cons = StrictList<U>.Cons (inner.First, StrictList<U>.Empty);
 					if (result.IsEmpty)
-						return funcRes;
-					resultLast.Rest = funcRes;
-					resultLast = funcRes.End;
+						result = cons;
+					resultLast.Rest = cons;
+					resultLast = cons;
 				}
-				else
-					funcRes.CopyUpTo (null).Bind ((copyFirst, copyLast) =>
-					{
-						if (result.IsEmpty)
-						{
-							result = copyFirst;
-							resultLast = copyLast;
-						}
-						else
-						{
-							resultLast.Rest = copyFirst;
-							resultLast = copyLast;
-						}
-					});
 			}
 			return result;
+		}
+
+		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
+		{
+			return Collect (func);
 		}
 
 		/// <summary>
 		/// Zip two lists together. 
 		/// </summary>
-		public NOPList<Tuple<T, U>> ZipWith<U> (NOPList<U> other)
+		public StrictList<Tuple<T, U>> ZipWith<U> (StrictList<U> other)
 		{
-			var result = NOPList<Tuple<T, U>>.Empty;
+			var result = StrictList<Tuple<T, U>>.Empty;
 			var resultLast = result;
 			
 			for (var list = this; !(list.IsEmpty || other.IsEmpty); list = list.Rest,other = other.Rest)
 			{
-				var cons = NOPList<Tuple<T, U>>.Cons (Tuple.Create (list.First, other.First), NOPList<Tuple<T, U>>.Empty);
+				var cons = StrictList<Tuple<T, U>>.Cons (Tuple.Create (list.First, other.First), StrictList<Tuple<T, U>>.Empty);
 				if (result.IsEmpty)
 				{
 					result = cons;
 					resultLast = cons;
-				}
+				}	
 				else
 				{
 					resultLast.Rest = cons;
@@ -440,9 +294,9 @@
 		/// <summary>
 		/// Zip two lists together extending the shorter one with default values.
 		/// </summary>
-		public NOPList<Tuple<T, U>> ZipExtendingWith<U> (NOPList<U> other)
+		public StrictList<Tuple<T, U>> ZipExtendingWith<U> (StrictList<U> other)
 		{
-			var result = NOPList<Tuple<T, U>>.Empty;
+			var result = StrictList<Tuple<T, U>>.Empty;
 			var resultLast = result;
 			var list = this;
 			
@@ -461,7 +315,7 @@
 					otherItem = other.First;
 					other = other.Rest;
 				}
-				var cons = NOPList<Tuple<T, U>>.Cons (Tuple.Create (listItem, otherItem), NOPList<Tuple<T, U>>.Empty);
+				var cons = StrictList<Tuple<T, U>>.Cons (Tuple.Create (listItem, otherItem), StrictList<Tuple<T, U>>.Empty);
 				if (result.IsEmpty)
 				{
 					result = cons;
@@ -512,7 +366,7 @@
 		/// <param name='acc'>Initial accumulator value.</param>
 		/// <param name='func'>The function applied to the lists' items.</param>
 		/// <param name='other'>The list to be reduced with.</param>
-		public U ReduceWith<U, V> (U acc, Func<U, T, V, U> func, NOPList<V> other)
+		public U ReduceWith<U, V> (U acc, Func<U, T, V, U> func, StrictList<V> other)
 		{
 			for (var list = this; !(list.IsEmpty || other.IsEmpty); 
 				 list = list.Rest, other = other.Rest)
@@ -525,10 +379,10 @@
 		/// </summary>
 		/// <param name="func">Function that maps the items.</param>
 		/// <returns>The mapped list.</returns>
-		public NOPList<U> Map<U> (Func<T, U> func)
+		public StrictList<U> Map<U> (Func<T, U> func)
 		{
 			if (IsEmpty)
-				return NOPList<U>.Empty;
+				return StrictList<U>.Empty;
 			
 			var result = List.Cons (func (First));
 			var last = result;
@@ -537,30 +391,45 @@
 				last.Rest = List.Cons (func (list.First));
 			return result;
 		}
+
+		ISequence<U> ISequence<T>.Map<U> (Func<T, U> map)
+		{
+			return Map (map);
+		}
+
+		public StrictList<T> Filter (Func<T, bool> predicate)
+		{
+			var result = Empty;
+			var last = Empty;
+
+			for (var list = this; !list.IsEmpty; list = list.Rest)
+				if (predicate (list.First))
+				{
+					last.Rest = Cons (list.First, Empty);
+					if (result.IsEmpty)
+						result = last;
+					last = last.Rest;
+				}
+			return result;
+		}
+
+		ISequence<T> ISequence<T>.Filter (Func<T, bool> predicate)
+		{
+			return Filter (predicate);
+		}
 		
 		/// <summary>
 		/// Determines whether the specified object is equal to the current list.
 		/// </summary>
-		/// <param name='obj'>
-		/// The <see cref="System.Object"/> to compare with the current <see cref="NOP.Collections.List`1"/>.
-		/// </param>
-		/// <returns>
-		/// <c>true</c> if the specified <see cref="System.Object"/> is equal to the current
-		/// <see cref="NOP.Collections.List`1"/>; otherwise, <c>false</c>.
-		/// </returns>
 		public override bool Equals (object obj)
 		{
-			var otherList = obj as NOPList<T>;
-			return (otherList != null) && EqualTo (otherList);
+			var otherList = obj as StrictList<T>;
+			return (otherList != null) && this.EqualTo (otherList);
 		}
 		
 		/// <summary>
 		/// Serves as a hash function for a <see cref="NOP.Collections.List`1"/> object.
 		/// </summary>
-		/// <returns>
-		/// A hash code for this instance that is suitable for use in hashing algorithms and data structures such 
-		/// as a hash table.
-		/// </returns>
 		public override int GetHashCode ()
 		{
 			return ReduceLeft (0, (h, e) => h ^ e.GetHashCode ());
@@ -571,59 +440,9 @@
 		/// </summary>
 		public override string ToString ()
 		{
-			return ToString ("[", "]", ", ");
+			return this.ToString ("[", "]", ", ");
 		}
 		
-		/// <summary>
-		/// Returns a string representing the list. Gets open, close bracket, and separtor as
-		/// an argument.
-		/// </summary>
-		public string ToString (string openBracket, string closeBracket, string separator)
-		{
-			StringBuilder sb = new StringBuilder (openBracket);
-			NOPList<T> list = this;
-			
-			while (!list.IsEmpty)
-			{
-				sb.Append (list.First);
-				list = list.Rest;
-				
-				if (list != Empty)
-					sb.Append (separator);
-			}
-			sb.Append (closeBracket);
-			return sb.ToString ();			
-		}
-
-		#region IEnumerable<T> Members
-
-		/// <summary>
-		/// Returns a new generic enumarator that can be used to iterate over the
-		/// items in the list.
-		/// </summary>
-		/// <returns>An enumerator containing the items of the list.</returns>
-		public IEnumerator<T> GetEnumerator ()
-		{
-			for (NOPList<T> list = this; !list.IsEmpty; list = list.Rest)
-				yield return list.First;
-		}
-
-		#endregion
-
-		#region IEnumerable Members
-
-		/// <summary>
-		/// Returns a new non-generic enumarator that can be used to iterate over the
-		/// items in the list.
-		/// </summary>
-		/// <returns>An enumerator containing the items of the list.</returns>
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
-		{
-			return this.GetEnumerator ();
-		}
-		
-		#endregion
-
 		#region IVisualizable members
 
 		public Visual ToVisual ()
@@ -636,7 +455,7 @@
 
 		#region Operator overloads
 
-		public static NOPList<T> operator | (T first, NOPList<T> rest)
+		public static StrictList<T> operator | (T first, StrictList<T> rest)
 		{
 			return Cons (first, rest);
 		}
@@ -652,17 +471,17 @@
 		/// <summary>
 		/// Helper to create a cons list without explicitly specifying the item type. 
 		/// </summary>
-		public static NOPList<T> Cons<T> (T first, NOPList<T> rest)
+		public static StrictList<T> Cons<T> (T first, StrictList<T> rest)
 		{
-			return NOPList<T>.Cons (first, rest);
+			return StrictList<T>.Cons (first, rest);
 		}
 
 		/// <summary>
 		/// Helper to create a cons list without explicitly specifying the item type. 
 		/// </summary>
-		public static NOPList<T> Cons<T> (T first)
+		public static StrictList<T> Cons<T> (T first)
 		{
-			return NOPList<T>.Cons (first, NOPList<T>.Empty);
+			return StrictList<T>.Cons (first, StrictList<T>.Empty);
 		}
 
 		/// <summary>
@@ -671,25 +490,25 @@
 		/// <param name="array">The array whose items are placed into the list.</param>
 		/// <returns>A new list that contains the same items in the same order as the 
 		/// array.</returns>
-		public static NOPList<T> FromArray<T> (T[] array)
+		public static StrictList<T> FromArray<T> (T[] array)
 		{
-			return array.ReduceRight (NOPList<T>.Cons, NOPList<T>.Empty);
+			return array.ReduceRight (StrictList<T>.Cons, StrictList<T>.Empty);
 		}
 
 		/// <summary>
 		/// Create a list from a reducible structure.
 		/// </summary>
-		public static NOPList<T> FromReducible<T> (IReducible<T> reducible)
+		public static StrictList<T> FromReducible<T> (IReducible<T> reducible)
 		{
-			return reducible.ReduceRight (NOPList<T>.Cons, NOPList<T>.Empty);
+			return reducible.ReduceRight (StrictList<T>.Cons, StrictList<T>.Empty);
 		}
 
 		/// <summary>
 		/// Create a list from a reducible structure.
 		/// </summary>
-		public static NOPList<U> MapReducible<T, U> (IReducible<T> reducible, Func<T, U> map)
+		public static StrictList<U> MapReducible<T, U> (IReducible<T> reducible, Func<T, U> map)
 		{
-			return reducible.ReduceRight ((t, l) => map(t) | l, NOPList<U>.Empty);
+			return reducible.ReduceRight ((t, l) => map(t) | l, StrictList<U>.Empty);
 		}
 
 		/// <summary>
@@ -697,7 +516,7 @@
 		/// </summary>
 		/// <param name="items">The items that are placed into the list.</param>
 		/// <returns>A new list that contains the items in the order specified.</returns>
-		public static NOPList<T> Create<T> (params T[] items)
+		public static StrictList<T> Create<T> (params T[] items)
 		{
 			return FromArray (items);
 		}
@@ -707,9 +526,9 @@
 		/// </summary>
 		/// <param name="items">The items that are placed into the list.</param>
 		/// <returns>A new list that contains the items in the order specified.</returns>
-		public static NOPList<T> Create<T> (IEnumerable<T> items)
+		public static StrictList<T> Create<T> (IEnumerable<T> items)
 		{
-			return NOPList<T>.FromEnumerable (items);
+			return StrictList<T>.FromEnumerable (items);
 		}
 	}
 }
