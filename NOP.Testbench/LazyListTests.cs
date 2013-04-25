@@ -139,7 +139,7 @@ namespace NOP.Testbench
 		[Test]
 		public void TestLinq ()
 		{
-			var list = LazyList.Create (Enumerable.Range (0, 10));
+			var list = LazyList.FromEnumerable (Enumerable.Range (0, 10));
 
 			var simple = from i in list
 						 select i.ToString ();

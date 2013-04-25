@@ -526,7 +526,7 @@
 		/// </summary>
 		/// <param name="items">The items that are placed into the list.</param>
 		/// <returns>A new list that contains the items in the order specified.</returns>
-		public static StrictList<T> Create<T> (IEnumerable<T> items)
+		public static StrictList<T> FromEnumerable<T> (IEnumerable<T> items)
 		{
 			return StrictList<T>.FromEnumerable (items);
 		}

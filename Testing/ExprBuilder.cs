@@ -64,7 +64,7 @@ namespace NOP
 			
 			public ListBuilder (IEnumerable<ExprBuilder> items)
 			{
-				_items = List.Create (items);
+				_items = List.FromEnumerable (items);
 			}
 			
 			public ListBuilder (StrictList<ExprBuilder> items)

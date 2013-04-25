@@ -9,8 +9,8 @@
 	public class FingerTreeTests
 	{
 		const int Count = 10000;
-		Sequence<int> TestSeq = Sequence.Create (Enumerable.Range (0, Count));
-		Sequence<int> OtherSeq = Sequence.Create (Enumerable.Range (Count, Count));
+		Sequence<int> TestSeq = Sequence.FromEnumerable (Enumerable.Range (0, Count));
+		Sequence<int> OtherSeq = Sequence.FromEnumerable (Enumerable.Range (Count, Count));
 		
 
 		[Test]
@@ -117,7 +117,7 @@
 		[Test]
 		public void TestVisualization ()
 		{
-			var seq = Sequence.Create (Enumerable.Range (1, 64));
+			var seq = Sequence.FromEnumerable (Enumerable.Range (1, 64));
 
 			Runner.VConsole.ShowVisual (seq.ToVisual ());
 		}

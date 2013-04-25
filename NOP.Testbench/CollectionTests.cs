@@ -183,7 +183,7 @@ namespace NOP.Testbench
 		[Test]
 		public void TestLinq ()
 		{
-			var list = LazyList.Create (Enumerable.Range (0, 10));
+			var list = LazyList.FromEnumerable (Enumerable.Range (0, 10));
 
 			var query = from i in list
 						from j in list

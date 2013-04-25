@@ -15,7 +15,7 @@ namespace NOP.Testbench
 		public static void Main (string[] args)
 		{
 			Task.Factory.StartNew (() =>
-				Tester.RunTestsTimed (
+				Tester.RunTests (
 					new CollectionTests (),
 					new LazyListTests (),
 					new MapTests (),
@@ -24,7 +24,8 @@ namespace NOP.Testbench
 					new TypeDefinitionTests (),
 					new TypeCheckingTests (),
 					new ParserTests (),
-					new SExprPathTests ())
+					new SExprPathTests (),
+					new ParserMonadTests ())
 			);
 			Application.Run (VConsole);
 			VConsole.Dispose ();

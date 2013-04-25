@@ -258,7 +258,7 @@
 		/// <summary>
 		/// Constructs a new list from IEnumerable.
 		/// </summary>
-		public static LazyList<T> Create<T> (IEnumerable<T> items)
+		public static LazyList<T> FromEnumerable<T> (IEnumerable<T> items)
 		{
 			return LazyList<T>.FromEnumerable (items);
 		}

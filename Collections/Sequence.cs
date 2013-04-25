@@ -309,7 +309,7 @@
 			return Sequence<T>.FromSequence (seq);
 		}
 
-		public static Sequence<T> Create<T> (IEnumerable<T> items)
+		public static Sequence<T> FromEnumerable<T> (IEnumerable<T> items)
 		{
 			return Sequence<T>.FromEnumerable (items);
 		}

@@ -15,7 +15,7 @@ namespace NOP.Testbench
 		
 		private void AssertEvaluatesTo<T> (T expected, params ExprBuilder[] exprs)
 		{
-			Check.AreEqual ((object)expected, Interpreter.Evaluate (List.Create (exprs.Select (eb => eb.Build ()))));
+			Check.AreEqual ((object)expected, Interpreter.Evaluate (List.FromEnumerable (exprs.Select (eb => eb.Build ()))));
 		}
 		
 		[Test]
