@@ -51,40 +51,67 @@ using System.Text;
 			return seq => parser (seq) ?? other (seq);
 		}
 
-		public static Parser<StrictList<T>, T> Many<T> (this Parser<T, T> parser)
-		{
-			return parser.Bind (x =>
-				Many (parser).Bind (xs =>
-				ToParser<StrictList<T>, T> (x | xs))).Plus (
-				ToParser<StrictList<T>, T> (StrictList<T>.Empty));
-		}
-
-		public static Parser<StrictList<T>, T> Many1<T> (this Parser<T, T> parser)
-		{
-			return parser.Bind (x =>
-				Many (parser).Bind (xs =>
-				ToParser<StrictList<T>, T> (x | xs)));
-		}
-
-		public static Parser<StrictList<T>, T> SeparatedBy1<T, U> (this Parser<T, T> parser, 
-			Parser<U, T> separator)
-		{
-			return from x in parser
-				   from xs in
-					    (from y in separator.Seq (parser)
-						 select y).Many ()
-				   select x | xs;
-		}
-
 		public static Parser<U, S> Select<T, U, S> (this Parser<T, S> parser, Func<T, U> select)
 		{
-			return parser.Bind (x => select(x).ToParser<U, S> ());
+			return parser.Bind (x => select (x).ToParser<U, S> ());
 		}
 
 		public static Parser<V, S> SelectMany<T, U, V, S> (this Parser<T, S> parser,
 			Func<T, Parser<U, S>> project, Func<T, U, V> select)
 		{
-			return parser.Bind (x => project (x).Bind (y => select (x, y).ToParser<V, S> ())); 
+			return parser.Bind (x => project (x).Bind (y => select (x, y).ToParser<V, S> ()));
+		}
+
+		public static Parser<StrictList<T>, S> Many<T, S> (this Parser<T, S> parser)
+		{
+			return (from x in parser
+					from xs in parser.Many ()
+					select x | xs).Plus (
+				   StrictList<T>.Empty.ToParser<StrictList<T>, S> ());
+		}
+
+		public static Parser<StrictList<T>, S> Many1<T, S> (this Parser<T, S> parser)
+		{
+			return from x in parser
+				   from xs in parser.Many ()
+				   select x | xs;
+		}
+
+		public static Parser<StrictList<T>, S> SeparatedBy1<T, U, S> (this Parser<T, S> parser, 
+			Parser<U, S> separator)
+		{
+			return from x in parser
+				   from xs in
+					   (from y in separator.Seq (parser)
+						select y).Many ()
+				   select x | xs;
+		}
+
+		public static Parser<StrictList<T>, S> SeparatedBy<T, U, S> (this Parser<T, S> parser, 
+			Parser<U, S> separator)
+		{
+			return SeparatedBy1 (parser, separator).Plus (
+				StrictList<T>.Empty.ToParser<StrictList<T>, S> ());
+		}
+
+		public static Parser<T, S> Bracket<T, U, V, S> (this Parser<T, S> parser, 
+			Parser<U, S> open, Parser<V, S> close)
+		{
+			return from o in open
+				   from x in parser
+				   from c in close
+				   select x;
+		}
+
+		public static Parser<T, S> ChainLeft1<T, S> (this Parser<T, S> parser, 
+			Parser<Func<T, T, T>, S> operation)
+		{
+			return from x in parser
+				   from fys in
+					   (from f in operation
+						from y in parser
+						select new { f, y }).Many ()
+				   select fys.ReduceLeft (x, (z, fy) => fy.f (z, fy.y));
 		}
 
 		public static Parser<char, char> Char (char x)
