@@ -1,8 +1,8 @@
 ﻿namespace NOP.Parsing
 {
 	using System;
-	using NOP.Collections;
 	using System.Text;
+	using NOP.Collections;
 
 	/// <summary>
 	/// A parser is a function that reads input from a sequence and returns a 
@@ -236,149 +236,6 @@
 		{
 			return ops.Map (op => from _ in op.Item1
 								  select op.Item2).ReduceLeft1 (Plus);
-		}
-
-		/// <summary>
-		/// Parse a given character.
-		/// </summary>
-		public static Parser<char, char> Char (char x)
-		{
-			return Sat<char> (y => x == y);
-		}
-
-		/// <summary>
-		/// Parse a number [0-9]
-		/// </summary>
-		public static Parser<char, char> Number ()
-		{
-			return Sat<char> (char.IsNumber);
-		}
-
-		/// <summary>
-		/// Parse a lower case character [a-z]
-		/// </summary>
-		public static Parser<char, char> Lower ()
-		{
-			return Sat<char> (char.IsLower);
-		}
-
-		/// <summary>
-		/// Parse an upper case character [A-Z]
-		/// </summary>
-		public static Parser<char, char> Upper ()
-		{
-			return Sat<char> (char.IsUpper);
-		}
-
-		/// <summary>
-		/// Parse any letter.
-		/// </summary>
-		public static Parser<char, char> Letter ()
-		{
-			return Sat<char> (char.IsLetter);
-		}
-
-		/// <summary>
-		/// Parse on alphanumeric character.
-		/// </summary>
-		public static Parser<char, char> AlphaNumeric ()
-		{
-			return Sat<char> (char.IsLetterOrDigit);
-		}
-
-		/// <summary>
-		/// Parse a word (sequence of consequtive letters)
-		/// </summary>
-		/// <returns></returns>
-		public static Parser<string, char> Word ()
-		{
-			return from xs in Letter ().Many ()
-				   select xs.ToString ("", "", "");
-		}
-
-		/// <summary>
-		/// Parse a given sequence of characters.
-		/// </summary>
-		public static Parser<ISequence<char>, char> CharSeq (ISequence<char> str)
-		{
-			return str.IsEmpty ? ToParser<ISequence<char>, char> (str) :
-				Char (str.First).Seq (
-				CharSeq (str.Rest).Seq (
-				str.ToParser<ISequence<char>, char> ()));
-		}
-
-		/// <summary>
-		/// Parse a given string.
-		/// </summary>
-		public static Parser<string, char> String (string str)
-		{
-			return from seq in CharSeq (LazyList.FromEnumerable (str))
-				   select str;
-		}
-
-		/// <summary>
-		/// Parse a positive integer without a leading '+' character.
-		/// </summary>
-		public static Parser<int, char> PositiveInteger ()
-		{
-			return (from x in Number ()
-					select x - '0').ChainLeft1 (
-					ToParser<Func<int, int, int>, char> (
-						(m, n) => 10 * m + n));
-		}
-
-		/// <summary>
-		/// Creates a parser that skips whitespace, i.e. just consumes white space 
-		/// from the sequence but does not return anything.
-		/// </summary>
-		public static Parser<Unit, char> WhiteSpace ()
-		{
-			return from _ in Sat<char> (char.IsWhiteSpace).Many1 ()
-				   select Unit.Void;
-		}
-
-		public static Parser<Unit, char> Comment ()
-		{
-			var nl = Environment.NewLine;
-			var eol = nl[nl.Length - 1];
-
-			return from x in String ("//")
-				   from y in Sat<char> (c => c != eol).Many ()
-				   select Unit.Void;
-		}
-
-		public static Parser<Unit, char> Junk ()
-		{
-			return from _ in WhiteSpace ().Plus (Comment ()).Many ()
-				   select Unit.Void;
-		}
-
-		public static Parser<T, char> SkipJunk<T> (this Parser<T, char> parser)
-		{
-			return from _ in Junk ()
-				   from v in parser
-				   select v;
-		}
-
-		public static Parser<T, char> Token<T> (this Parser<T, char> parser)
-		{
-			return from v in parser
-				   from _ in Junk ()
-				   select v;
-		}
-
-		public static Parser<string, char> Identifier ()
-		{
-			return from x in Letter ()
-				   from xs in AlphaNumeric ().Many ()
-				   select (x | xs).ToString ("", "", "");
-		}
-
-		public static Parser<string, char> Identifier (Set<string> identifiers)
-		{
-			return from x in Identifier ()
-				   where identifiers.Contains (x)
-				   select x;
 		}
 	}
 }

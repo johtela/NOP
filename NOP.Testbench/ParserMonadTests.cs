@@ -13,9 +13,9 @@ namespace NOP.Testbench
 		public void BindTest ()
 		{
 			var input = LazyList.FromEnumerable ("foo");
-			var parseFoo = from x in Parser.Char ('f')
-						   from y in Parser.Char ('o')
-						   from z in Parser.Char ('o')
+			var parseFoo = from x in StringParser.Char ('f')
+						   from y in StringParser.Char ('o')
+						   from z in StringParser.Char ('o')
 						   select new string (new char[] { x, y, z });
 
 			var res = parseFoo (input);
@@ -27,7 +27,7 @@ namespace NOP.Testbench
 		public void ParseWordTest ()
 		{
 			var input = LazyList.FromEnumerable ("abba");
-			var res = Parser.Word () (input);
+			var res = StringParser.Word () (input);
 			Check.AreEqual ("abba", res.Item1);
 			Check.IsTrue (res.Item2.IsEmpty);
 		}
@@ -36,7 +36,7 @@ namespace NOP.Testbench
 		public void ParseIntegerTest ()
 		{
 			var input = LazyList.FromEnumerable ("1000");
-			var res = Parser.PositiveInteger () (input);
+			var res = StringParser.PositiveInteger () (input);
 			Check.AreEqual (1000, res.Item1);
 			Check.IsTrue (res.Item2.IsEmpty);
 		}
