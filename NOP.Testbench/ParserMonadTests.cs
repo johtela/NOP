@@ -10,28 +10,35 @@ namespace NOP.Testbench
 	public class ParserMonadTests
 	{
 		[Test]
-		public void SimpleTest ()
+		public void BindTest ()
 		{
 			var input = LazyList.FromEnumerable ("foo");
+			var parseFoo = from x in Parser.Char ('f')
+						   from y in Parser.Char ('o')
+						   from z in Parser.Char ('o')
+						   select new string (new char[] { x, y, z });
 
-			var parseFoo =
-				Parser.Char ('f').Bind (x =>
-				Parser.Char ('o').Bind (y =>
-				Parser.Char ('o').Bind (z => 
-				Parser.ToParser<char[], char> (new char[] { x, y, z }))));
-
-			Check.AreEqual ("foo", new string(parseFoo (input).Item1));
+			var res = parseFoo (input);
+			Check.AreEqual ("foo", res.Item1);
+			Check.IsTrue (res.Item2.IsEmpty);
 		}
 
 		[Test]
 		public void ParseWordTest ()
 		{
 			var input = LazyList.FromEnumerable ("abba");
-
-			var parser = Parser.Word ();
-
-			var res = parser (input);
+			var res = Parser.Word () (input);
 			Check.AreEqual ("abba", res.Item1);
+			Check.IsTrue (res.Item2.IsEmpty);
+		}
+
+		[Test]
+		public void ParseIntegerTest ()
+		{
+			var input = LazyList.FromEnumerable ("1000");
+			var res = Parser.PositiveInteger () (input);
+			Check.AreEqual (1000, res.Item1);
+			Check.IsTrue (res.Item2.IsEmpty);
 		}
 	}
 }

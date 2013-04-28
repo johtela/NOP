@@ -181,5 +181,10 @@ namespace NOP.Collections
 		{
 			return seq.Filter (predicate);
 		}
+
+		public static T ReduceLeft1<T> (this ISequence<T> seq, Func<T, T, T> func)
+		{
+			return seq.Rest.ReduceLeft (seq.First, func);
+		}
 	}
 }
