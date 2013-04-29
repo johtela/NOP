@@ -70,12 +70,12 @@
 		/// <summary>
 		/// Parse a given sequence of characters.
 		/// </summary>
-		public static Parser<ISequence<char>, char> CharSeq (ISequence<char> str)
+		public static Parser<IStream<char>, char> CharStream (IStream<char> str)
 		{
-			return str.IsEmpty ? str.ToParser<ISequence<char>, char> () :
+			return str.IsEmpty ? str.ToParser<IStream<char>, char> () :
 				Char (str.First).Seq (
-				CharSeq (str.Rest).Seq (
-				str.ToParser<ISequence<char>, char> ()));
+				CharStream (str.Rest).Seq (
+				str.ToParser<IStream<char>, char> ()));
 		}
 
 		/// <summary>
@@ -83,7 +83,7 @@
 		/// </summary>
 		public static Parser<string, char> String (string str)
 		{
-			return from seq in CharSeq (LazyList.FromEnumerable (str))
+			return from seq in CharStream (LazyList.FromEnumerable (str))
 				   select str;
 		}
 

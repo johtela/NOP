@@ -9,7 +9,7 @@
 	/// parsed value. The types of the input stream and the parsed value are 
 	/// generic, so effectively parser can read any stream and return any value.
 	/// </summary>
-	public delegate Tuple<T, ISequence<S>> Parser<T, S> (ISequence<S> seq);
+	public delegate Tuple<T, IStream<S>> Parser<T, S> (IStream<S> seq);
 
 	/// <summary>
 	/// Monadic parsing operations implemented as extensions methods for the

@@ -41,7 +41,7 @@
 			}
 		}
 
-		ISequence<T> ISequence<T>.Rest
+		IStream<T> IStream<T>.Rest
 		{
 			get { return Rest; }
 		}
@@ -86,11 +86,11 @@
 
 		/// Construct a list from an enumerable.
 		/// </summary>
-		public static LazyList<T> FromSequence (ISequence<T> seq)
+		public static LazyList<T> FromStream (IStream<T> seq)
 		{
 			return seq is LazyList<T> ? seq as LazyList<T> :
 				seq.IsEmpty ? Empty :
-				new LazyList<T> (seq.First, () => FromSequence (seq.Rest));
+				new LazyList<T> (seq.First, () => FromStream (seq.Rest));
 		}
 
 		/// <summary>
@@ -133,7 +133,7 @@
 
 		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
 		{
-			return Collect (e => LazyList<U>.FromSequence (func (e)));
+			return Collect (e => LazyList<U>.FromStream (func (e)));
 		}
 
 		public LazyList<T> Reverse ()

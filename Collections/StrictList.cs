@@ -54,7 +54,7 @@
 			}
 		}
 
-		ISequence<T> ISequence<T>.Rest
+		IStream<T> IStream<T>.Rest
 		{
 			get { return Rest; }
 		}
@@ -96,7 +96,7 @@
 			return result;
 		}
 
-		public static StrictList<T> FromSequence (ISequence<T> seq)
+		public static StrictList<T> FromStream (IStream<T> seq)
 		{
 			if (seq is StrictList<T>)
 				return seq as StrictList<T>;
@@ -242,7 +242,7 @@
 		/// <summary>
 		/// Collect the list of lists into another list.
 		/// </summary>
-		public StrictList<U> Collect<U> (Func<T, ISequence<U>> func)
+		public StrictList<U> Collect<U> (Func<T, IStream<U>> func)
 		{
 			var result = StrictList<U>.Empty;
 			var resultLast = result;

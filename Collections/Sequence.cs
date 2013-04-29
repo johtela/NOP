@@ -140,7 +140,7 @@
 			get { return new Sequence<T> (_tree.RestR); }
 		}
 
-		public ISequence<T> Rest
+		public IStream<T> Rest
 		{
 			get { return RestL; }
 		}

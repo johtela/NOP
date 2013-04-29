@@ -193,7 +193,7 @@ namespace NOP.Testbench
 				for (int j = 0; j < 10; j++)
 				{
 					Check.AreEqual (Tuple.Create (i, j), query.First);
-					query = query.Rest;
+					query = query.Rest as ISequence<Tuple<int, int>>;
 				}
 		}
 	}
