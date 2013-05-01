@@ -10,7 +10,9 @@
 	/// </summary>
 	public class EmptyListException : Exception
 	{
-		public EmptyListException () : base ("The list is empty") { }
+		public EmptyListException () : base ("The list is empty")
+		{
+		}
 	}
 
 	/// <summary>
@@ -180,14 +182,15 @@
 		/// </summary>
 		/// <param name="item">Item to be appended.</param>
 		/// <returns>A new list with <paramref name="item"/> as its last element.</returns>
-		public StrictList<T> Append(T item)
+		public StrictList<T> Append (T item)
 		{
 			return CopyUpTo (Empty).Bind ((prefixFirst, prefixLast) =>
 			{
 				var cons = Cons (item, Empty);
 				prefixLast.Rest = cons;
 				return prefixFirst.IsEmpty ? cons : prefixFirst;
-			});
+			}
+			);
 		}
 
 		/// <summary>
@@ -206,7 +209,8 @@
 				var cons = Cons (item, tail);
 				prefixLast.Rest = cons;
 				return prefixFirst.IsEmpty ? cons : prefixFirst;
-			});
+			}
+			);
 		}
 
 		/// <summary>
@@ -223,7 +227,8 @@
 				var rest = tail.IsEmpty ? Empty : tail.Rest;
 				prefixLast.Rest = rest;
 				return prefixFirst.IsEmpty ? rest : prefixFirst;
-			});
+			}
+			);
 		}
 
 		/// <summary>
@@ -263,7 +268,7 @@
 
 		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
 		{
-			return Collect (func);
+			return Collect ((Func<T, IStream<U>>)func);
 		}
 
 		/// <summary>
@@ -281,8 +286,7 @@
 				{
 					result = cons;
 					resultLast = cons;
-				}	
-				else
+				} else
 				{
 					resultLast.Rest = cons;
 					resultLast = cons;
@@ -320,8 +324,7 @@
 				{
 					result = cons;
 					resultLast = cons;
-				}
-				else
+				} else
 				{
 					resultLast.Rest = cons;
 					resultLast = cons;
@@ -508,7 +511,7 @@
 		/// </summary>
 		public static StrictList<U> MapReducible<T, U> (IReducible<T> reducible, Func<T, U> map)
 		{
-			return reducible.ReduceRight ((t, l) => map(t) | l, StrictList<U>.Empty);
+			return reducible.ReduceRight ((t, l) => map (t) | l, StrictList<U>.Empty);
 		}
 
 		/// <summary>

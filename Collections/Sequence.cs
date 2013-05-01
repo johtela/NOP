@@ -94,7 +94,7 @@
 			return new Elem (item);
 		}
 
-		private static Func<Size, bool> FindP(int index)
+		private static Func<Size, bool> FindP (int index)
 		{
 			return sz => index < sz;
 		}
@@ -147,7 +147,7 @@
 
 		public Tuple<T, Sequence<T>> LeftView
 		{
-			get 
+			get
 			{
 				var view = _tree.LeftView ();
 				return view == null ? null : 
@@ -165,9 +165,9 @@
 			}
 		}
 
-		public T this[int index]
+		public T this [int index]
 		{
-			get 
+			get
 			{
 				if (index < 0 || index >= Length)
 					throw new IndexOutOfRangeException ("Index was outside the bounds of the sequence.");
@@ -197,9 +197,10 @@
 			var result = new T[Length];
 			_tree.ReduceLeft (0, (i, e) =>
 			{
-				result[i] = e;
+				result [i] = e;
 				return i + 1;
-			});
+			}
+			);
 			return result;
 		}
 
@@ -279,6 +280,8 @@
 
 		public U ReduceLeft<U> (U acc, Func<U, T, U> func)
 		{
+			return _tree.ReduceLeft (acc, (a, e) => func (a, e.Value));
+			return _tree.ReduceLeft (acc, (a, e) => func (a, e.Value));
 			return _tree.ReduceLeft (acc, (a, e) => func (a, e.Value));
 		}
 

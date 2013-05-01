@@ -9,7 +9,7 @@
 	/// parsed value. The types of the input stream and the parsed value are 
 	/// generic, so effectively parser can read any stream and return any value.
 	/// </summary>
-	public delegate Tuple<T, IStream<S>> Parser<T, S> (IStream<S> seq);
+	public delegate Reply<S> Parser<T, S> (Input<S> seq);
 
 	/// <summary>
 	/// Monadic parsing operations implemented as extensions methods for the
@@ -26,7 +26,13 @@
 			return seq =>
 			{
 				var res = parser (seq);
-				return res == null ? null : func (res.Item1) (res.Item2);
+				if (res is Reply<S>.Success<T>)
+				{
+					var success = res as Reply<S>.Success<T>;
+					return func (success.Result) (success.Input);
+				} 
+				return res;
+//				return res == null ? null : func (res.Item1) (res.Item2);
 			};
 		}
 
@@ -108,7 +114,7 @@
 		/// </summary>
 		public static Parser<T, S> Where<T, S> (this Parser<T, S> parser, Func<T, bool> predicate)
 		{
-			return parser.Bind(x => predicate(x) ? x.ToParser<T, S> () : null);
+			return parser.Bind (x => predicate (x) ? x.ToParser<T, S> () : null);
 		}
 
 		/// <summary>
@@ -199,7 +205,8 @@
 				   (from f in operation
 					from y in ChainRight1 (parser, operation)
 					select f (x, y))
-					.Plus (x.ToParser<T, S> ()));
+					.Plus (x.ToParser<T, S> ())
+			);
 		}
 
 		/// <summary>
@@ -235,7 +242,8 @@
 		public static Parser<U, S> Operators<T, U, S> (ISequence<Tuple<Parser<T, S>, U>> ops)
 		{
 			return ops.Map (op => from _ in op.Item1
-								  select op.Item2).ReduceLeft1 (Plus);
+								  select op.Item2
+			).ReduceLeft1 (Plus);
 		}
 	}
 }

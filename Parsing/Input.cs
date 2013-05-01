@@ -5,18 +5,13 @@
 	using System.Text;
 	using NOP.Collections;
 
-	public abstract class Input<S, P> : IStream<S>
+	public abstract class Input<S> : IStream<S>
 	{
-		public readonly P Position;
-
-		public Input (P position)
-		{
-			Position = position;
-		}
+		public abstract P GetPosition<P> ();
 
 		public abstract S First { get; }
 
-		public abstract Input<S, P> Rest { get; }
+		public abstract Input<S> Rest { get; }
 
 		public abstract bool IsEmpty { get; }
 
