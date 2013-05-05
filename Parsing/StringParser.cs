@@ -12,89 +12,89 @@
 		/// <summary>
 		/// Parse a given character.
 		/// </summary>
-		public static Parser<char, char> Char (char x)
+		public static Parser<char, char, P> Char<P> (char x)
 		{
-			return Parser.Sat<char> (y => x == y);
+			return Parser.Satisfy<char, P> (y => x == y);
 		}
 
 		/// <summary>
 		/// Parse a number [0-9]
 		/// </summary>
-		public static Parser<char, char> Number ()
+		public static Parser<char, char, P> Number<P> ()
 		{
-			return Parser.Sat<char> (char.IsNumber);
+			return Parser.Satisfy<char, P> (char.IsNumber);
 		}
 
 		/// <summary>
 		/// Parse a lower case character [a-z]
 		/// </summary>
-		public static Parser<char, char> Lower ()
+		public static Parser<char, char, P> Lower<P> ()
 		{
-			return Parser.Sat<char> (char.IsLower);
+			return Parser.Satisfy<char, P> (char.IsLower);
 		}
 
 		/// <summary>
 		/// Parse an upper case character [A-Z]
 		/// </summary>
-		public static Parser<char, char> Upper ()
+		public static Parser<char, char, P> Upper<P> ()
 		{
-			return Parser.Sat<char> (char.IsUpper);
+			return Parser.Satisfy<char, P> (char.IsUpper);
 		}
 
 		/// <summary>
 		/// Parse any letter.
 		/// </summary>
-		public static Parser<char, char> Letter ()
+		public static Parser<char, char, P> Letter<P> ()
 		{
-			return Parser.Sat<char> (char.IsLetter);
+			return Parser.Satisfy<char, P> (char.IsLetter);
 		}
 
 		/// <summary>
 		/// Parse on alphanumeric character.
 		/// </summary>
-		public static Parser<char, char> AlphaNumeric ()
+		public static Parser<char, char, P> AlphaNumeric<P> ()
 		{
-			return Parser.Sat<char> (char.IsLetterOrDigit);
+			return Parser.Satisfy<char, P> (char.IsLetterOrDigit);
 		}
 
 		/// <summary>
 		/// Parse a word (sequence of consequtive letters)
 		/// </summary>
 		/// <returns></returns>
-		public static Parser<string, char> Word ()
+		public static Parser<string, char, P> Word<P> ()
 		{
-			return from xs in Letter ().Many ()
+			return from xs in Letter<P> ().Many ()
 				   select xs.ToString ("", "", "");
 		}
 
 		/// <summary>
 		/// Parse a given sequence of characters.
 		/// </summary>
-		public static Parser<IStream<char>, char> CharStream (IStream<char> str)
+		public static Parser<IStream<char>, char, P> CharStream<P> (IStream<char> str)
 		{
-			return str.IsEmpty ? str.ToParser<IStream<char>, char> () :
-				Char (str.First).Seq (
-				CharStream (str.Rest).Seq (
-				str.ToParser<IStream<char>, char> ()));
+			return str.IsEmpty ? str.ToParser<IStream<char>, char, P> () :
+				Char<P> (str.First).Seq (
+				CharStream<P> (str.Rest).Seq (
+				str.ToParser<IStream<char>, char, P> ()));
 		}
 
 		/// <summary>
 		/// Parse a given string.
 		/// </summary>
-		public static Parser<string, char> String (string str)
+		public static Parser<string, char, P> String<P> (string str)
 		{
-			return from seq in CharStream (LazyList.FromEnumerable (str))
+			return from seq in CharStream<P> (LazyList.FromEnumerable (str))
 				   select str;
 		}
 
 		/// <summary>
 		/// Parse a positive integer without a leading '+' character.
 		/// </summary>
-		public static Parser<int, char> PositiveInteger ()
+		public static Parser<int, char, P> PositiveInteger<P> ()
 		{
-			return (from x in Number ()
+			return (from x in Number<P> ()
 					select x - '0').ChainLeft1 (
-					Parser.ToParser<Func<int, int, int>, char> (
+					Parser.ToParser<Func<int, int, int>, char, P> (
 						(m, n) => 10 * m + n));
 		}
 
@@ -102,52 +102,52 @@
 		/// Creates a parser that skips whitespace, i.e. just consumes white space 
 		/// from the sequence but does not return anything.
 		/// </summary>
-		public static Parser<Unit, char> WhiteSpace ()
+		public static Parser<Unit, char, P> WhiteSpace<P> ()
 		{
-			return from _ in Parser.Sat<char> (char.IsWhiteSpace).Many1 ()
+			return from _ in Parser.Satisfy<char, P> (char.IsWhiteSpace).Many1 ()
 				   select Unit.Void;
 		}
 
-		public static Parser<Unit, char> Comment ()
+		public static Parser<Unit, char, P> Comment<P> ()
 		{
 			var nl = Environment.NewLine;
 			var eol = nl[nl.Length - 1];
 
-			return from x in String ("//")
-				   from y in Parser.Sat<char> (c => c != eol).Many ()
+			return from x in String<P> ("//")
+				   from y in Parser.Satisfy<char, P> (c => c != eol).Many ()
 				   select Unit.Void;
 		}
 
-		public static Parser<Unit, char> Junk ()
+		public static Parser<Unit, char, P> Junk<P> ()
 		{
-			return from _ in WhiteSpace ().Plus (Comment ()).Many ()
+			return from _ in WhiteSpace<P> ().Plus (Comment<P> ()).Many ()
 				   select Unit.Void;
 		}
 
-		public static Parser<T, char> SkipJunk<T> (this Parser<T, char> parser)
+		public static Parser<T, char, P> SkipJunk<T, P> (this Parser<T, char, P> parser)
 		{
-			return from _ in Junk ()
+			return from _ in Junk<P> ()
 				   from v in parser
 				   select v;
 		}
 
-		public static Parser<T, char> Token<T> (this Parser<T, char> parser)
+		public static Parser<T, char, P> Token<T, P> (this Parser<T, char, P> parser)
 		{
 			return from v in parser
-				   from _ in Junk ()
+				   from _ in Junk<P> ()
 				   select v;
 		}
 
-		public static Parser<string, char> Identifier ()
+		public static Parser<string, char, P> Identifier<P> ()
 		{
-			return from x in Letter ()
-				   from xs in AlphaNumeric ().Many ()
+			return from x in Letter<P> ()
+				   from xs in AlphaNumeric<P> ().Many ()
 				   select (x | xs).ToString ("", "", "");
 		}
 
-		public static Parser<string, char> Identifier (Set<string> identifiers)
+		public static Parser<string, char, P> Identifier<P> (Set<string> identifiers)
 		{
-			return (from x in Identifier ()
+			return (from x in Identifier<P> ()
 					where identifiers.Contains (x)
 					select x).Token ();
 		}
