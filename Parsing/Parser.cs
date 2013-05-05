@@ -9,7 +9,7 @@
 	/// parsed value. The types of the input stream and the parsed value are 
 	/// generic, so effectively parser can read any stream and return any value.
 	/// </summary>
-	public delegate Reply<S> Parser<T, S> (Input<S> seq);
+	public delegate Consumed<T, S> Parser<T,S> (Input<S> input);
 
 	/// <summary>
 	/// Monadic parsing operations implemented as extensions methods for the
@@ -23,16 +23,33 @@
 		/// </summary>
 		public static Parser<U, S> Bind<T, U, S> (this Parser<T, S> parser, Func<T, Parser<U, S>> func)
 		{
-			return seq =>
+			return input =>
 			{
-				var res = parser (seq);
-				if (res is Reply<S>.Success<T>)
+				var res1 = parser (input);
+				if (res1.IsEmpty)
 				{
-					var success = res as Reply<S>.Success<T>;
-					return func (success.Result) (success.Input);
+					if (res1.Reply)
+					{
+						var res2 = func (res1.Reply.Result) (res1.Reply.Input);
+						return res2.IsEmpty ?
+						 	new Empty<U, S> (Lazy.Create (res2.Reply.MergeExpected (res1.Reply))) :
+							res2;
+					}
+					return new Empty<U, S> (
+						Lazy.Create (Reply<U, S>.Fail (res1.Reply.Input, res1.Reply.Found, res1.Reply.Expected)));
 				} 
-				return res;
-//				return res == null ? null : func (res.Item1) (res.Item2);
+				else
+					return Consumed<U, S> (Lazy.Create (() =>
+					{
+						if (res1.Reply)
+						{
+							var res2 = func (res1.Reply.Result) (res1.Reply.Input);
+							return res2.IsEmpty ?
+							 		res2.Reply.MergeExpected (res1.Reply) :
+									res2.Reply;
+						}
+						return Reply<U, S>.Fail (res1.Reply.Input, res1.Reply.Found, res1.Reply.Expected);
+					}));
 			};
 		}
 
@@ -42,11 +59,7 @@
 		/// </summary>
 		public static Parser<U, S> Seq<T, U, S> (this Parser<T, S> parser, Parser<U, S> other)
 		{
-			return seq =>
-			{
-				var res = parser (seq);
-				return res == null ? null : other (res.Item2);
-			};
+			return parser.Bind (_ => other);
 		}
 
 		/// <summary>
@@ -55,23 +68,7 @@
 		/// </summary>
 		public static Parser<T, S> ToParser<T, S> (this T value)
 		{
-			return seq => Tuple.Create (value, seq);
-		}
-
-		/// <summary>
-		/// Creates a parser that will always fail.
-		/// </summary>
-		public static Parser<T, S> Fail<T, S> ()
-		{
-			return seq => null;
-		}
-
-		/// <summary>
-		/// Creates a parser that reads one item from the input and returns it.
-		/// </summary>
-		public static Parser<T, T> Item<T> ()
-		{
-			return seq => seq.IsEmpty ? null : Tuple.Create (seq.First, seq.Rest);
+			return input => new Empty<T, S> (new Reply<T, S>.Success (value, input));
 		}
 
 		/// <summary>
@@ -80,7 +77,15 @@
 		/// </summary>
 		public static Parser<T, T> Sat<T> (Func<T, bool> predicate)
 		{
-			return Item<T> ().Bind (x => predicate (x) ? ToParser<T, T> (x) : Fail<T, T> ());
+			return input =>
+			{
+				if (input.IsEmpty) 
+					return new Empty<T, T> (new Reply<T, T>.Failure (input, "end of input"));
+				var item = input.First;
+				return predicate (item) ?
+					new Consumed<T, T> (new Reply<T, T>.Success (item, input.Rest)) :
+					new Empty<T, T> (new Reply<T, T>.Failure (input, item.ToString ()));
+			};
 		}
 
 		/// <summary>

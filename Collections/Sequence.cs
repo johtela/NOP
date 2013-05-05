@@ -281,8 +281,6 @@
 		public U ReduceLeft<U> (U acc, Func<U, T, U> func)
 		{
 			return _tree.ReduceLeft (acc, (a, e) => func (a, e.Value));
-			return _tree.ReduceLeft (acc, (a, e) => func (a, e.Value));
-			return _tree.ReduceLeft (acc, (a, e) => func (a, e.Value));
 		}
 
 		public U ReduceRight<U> (Func<T, U, U> func, U acc)

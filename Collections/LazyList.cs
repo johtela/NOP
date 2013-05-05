@@ -112,7 +112,7 @@
 		/// <summary>
 		/// Concatenate two lazy lists
 		/// </summary>
-		private LazyList<T> Concat (LazyList<T> other)
+		public LazyList<T> Concat (LazyList<T> other)
 		{
 			return IsEmpty ? other :
 				Cons (First, Fun.Partial (Rest.Concat, other));
@@ -206,6 +206,11 @@
 		public static LazyList<T> operator | (T first, LazyList<T> rest)
 		{
 			return new LazyList<T> (first, rest);
+		}
+
+		public static LazyList<T> operator + (LazyList<T> list, LazyList<T> other)
+		{
+			return list.Concat (other);
 		}
 
 		#endregion
