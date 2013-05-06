@@ -63,6 +63,12 @@
 			return new Success (result, input, string.Empty, LazyList<string>.Empty);
 		}
 
+		public static Reply<T, S, P> Ok (T result, Input<S, P> input, string found, 
+			LazyList<string> expected)
+		{
+			return new Success (result, input, found, expected);
+		}
+
 		public static Reply<T, S, P> Fail (Input<S, P> input, string found) 
 		{
 			return new Failure (input, found, LazyList<string>.Empty);

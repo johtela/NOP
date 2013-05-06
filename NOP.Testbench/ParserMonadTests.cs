@@ -12,33 +12,30 @@ namespace NOP.Testbench
 		[Test]
 		public void BindTest ()
 		{
-			var input = LazyList.FromEnumerable ("foo");
-			var parseFoo = from x in StringParser.Char ('f')
-						   from y in StringParser.Char ('o')
-						   from z in StringParser.Char ('o')
-						   select new string (new char[] { x, y, z });
+			var input = Input.FromString ("foo");
+			var foo = from x in StringParser.Char<int> ('f')
+					  from y in StringParser.Char<int> ('o')
+					  from z in StringParser.Char<int> ('o')
+					  select new string (new char[] { x, y, z });
 
-			var res = parseFoo (input);
-			Check.AreEqual ("foo", res.Item1);
-			Check.IsTrue (res.Item2.IsEmpty);
+			var res = foo.TryParse (input);
+			Check.AreEqual ("foo", res.Left);
 		}
 
 		[Test]
 		public void ParseWordTest ()
 		{
-			var input = LazyList.FromEnumerable ("abba");
-			var res = StringParser.Word () (input);
-			Check.AreEqual ("abba", res.Item1);
-			Check.IsTrue (res.Item2.IsEmpty);
+			var input = Input.FromString ("abba");
+			var res = StringParser.Word<int> ().Parse (input);
+			Check.AreEqual ("abba", res);
 		}
 
 		[Test]
 		public void ParseIntegerTest ()
 		{
-			var input = LazyList.FromEnumerable ("1000");
-			var res = StringParser.PositiveInteger () (input);
-			Check.AreEqual (1000, res.Item1);
-			Check.IsTrue (res.Item2.IsEmpty);
+			var input = Input.FromString ("1000");
+			var res = StringParser.PositiveInteger<int> ().Parse (input);
+			Check.AreEqual (1000, res);
 		}
 	}
 }

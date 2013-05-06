@@ -18,6 +18,27 @@
 	public static class Parser
 	{
 		/// <summary>
+		/// Attempt to parse an input with a given parser.
+		/// </summary>
+		public static Either<T, ParseError> TryParse<T, S, P>(this Parser<T, S, P> parser, Input<S, P> input)
+		{
+			var res = parser (input);
+			return res.Reply ?
+				Either<T, ParseError>.Create (res.Reply.Result) : 
+				Either<T, ParseError>.Create (ParseError.FromReply (res.Reply));
+		}
+
+		/// <summary>
+		/// Parses an input, or throws an ParseError exception, if the parse fails.
+		/// </summary>
+		public static T Parse<T, S, P> (this Parser<T, S, P> parser, Input<S, P> input)
+		{
+			return TryParse (parser, input).Match (
+				value => value,
+				error => { throw error; });
+		}
+
+		/// <summary>
 		/// The monadic bind. Runs the first parser, and if it succeeds, feeds the
 		/// result to the second parser. Corresponds to Haskell's >>= operator.
 		/// </summary>
@@ -105,6 +126,22 @@
 						res2;
 				}
 				return res1;
+			};
+		}
+
+		public static Parser<T, S, P> Label<T, S, P> (this Parser<T, S, P> parser, string expected)
+		{
+			return input =>
+			{
+				var res = parser (input);
+				if (res.IsEmpty)
+				{
+					var exp = LazyList.Create (expected);
+					return new Empty<T, S, P> (Lazy.Create (res.Reply ?
+						Reply<T, S, P>.Ok (res.Reply.Result, res.Reply.Input, res.Reply.Found, exp) :
+						Reply<T, S, P>.Fail (res.Reply.Input, res.Reply.Found, exp)));
+				}
+				return res;
 			};
 		}
 

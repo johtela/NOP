@@ -1,4 +1,4 @@
-﻿namespace NOP.Base
+﻿namespace NOP
 {
 	using System;
 
@@ -37,7 +37,7 @@
 		{
 			private U _right;
 
-			private _Right (U right)
+			public _Right (U right)
 			{
 				_right = right;
 			}
@@ -51,6 +51,16 @@
 			{
 				get { return _right; }
 			}
+		}
+
+		public static Either<T, U> Create (T value)
+		{
+			return new _Left (value);
+		}
+
+		public static Either<T, U> Create (U value)
+		{
+			return new _Right (value);
 		}
 
 		public V Match<V> (Func<T, V> left, Func<U, V> right)

@@ -14,7 +14,7 @@
 		/// </summary>
 		public static Parser<char, char, P> Char<P> (char x)
 		{
-			return Parser.Satisfy<char, P> (y => x == y);
+			return Parser.Satisfy<char, P> (y => x == y).Label (x.ToString ());
 		}
 
 		/// <summary>
@@ -22,7 +22,7 @@
 		/// </summary>
 		public static Parser<char, char, P> Number<P> ()
 		{
-			return Parser.Satisfy<char, P> (char.IsNumber);
+			return Parser.Satisfy<char, P> (char.IsNumber).Label ("number");
 		}
 
 		/// <summary>
@@ -30,7 +30,7 @@
 		/// </summary>
 		public static Parser<char, char, P> Lower<P> ()
 		{
-			return Parser.Satisfy<char, P> (char.IsLower);
+			return Parser.Satisfy<char, P> (char.IsLower).Label ("lowercase character");
 		}
 
 		/// <summary>
@@ -38,7 +38,7 @@
 		/// </summary>
 		public static Parser<char, char, P> Upper<P> ()
 		{
-			return Parser.Satisfy<char, P> (char.IsUpper);
+			return Parser.Satisfy<char, P> (char.IsUpper).Label ("uppercase character");
 		}
 
 		/// <summary>
@@ -46,7 +46,7 @@
 		/// </summary>
 		public static Parser<char, char, P> Letter<P> ()
 		{
-			return Parser.Satisfy<char, P> (char.IsLetter);
+			return Parser.Satisfy<char, P> (char.IsLetter).Label ("letter");
 		}
 
 		/// <summary>
@@ -54,7 +54,7 @@
 		/// </summary>
 		public static Parser<char, char, P> AlphaNumeric<P> ()
 		{
-			return Parser.Satisfy<char, P> (char.IsLetterOrDigit);
+			return Parser.Satisfy<char, P> (char.IsLetterOrDigit).Label ("alphanumeric character");
 		}
 
 		/// <summary>
@@ -83,8 +83,8 @@
 		/// </summary>
 		public static Parser<string, char, P> String<P> (string str)
 		{
-			return from seq in CharStream<P> (LazyList.FromEnumerable (str))
-				   select str;
+			return (from seq in CharStream<P> (LazyList.FromEnumerable (str))
+					select str).Label (str);
 		}
 
 		/// <summary>
