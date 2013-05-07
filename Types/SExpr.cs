@@ -40,7 +40,7 @@ namespace NOP
 			
 			public override string ToString ()
 			{
-				return Value.ToString ();
+				return string.Format("[{0}]{{{1}}}", Value.GetType().FullName, Value);
 			}
 		}
 
@@ -100,7 +100,7 @@ namespace NOP
 			
 			public override string ToString ()
 			{
-				return Items.ToString ();
+				return Items.ToString ("(", ")", " ");
 			}
 		}
 	}
