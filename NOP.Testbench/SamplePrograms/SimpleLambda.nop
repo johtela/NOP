@@ -1,0 +1,3 @@
+﻿(let getFoo (lambda () 
+	{System.String:"foo"}) 
+(getFoo))

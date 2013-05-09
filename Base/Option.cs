@@ -20,6 +20,5 @@ namespace NOP
 			HasValue = true;
 			Value = value;
 		}
-
 	}
 }

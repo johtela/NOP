@@ -1,0 +1,5 @@
+﻿((lambda (foo)
+	(let bar (lambda (x y) 
+				(eq? x y)) 
+	(bar foo {System.Int32:3}))) 
+{System.Int32:4})

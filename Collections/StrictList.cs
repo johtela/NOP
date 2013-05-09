@@ -443,7 +443,9 @@
 		/// </summary>
 		public override string ToString ()
 		{
-			return this.ToString ("[", "]", ", ");
+			return typeof (T) == typeof (char) ?
+				this.ToString (null, null,  null) :
+				this.ToString ("[", "]", ", ");
 		}
 		
 		#region IVisualizable members

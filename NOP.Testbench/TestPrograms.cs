@@ -45,12 +45,5 @@
 					Call ("bar", S ("foo"), A (3)))
 			), A (4));
 		}
-
-		public static string Serialize (SExpr expr)
-		{
-			var s = new JavaScriptSerializer ();
-
-			return s.Serialize (expr);
-		}
 	}
 }

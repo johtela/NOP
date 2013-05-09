@@ -13,9 +13,9 @@ namespace NOP.Testbench
 		public void BindTest ()
 		{
 			var input = Input.FromString ("foo");
-			var foo = from x in StringParser.Char<int> ('f')
-					  from y in StringParser.Char<int> ('o')
-					  from z in StringParser.Char<int> ('o')
+			var foo = from x in StringParser.Char ('f')
+					  from y in StringParser.Char ('o')
+					  from z in StringParser.Char ('o')
 					  select new string (new char[] { x, y, z });
 
 			var res = foo.TryParse (input);
@@ -26,7 +26,7 @@ namespace NOP.Testbench
 		public void ParseWordTest ()
 		{
 			var input = Input.FromString ("abba");
-			var res = StringParser.Word<int> ().Parse (input);
+			var res = StringParser.Word ().Parse (input);
 			Check.AreEqual ("abba", res);
 		}
 
@@ -34,8 +34,8 @@ namespace NOP.Testbench
 		public void ParseIntegerTest ()
 		{
 			var input = Input.FromString ("1000");
-			var res = StringParser.PositiveInteger<int> ().Parse (input);
+			var res = StringParser.PositiveInteger ().Parse (input);
 			Check.AreEqual (1000, res);
 		}
 	}
-}
+	}

@@ -2,11 +2,11 @@ namespace NOP.Parsing
 {
 	using NOP;
 
-	public class Consumed<T, S, P>
+	public class Consumed<T, S>
 	{
-		private Lazy<Reply<T, S, P>> _reply;
+		private Lazy<Reply<T, S>> _reply;
 
-		public Consumed (Lazy<Reply<T, S, P>> reply)
+		public Consumed (Lazy<Reply<T, S>> reply)
 		{
 			_reply = reply;
 		}
@@ -16,15 +16,15 @@ namespace NOP.Parsing
 			get { return false; }
 		}
 
-		public Reply<T, S, P> Reply
+		public Reply<T, S> Reply
 		{ 
 			get { return _reply;}
 		}
 	}
 
-	public class Empty<T, S, P> : Consumed<T, S, P>
+	public class Empty<T, S> : Consumed<T, S>
 	{
-		public Empty (Lazy<Reply<T, S, P>> reply) : base (reply)
+		public Empty (Lazy<Reply<T, S>> reply) : base (reply)
 		{
 			// Evaluate the lazy value.
 			Fun.Ignore (Reply);

@@ -1,0 +1,5 @@
+﻿(let foo (lambda (i) 
+	(if (eq? i {System.Int32:3}) 
+		{System.String:"It's numberwang!"} 
+		{System.String:"It's a number"})) 
+(foo {System.Int32:3}))

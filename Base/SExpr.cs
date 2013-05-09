@@ -2,6 +2,8 @@ namespace NOP
 {
 	using System;
 	using Collections;
+	using IO;
+	using Parsing;
 	using Visuals;
 	
 	/// <summary>
@@ -40,7 +42,8 @@ namespace NOP
 			
 			public override string ToString ()
 			{
-				return string.Format("[{0}]{{{1}}}", Value.GetType().FullName, Value);
+				return string.Format("{{{0}:{1}}}", Value.GetType().FullName, 
+					ConvertLiteral.ToString (Value));
 			}
 		}
 
@@ -102,6 +105,26 @@ namespace NOP
 			{
 				return Items.ToString ("(", ")", " ");
 			}
+		}
+
+		public static SExpr Lit (object value)
+		{
+			return new Literal (value);
+		}
+
+		public static SExpr Sym (string value)
+		{
+			return new Symbol (value);
+		}
+
+		public static SExpr Lst (params SExpr[] items)
+		{
+			return new List (Sequence.Create (items));
+		}
+
+		public static SExpr Lst (ISequence<SExpr> items)
+		{
+			return new List (Sequence.Create (items));
 		}
 	}
 }

@@ -35,6 +35,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IOTests.cs" />
     <Compile Include="LazyListTests.cs" />
     <Compile Include="FingerTreeTests.cs" />
     <Compile Include="Main.cs" />
@@ -57,5 +58,26 @@
       <Project>{ACC799C6-BCD3-47D8-993A-DA67787AC7FE}</Project>
       <Name>NOP.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="SamplePrograms\ComplexIf.nop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SamplePrograms\NestedLambdas.nop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SamplePrograms\NestedLets.nop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SamplePrograms\SimpleIf.nop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SamplePrograms\SimpleLambda.nop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SamplePrograms\SimpleLet.nop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
