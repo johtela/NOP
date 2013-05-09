@@ -68,7 +68,6 @@
     <Compile Include="Base\NOPException.cs" />
     <Compile Include="Base\Fun.cs" />
     <Compile Include="Parsing\Reply.cs" />
-    <Compile Include="IO\SExprTextFormat.cs" />
     <Compile Include="Parsing\StringParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Collections\ArraySegment.cs" />
