@@ -47,17 +47,17 @@
 		}
 
 		[Test]
-		public void TestNestedLambdas ()
-		{
-			ParserTests.AssertParsesTo<ApplicationExpression> ("System.Boolean",
-				ReadFile (@"SamplePrograms\NestedLambdas.nop"));
-		}
-
-		[Test]
 		public void TestNestedLets ()
 		{
 			ParserTests.AssertParsesTo<LetExpression> ("System.Boolean",
 				ReadFile (@"SamplePrograms\NestedLets.nop"));
+		}
+		
+		[Test]
+		public void TestNestedLambdas ()
+		{
+			ParserTests.AssertParsesTo<ApplicationExpression> ("System.Boolean",
+				ReadFile (@"SamplePrograms\NestedLambdas.nop"));
 		}
 	}
 }

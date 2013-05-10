@@ -124,7 +124,7 @@
 		private Tuple<SExpr, SExprPath> StackToPath (SExpr root, Sequence<StackItem> stack)
 		{
 			return stack.IsEmpty ?
-				Tuple.Create (root, new SExprPath (Sequence.Create (int.MaxValue))) :
+				Tuple.Create (root, new SExprPath (Sequence<int>.Empty)) :
 				Tuple.Create (stack.Last.Seq[stack.Last.Ind],
 					new SExprPath (stack.Map (t => t.Ind)));
 		}
@@ -182,13 +182,14 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> NextSibling (SExpr root)
 		{
-			var stack = PathToStack (root);
+			var orig = PathToStack (root);
+			var stack = orig;
 			if (stack.Length == Path.Length)
 			{
 				while (!stack.IsEmpty && !NextSexp (ref stack))
 					stack = stack.RestR;
 			}
-			return StackToPath (root, stack);
+			return StackToPath (root, stack.IsEmpty ? orig : stack);
 		}
 
 		/// <summary>
@@ -197,13 +198,14 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> PrevSibling (SExpr root)
 		{
-			var stack = PathToStack (root);
+			var orig = PathToStack (root);
+			var stack = orig;
 			if (!stack.IsEmpty && stack.Length == Path.Length)
 			{
 				if (!PrevSexp (ref stack))
 					stack = stack.RestR;
 			}
-			return StackToPath (root, stack);
+			return StackToPath (root, stack.IsEmpty ? orig : stack);
 		}
 
 		/// <summary>
@@ -212,7 +214,8 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> Next (SExpr root)
 		{
-			var stack = PathToStack (root);
+			var orig = PathToStack (root);
+			var stack = orig;
 			if (stack.Length == Path.Length)
 			{
 				if (!ChildSexp (root, ref stack))
@@ -221,7 +224,7 @@
 						stack = stack.RestR;
 				}
 			}
-			return StackToPath (root, stack);
+			return StackToPath (root, stack.IsEmpty ? orig : stack);
 		}
 
 		/// <summary>
@@ -230,7 +233,8 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> Previous (SExpr root)
 		{
-			var stack = PathToStack (root);
+			var orig = PathToStack (root);
+			var stack = orig;
 			if (!stack.IsEmpty && stack.Length == Path.Length)
 			{
 				if (PrevSexp (ref stack))
@@ -240,7 +244,7 @@
 				}
 				else stack = stack.RestR;
 			}
-			return StackToPath (root, stack);
+			return StackToPath (root, stack.IsEmpty ? orig : stack);
 		}
 
 		/// <summary>
