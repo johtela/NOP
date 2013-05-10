@@ -7,12 +7,12 @@
 
 	public abstract class Reply<T, S>
 	{
-		public readonly Input<S> Input;
+		public readonly IInput<S> Input;
 		public readonly string Found;
 		public readonly LazyList<string> Expected;
 		public abstract T Result { get; }
 
-		private Reply (Input<S> input, string found, LazyList<string> expected)
+		private Reply (IInput<S> input, string found, LazyList<string> expected)
 		{
 			Input = input;
 			Found = found;
@@ -25,7 +25,7 @@
 		{
 			private readonly T _result;
 
-			public Success (T result, Input<S> input, string found, LazyList<string> expected) :
+			public Success (T result, IInput<S> input, string found, LazyList<string> expected) :
 				base (input, found, expected)
 			{
 				_result = result;
@@ -44,7 +44,7 @@
 
 		private class Failure : Reply<T, S>
 		{
-			public Failure (Input<S> input, string found, LazyList<string> expected) :
+			public Failure (IInput<S> input, string found, LazyList<string> expected) :
 				base (input, found, expected) { }
 
 			public override T Result
@@ -58,23 +58,23 @@
 			}
 		}
 
-		public static Reply<T, S> Ok (T result, Input<S> input)
+		public static Reply<T, S> Ok (T result, IInput<S> input)
 		{
 			return new Success (result, input, string.Empty, LazyList<string>.Empty);
 		}
 
-		public static Reply<T, S> Ok (T result, Input<S> input, string found, 
+		public static Reply<T, S> Ok (T result, IInput<S> input, string found, 
 			LazyList<string> expected)
 		{
 			return new Success (result, input, found, expected);
 		}
 
-		public static Reply<T, S> Fail (Input<S> input, string found) 
+		public static Reply<T, S> Fail (IInput<S> input, string found) 
 		{
 			return new Failure (input, found, LazyList<string>.Empty);
 		}
 
-		public static Reply<T, S> Fail (Input<S> input, string found, LazyList<string> expected) 
+		public static Reply<T, S> Fail (IInput<S> input, string found, LazyList<string> expected) 
 		{
 			return new Failure (input, found, expected);
 		}

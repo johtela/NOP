@@ -12,11 +12,11 @@ namespace NOP.Testbench
 		public static void AssertParsesTo<T> (string type, SExpr sexp) where T : Expression
 		{
 			var expr = Expression.Parse (sexp);
-			System.Diagnostics.Debug.WriteLine (sexp);
+			//System.Diagnostics.Debug.WriteLine (sexp);
 			Check.IsOfType<T> (expr);
 			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
-			expr.ChangeVisualDepictions ();
-			Runner.VConsole.ShowSExpr (sexp);
+			//expr.ChangeVisualDepictions ();
+			//Runner.VConsole.ShowSExpr (sexp);
 		}
 
 		[Test]

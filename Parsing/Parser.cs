@@ -9,7 +9,7 @@
 	/// parsed value. The types of the input stream and the parsed value are 
 	/// generic, so effectively parser can read any stream and return any value.
 	/// </summary>
-	public delegate Consumed<T, S> Parser<T, S> (Input<S> input);
+	public delegate Consumed<T, S> Parser<T, S> (IInput<S> input);
 
 	/// <summary>
 	/// Monadic parsing operations implemented as extensions methods for the
@@ -20,7 +20,7 @@
 		/// <summary>
 		/// Attempt to parse an input with a given parser.
 		/// </summary>
-		public static Either<T, ParseError> TryParse<T, S>(this Parser<T, S> parser, Input<S> input)
+		public static Either<T, ParseError> TryParse<T, S>(this Parser<T, S> parser, IInput<S> input)
 		{
 			var res = parser (input);
 			return res.Reply ?
@@ -31,7 +31,7 @@
 		/// <summary>
 		/// Parses an input, or throws an ParseError exception, if the parse fails.
 		/// </summary>
-		public static T Parse<T, S> (this Parser<T, S> parser, Input<S> input)
+		public static T Parse<T, S> (this Parser<T, S> parser, IInput<S> input)
 		{
 			return TryParse (parser, input).Match (
 				value => value,

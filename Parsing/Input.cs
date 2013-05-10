@@ -5,22 +5,15 @@
 	using System.Text;
 	using NOP.Collections;
 
-	public abstract class Input<S> : IStream<S>
+	public interface IInput<S> : IStream<S>
 	{
-		public abstract object GetPosition ();
-		
-		public abstract S First { get; }
-
-		public abstract Input<S> Rest { get; }
-
-		public abstract bool IsEmpty { get; }
-
-		IStream<S> IStream<S>.Rest { get { return Rest; } }
+		object GetPosition ();
+		new IInput<S> Rest { get; }
 	}
 
 	public static class Input
 	{
-		private class StringInt : Input<char>
+		private struct StringInt : IInput<char>
 		{
 			private readonly string _str;
 			private readonly int _pos;
@@ -37,12 +30,12 @@
 					throw new ParseError ("String is exhausted.");
 			}
 
-			public override object GetPosition ()
+			public object GetPosition ()
 			{
 				return _pos;
 			}
 
-			public override char First
+			public char First
 			{
 				get 
 				{
@@ -51,7 +44,7 @@
 				}
 			}
 
-			public override Input<char> Rest
+			public IInput<char> Rest
 			{
 				get 
 				{
@@ -60,13 +53,15 @@
 				}
 			}
 
-			public override bool IsEmpty
+			IStream<char> IStream<char>.Rest { get { return Rest; } }
+				 
+			public bool IsEmpty
 			{
 				get { return _pos >= _str.Length; }
 			}
 		}
 
-		public static Input<char> FromString (string str)
+		public static IInput<char> FromString (string str)
 		{
 			return new StringInt (str ?? string.Empty, 0);
 		}
