@@ -7,7 +7,13 @@ namespace NOP
 	public class QuoteExpression : Expression
 	{
 		public readonly Expression QuotedExpression;
-		
+
+		public QuoteExpression (SExpr sexp, Expression quotedExpression)
+			: base (sexp)
+		{
+			QuotedExpression = quotedExpression;
+		}
+
 		public QuoteExpression (SExpr.List quoteSExp) : base (quoteSExp)
 		{
 			var sexps = quoteSExp.Items.RestL;

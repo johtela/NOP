@@ -11,7 +11,15 @@ namespace NOP
 		public readonly SymbolExpression Variable;
 		public readonly Expression Value;
 		public readonly Expression Body;
-		
+
+		public LetExpression (SExpr sexp, SymbolExpression variable, Expression value,
+			Expression body) : base (sexp)
+		{
+			Variable = variable;
+			Value = value;
+			Body = body;
+		}
+
 		public LetExpression (SExpr.List letExpr) : base (letExpr)
 		{
 			var sexps = letExpr.Items.RestL;

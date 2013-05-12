@@ -17,7 +17,7 @@
 			Text = "Visual Console";
 			Size = new Size (700, 500);
 			AutoScroll = true;
-			BackColor = Color.Blue;
+			BackColor = Color.Black;
 			_control = new VisualControl ();
 			_control.Location = new Point (0, 0);
 			_control.Parent = this;

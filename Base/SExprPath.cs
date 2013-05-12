@@ -48,7 +48,7 @@
 		/// <summary>
 		/// Create a SExprPath that points to root.
 		/// </summary>
-		public SExprPath () : this (Sequence.Create (0)) {}
+		public SExprPath () : this (Sequence<int>.Empty ) {}
 
 		/// <summary>
 		/// Create a SExprPath that is pointig to a given node.
@@ -198,14 +198,13 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> PrevSibling (SExpr root)
 		{
-			var orig = PathToStack (root);
-			var stack = orig;
+			var stack = PathToStack (root);
 			if (!stack.IsEmpty && stack.Length == Path.Length)
 			{
 				if (!PrevSexp (ref stack))
 					stack = stack.RestR;
 			}
-			return StackToPath (root, stack.IsEmpty ? orig : stack);
+			return StackToPath (root, stack);
 		}
 
 		/// <summary>
@@ -233,8 +232,7 @@
 		/// </summary>
 		public Tuple<SExpr, SExprPath> Previous (SExpr root)
 		{
-			var orig = PathToStack (root);
-			var stack = orig;
+			var stack = PathToStack (root);
 			if (!stack.IsEmpty && stack.Length == Path.Length)
 			{
 				if (PrevSexp (ref stack))
@@ -244,7 +242,18 @@
 				}
 				else stack = stack.RestR;
 			}
-			return StackToPath (root, stack.IsEmpty ? orig : stack);
+			return StackToPath (root, stack);
+		}
+
+		public override bool Equals (object obj)
+		{
+			var other = obj as SExprPath;
+			return other != null && Path.Equals (other.Path);
+		}
+
+		public override int GetHashCode ()
+		{
+			return Path.GetHashCode ();
 		}
 
 		/// <summary>

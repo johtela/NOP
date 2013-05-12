@@ -95,5 +95,12 @@
 		public static void Ignore<T> (T value)
 		{	
 		}
+		
+		public static T Memoize<T> (Func<T> func, ref T store) where T : class
+		{
+			if (store == null)
+				store = func ();
+			return store;
+		}
 	}
 }

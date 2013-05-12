@@ -1,13 +1,20 @@
 namespace NOP
 {
 	using System;
-    using System.Collections.Generic;
-    using NOP.Collections;
+	using System.Collections.Generic;
+	using NOP.Collections;
 
 	public class SetExpression : Expression
 	{
 		public readonly SymbolExpression Variable;
 		public readonly Expression Value;
+
+		public SetExpression (SExpr sexp, SymbolExpression variable, Expression value)
+			: base (sexp)
+		{
+			Variable = variable;
+			Value = value;
+		}
 		
 		public SetExpression (SExpr.List setExpr) : base (setExpr)
 		{
@@ -25,9 +32,9 @@ namespace NOP
 		}
 
 		protected override void DoForChildNodes (Action<AstNode> action)
-        {
+		{
 			action (Variable);
 			action (Value);
-        }
+		}
 	}
 }

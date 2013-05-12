@@ -519,6 +519,10 @@
 			public readonly FingerTree<Node<T, V>, V> Inner;
 			public readonly Digit<T, V> Back;
 
+			// Memoized views.
+			private ViewL<T, V> _leftView;
+			private ViewR<T, V> _rightView;
+
 			public _Deep (Digit<T, V> front, FingerTree<Node<T, V>, V> inner, Digit<T, V> back)
 			{
 				Front = front;
@@ -547,12 +551,14 @@
 
 			public override ViewL<T, V> LeftView ()
 			{
-				return new ViewL<T, V> (Front.First, DeepL (Front.Suffix, Inner, Back));
+				return Fun.Memoize (() => new ViewL<T, V> (Front.First, DeepL (Front.Suffix, Inner, Back)), 
+					ref _leftView);
 			}
 
 			public override ViewR<T, V> RightView ()
 			{
-				return new ViewR<T, V> (Back.Last, DeepR (Front, Inner, Back.Prefix));
+				return Fun.Memoize (() => new ViewR<T, V> (Back.Last, DeepR (Front, Inner, Back.Prefix)),
+					ref _rightView);
 			}
 
 			public override FingerTree<T, V> AppendTree (IReducible<T> items, FingerTree<T, V> tree)

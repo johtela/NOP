@@ -9,6 +9,13 @@ namespace NOP
 		public readonly VariableDefinition Variable;
 		public readonly Expression Value;
 
+		public MemberDefinition (SExpr sexp, VariableDefinition variable, Expression value)
+			: base (sexp)
+		{
+			Variable = variable;
+			Value = value;
+		}
+
 		public MemberDefinition (SExpr.List typeDef) : base (typeDef)
 		{
 			var sexps = typeDef.Items.RestL;

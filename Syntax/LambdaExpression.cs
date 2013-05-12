@@ -10,7 +10,14 @@ namespace NOP
 	{
 		public readonly StrictList<SymbolExpression> Parameters;
 		public readonly Expression FunctionBody;
-		
+
+		public LambdaExpression (SExpr sexp, StrictList<SymbolExpression> parameters,
+			Expression functionBody) : base (sexp)
+		{
+			Parameters = parameters;
+			FunctionBody = functionBody;
+		}
+
 		public LambdaExpression (SExpr.List lambdaExpr) : base (lambdaExpr)
 		{
 			var sexps = lambdaExpr.Items.RestL;

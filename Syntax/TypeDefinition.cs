@@ -8,7 +8,14 @@ namespace NOP
 	{
 		public readonly SymbolExpression Name;
 		public readonly StrictList<Definition> Members;
-		
+
+		public TypeDefinition (SExpr sexp, SymbolExpression name, StrictList<Definition> members)
+			: base (sexp)
+		{
+			Name = name;
+			Members = members;
+		}
+
 		public TypeDefinition (SExpr.List typeDef) : base (typeDef)
 		{
 			var sexps = typeDef.Items.RestL;

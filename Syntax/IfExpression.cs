@@ -11,7 +11,15 @@ namespace NOP
 		public readonly Expression Condition;
 		public readonly Expression ThenExpression;
 		public readonly Expression ElseExpression;
-		
+
+		public IfExpression (SExpr sexp, Expression condition, Expression thenExpression,
+			Expression elseExpression) : base (sexp)
+		{
+			Condition = condition;
+			ThenExpression = thenExpression;
+			ElseExpression = elseExpression;
+		}
+
 		public IfExpression (SExpr.List ifExpr) : base (ifExpr)
 		{
 			var sexps = ifExpr.Items.RestL;

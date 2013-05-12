@@ -1,13 +1,20 @@
 namespace NOP
 {
 	using System;
-    using System.Collections.Generic;
-    using NOP.Collections;
+	using System.Collections.Generic;
+	using NOP.Collections;
 
 	public class VariableDefinition : AstNode
 	{
 		public readonly SymbolExpression Name;
 		public readonly TypeReference Type;
+
+		public VariableDefinition (SExpr sexp, SymbolExpression name, TypeReference type)
+			: base (sexp)
+		{
+			Name = name;
+			Type = type;
+		}
 
 		public VariableDefinition (SExpr sexp) : base (sexp)
 		{
@@ -30,9 +37,9 @@ namespace NOP
 		}
 
 		protected override void DoForChildNodes (Action<AstNode> action)
-        {
+		{
 			action (Name);
 			action (Type);
-        }
+		}
 	}
 }

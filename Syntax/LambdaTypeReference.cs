@@ -8,6 +8,13 @@ namespace NOP
 	{
 		public readonly TypeReference ArgumentType, ResultType;
 
+		public LambdaTypeReference (SExpr sexp, TypeReference argumentType,
+			TypeReference resultType) : base (sexp)
+		{
+			ArgumentType = argumentType;
+			ResultType = resultType;
+		}
+
 		public LambdaTypeReference (SExpr.List typeExpr) : base (typeExpr)
 		{
 			var sexps = typeExpr.Items.RestL;

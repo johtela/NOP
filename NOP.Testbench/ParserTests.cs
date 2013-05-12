@@ -15,8 +15,8 @@ namespace NOP.Testbench
 			//System.Diagnostics.Debug.WriteLine (sexp);
 			Check.IsOfType<T> (expr);
 			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
-			//expr.ChangeVisualDepictions ();
-			//Runner.VConsole.ShowSExpr (sexp);
+			expr.ChangeVisualDepictions ();
+			Runner.VConsole.ShowSExpr (sexp);
 		}
 
 		[Test]

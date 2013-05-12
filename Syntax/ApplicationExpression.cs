@@ -12,6 +12,13 @@ namespace NOP
 		public readonly Expression FuncName;
 		public readonly StrictList<Expression> Parameters;
 		
+		public ApplicationExpression (SExpr sexp, Expression funcName, 
+			StrictList<Expression> parameters) : base (sexp)
+		{
+			FuncName = funcName;
+			Parameters = parameters;
+		}
+
 		public ApplicationExpression (SExpr.List funcExpr) : base (funcExpr)
 		{
 			var sexps = funcExpr.Items;

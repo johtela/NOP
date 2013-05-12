@@ -9,6 +9,13 @@ namespace NOP
 		public readonly SymbolExpression TypeName;
 		public readonly StrictList<TypeReference> TypeParams;
 
+		public GenericTypeReference (SExpr sexp, SymbolExpression typeName,
+			StrictList<TypeReference> typeParams) : base (sexp)
+		{
+			TypeName = typeName;
+			TypeParams = typeParams;
+		}
+
 		public GenericTypeReference (SExpr.List typeExpr) : base (typeExpr)
 		{
 			TypeName = new SymbolExpression ((SExpr.Symbol)typeExpr.Items.First);
