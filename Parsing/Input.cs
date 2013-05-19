@@ -28,12 +28,12 @@
 		/// <summary>
 		/// Input for strings. Position is indicated by the index of current character.
 		/// </summary>
-		private struct StringPosInt : IInput<char>
+		private struct StringInt : IInput<char>
 		{
 			private readonly string _str;
 			private readonly int _pos;
 
-			public StringPosInt (string str, int pos)
+			public StringInt (string str, int pos)
 			{
 				_str = str;
 				_pos = pos;
@@ -58,7 +58,7 @@
 				get 
 				{
 					CheckNotEmpty (this);
-					return new StringPosInt (_str, _pos + 1);
+					return new StringInt (_str, _pos + 1);
 				}
 			}
 
@@ -74,12 +74,12 @@
 		/// Input stream for S-expressions. The current position is indicated
 		/// by the path.
 		/// </summary>
-		private class SExprPosPath : IInput<SExpr>
+		private class SExprSeqPath : IInput<Sequence<SExpr>>
 		{
-			private SExprPosPath _parent;
+			private SExprSeqPath _parent;
 			private Sequence<SExpr> _seq;
 
-			public SExprPosPath (SExprPosPath parent, Sequence<SExpr> seq)
+			public SExprSeqPath (SExprSeqPath parent, Sequence<SExpr> seq)
 			{
 				_parent = parent;
 				_seq = seq;
@@ -93,39 +93,36 @@
 				return new SExprPath (path);
 			}
 
-			public IInput<SExpr> Rest
+			public Sequence<SExpr> First
+			{
+				get
+				{
+					CheckNotEmpty (this);
+					return _seq;
+				}
+			}
+
+			public IInput<Sequence<SExpr>> Rest
 			{
 				get 
 				{
 					CheckNotEmpty (this);
 					if (_seq.First is SExpr.List)
-						return new SExprPosPath (this, (_seq.First as SExpr.List).Items);
-					var sp = this;
-					while (sp != null && sp._seq.RestL.IsEmpty)
-						sp = sp._parent;
-					return sp == null ?
-						new SExprPosPath (null, Sequence<SExpr>.Empty) :
-						new SExprPosPath (sp._parent, sp._seq.RestL);
+						return new SExprSeqPath (this, (_seq.First as SExpr.List).Items);
+					return _seq.IsEmpty ?
+						new SExprSeqPath (_parent._parent, _parent._seq.RestL) :
+						new SExprSeqPath (_parent, _seq.RestL);
 				}
 			}
 
-			public SExpr First
-			{
-				get 
-				{
-					CheckNotEmpty (this);
-					return _seq.First; 
-				}
-			}
-
-			IStream<SExpr> IStream<SExpr>.Rest
+			IStream<Sequence<SExpr>> IStream<Sequence<SExpr>>.Rest
 			{
 				get { return Rest; }
 			}
 
 			public bool IsEmpty
 			{
-				get { return _seq.IsEmpty; }
+				get { return _seq.IsEmpty && _parent == null; }
 			}
 		}
 
@@ -134,12 +131,16 @@
 		/// </summary>
 		public static IInput<char> FromString (string str)
 		{
-			return new StringPosInt (str ?? string.Empty, 0);
+			return new StringInt (str ?? string.Empty, 0);
 		}
 
-		public static IInput<SExpr> FromSExpr (SExpr root)
+		/// <summary>
+		/// Return an input stream for the given S-expression. The expression tree
+		/// is traversed in a depth first manner.
+		/// </summary>
+		public static IInput<Sequence<SExpr>> FromSExpr (SExpr root)
 		{
-			return new SExprPosPath (null, Sequence.Create (root));
+			return new SExprSeqPath (null, Sequence.Create (root));
 		}
 	}
 }

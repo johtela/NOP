@@ -95,7 +95,9 @@
 		public static Parser<T, S> Fail<T, S> (string found, string expected)
 		{ 
 			return input => new Empty<T, S> (Lazy.Create (Reply<T, S>.Fail (
-				input, found, LazyList.Create (expected))));
+				input, found, string.IsNullOrEmpty(expected) ? 
+					LazyList<string>.Empty :
+					LazyList.Create (expected))));
 		}
 
 		/// <summary>
@@ -168,12 +170,9 @@
 			return parser.Bind (x => project (x).Bind (y => select (x, y).ToParser<V, S> ()));
 		}
 
-		/// <summary>
-		/// Where extension method needed to enable Linq's syntactic sugaring.
-		/// </summary>
 		public static Parser<T, S> Where<T, S> (this Parser<T, S> parser, Func<T, bool> predicate)
 		{
-			return parser.Bind (x => predicate (x) ? x.ToParser<T, S> () : null);
+			return parser.Bind (x => predicate (x) ? x.ToParser<T, S> () : Fail<T, S> (x.ToString (), null));
 		}
 
 		/// <summary>

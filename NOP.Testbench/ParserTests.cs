@@ -1,6 +1,7 @@
 namespace NOP.Testbench
 {
 	using NOP;
+	using NOP.Grammar;
 
 	public class ParserTests : ExprUser
 	{
@@ -22,43 +23,43 @@ namespace NOP.Testbench
 		[Test]
 		public void TestAtom ()
 		{
-			AssertParsesTo<LiteralExpression> ("System.Int32", A (42));
+			AssertParsesTo<Expression._Literal> ("System.Int32", A (42));
 		}
 		
 		[Test]
 		public void TestLet ()
 		{
-			AssertParsesTo<LetExpression> ("System.Int32", TestPrograms.SimpleLet ());
+			AssertParsesTo<Expression._Let> ("System.Int32", TestPrograms.SimpleLet ());
 		}
 
 		[Test]
 		public void TestLambda ()
 		{
-			AssertParsesTo<LetExpression> ("System.String", TestPrograms.SimpleLambda ());
+			AssertParsesTo<Expression._Let> ("System.String", TestPrograms.SimpleLambda ());
 		}
 
 		[Test]
 		public void TestIf ()
 		{
-			AssertParsesTo<IfExpression> ("System.String", TestPrograms.SimpleIf ());
+			AssertParsesTo<Expression._If> ("System.String", TestPrograms.SimpleIf ());
 		}
 
 		[Test]
 		public void TestComplexIf ()
 		{
-			AssertParsesTo<LetExpression> ("System.String", TestPrograms.ComplexIf ());
+			AssertParsesTo<Expression._Let> ("System.String", TestPrograms.ComplexIf ());
 		}
 
 		[Test]
 		public void TestNestedLets ()
 		{
-			AssertParsesTo<LetExpression> ("System.Boolean", TestPrograms.NestedLets ());
+			AssertParsesTo<Expression._Let> ("System.Boolean", TestPrograms.NestedLets ());
 		}
 
 		[Test]
 		public void TestNestedLambdas ()
 		{
-			AssertParsesTo<ApplicationExpression> ("System.Boolean", TestPrograms.NestedLambdas ());
+			AssertParsesTo<Expression._Application> ("System.Boolean", TestPrograms.NestedLambdas ());
 		}
 	}
 }

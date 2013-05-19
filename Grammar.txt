@@ -25,7 +25,7 @@ LambdaExpression:		List ( Symbol("lambda") List ( VariableDefinition* ) Expressi
 SetExpression:			List ( Symbol("set!") VariableDefinition Expression )
 FunctionCallExpression: List ( Expression+ )
 VariableDefinition:		SymbolExpression | 
-						List ( SymbolExpression TypeExpression )
+						List ( SymbolExpression TypeReference )
 TypeReference:			BasicTypeRefence | 
 						GenericTypeReference | 
 						LambdaTypeReference 

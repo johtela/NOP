@@ -3,6 +3,7 @@
 	using System;
 	using System.Linq;
 	using NOP.Collections;
+	using Grammar;
 	
 	/// <summary>
 	/// Unification error is thrown when two monotypes cannot be unified, i.e. when there

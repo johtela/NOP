@@ -2,6 +2,7 @@ namespace NOP
 {
 	using System;
 	using Collections;
+	using Grammar;
 	
 	/// <summary>
 	/// TypeExpr class defines a simple typed lambda calculus that is used

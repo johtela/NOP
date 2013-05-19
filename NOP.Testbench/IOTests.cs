@@ -7,6 +7,7 @@
 	using System.IO;
 	using NOP;
 	using NOP.IO;
+	using NOP.Grammar;
 
 	public class IOTests
 	{
@@ -21,42 +22,42 @@
 		[Test]
 		public void TestSimpleLet ()
 		{
-			ParserTests.AssertParsesTo<LetExpression> ("System.Int32", 
+			ParserTests.AssertParsesTo<Expression._Let> ("System.Int32", 
 				ReadFile (@"SamplePrograms\SimpleLet.nop"));
 		}
 
 		[Test]
 		public void TestSimpleLambda ()
 		{
-			ParserTests.AssertParsesTo<LetExpression> ("System.String",
+			ParserTests.AssertParsesTo<Expression._Let> ("System.String",
 				ReadFile (@"SamplePrograms\SimpleLambda.nop"));
 		}
 
 		[Test]
 		public void TestSimpleIf ()
 		{
-			ParserTests.AssertParsesTo<IfExpression> ("System.String",
+			ParserTests.AssertParsesTo<Expression._If> ("System.String",
 				ReadFile (@"SamplePrograms\SimpleIf.nop"));
 		}
 
 		[Test]
 		public void TestComplexIf ()
 		{
-			ParserTests.AssertParsesTo<LetExpression> ("System.String",
+			ParserTests.AssertParsesTo<Expression._Let> ("System.String",
 				ReadFile (@"SamplePrograms\ComplexIf.nop"));
 		}
 
 		[Test]
 		public void TestNestedLets ()
 		{
-			ParserTests.AssertParsesTo<LetExpression> ("System.Boolean",
+			ParserTests.AssertParsesTo<Expression._Let> ("System.Boolean",
 				ReadFile (@"SamplePrograms\NestedLets.nop"));
 		}
 		
 		[Test]
 		public void TestNestedLambdas ()
 		{
-			ParserTests.AssertParsesTo<ApplicationExpression> ("System.Boolean",
+			ParserTests.AssertParsesTo<Expression._Application> ("System.Boolean",
 				ReadFile (@"SamplePrograms\NestedLambdas.nop"));
 		}
 	}

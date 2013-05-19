@@ -1,4 +1,4 @@
-namespace NOP
+namespace NOP.Grammar
 {
 	using System;
 	using Collections;
