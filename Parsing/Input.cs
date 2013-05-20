@@ -89,7 +89,10 @@
 			{
 				var path = Sequence<int>.Empty;
 				for (var sp = this; sp._parent != null; sp = sp._parent)
-					path += (sp._parent._seq.First as SExpr.List).Items.IndexOf(sp._seq.First);
+				{
+					var pseq = (sp._parent._seq.First as SExpr.List).Items;
+					path += sp._seq.IsEmpty ? pseq.Length : pseq.IndexOf (sp._seq.First);
+				}
 				return new SExprPath (path);
 			}
 

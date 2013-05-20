@@ -172,13 +172,6 @@
 				   select (x | xs).ToString ();
 		}
 
-		public static Parser<string, char> Identifier (Set<string> identifiers)
-		{
-			return (from x in Identifier ()
-					where identifiers.Contains (x)
-					select x).Token ();
-		}
-
 		public static Parser<T, char> Token<T> (this Parser<T, char> parser)
 		{
 			return from v in parser

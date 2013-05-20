@@ -30,7 +30,7 @@
 		{
 			return SExpr<SExpr.Symbol> (sym => sym.Name == name).Bind (sexp =>
 				new Expression._Symbol (sexp).ToParser<Expression._Symbol, Seq> ())
-				.Label ("symbol: " + name);
+				.Label (string.Format("'{0}'", name));
 		}
 
 		public static Parser<Expression._Literal, Seq> Literal ()
@@ -139,9 +139,10 @@
 
 		public static Parser<Expression, Seq> Application (SExpr lst)
 		{
-			return from fun in Expr ()
+			return (from fun in Expr ()
 				   from pars in Expr ().Many ()
-				   select Expression.Application (lst, fun, pars);
+				   select Expression.Application (lst, fun, pars))
+				   .Label ("function call");
 		}
 
 		public static Parser<Expression, Seq> If (SExpr lst)
