@@ -2,6 +2,8 @@ namespace NOP.Grammar
 {
 	using System;
 	using Collections;
+	using Grammar;
+	using Parsing;
 	using Visuals;
 	using V = NOP.Visuals.Visual;
 
@@ -28,63 +30,25 @@ namespace NOP.Grammar
 		/// </summary>
 		public static Expression Parse (SExpr sexp)
 		{
-			if (sexp is SExpr.Symbol)
-				return new _Symbol (sexp as SExpr.Symbol);
-			var slist = sexp as SExpr.List;
-			if (slist != null)
-			{
-				var list = (sexp as SExpr.List).Items;
-				if (list.IsEmpty)
-					return new _Literal (null);
-				var symbol = list.First as SExpr.Symbol;
-				if (symbol != null)
-				{
-					// Check if we have any of the special forms as first item.
-					switch (symbol.Name)
-					{
-						case "quote":
-							return new _Quoted (slist);
-						case "if":
-							return new _If (slist);
-						case "let":
-							return new _Let (slist);
-						case "lambda":
-							return new _Lambda (slist);
-						case "set!":
-							return new _Set (slist);
-					}
-				}
-				// Otherwise do a function call.
-				return new _Application (slist);
-			}
-			return new _Literal (sexp as SExpr.Literal);
+			return SExprParser.Expr ().Parse (Input.FromSExpr (sexp));
 		}
 
 		public class _Application : Expression
 		{
-			public readonly Expression FuncName;
+			public readonly Expression Function;
 			public readonly StrictList<Expression> Parameters;
 
-			public _Application (SExpr sexp, Expression funcName,
-				StrictList<Expression> parameters)
-				: base (sexp)
+			public _Application (SExpr sexp, Expression function,
+				StrictList<Expression> parameters) : base (sexp)
 			{
-				FuncName = funcName;
+				Function = function;
 				Parameters = parameters;
-			}
-
-			public _Application (SExpr.List funcExpr)
-				: base (funcExpr)
-			{
-				var sexps = funcExpr.Items;
-				FuncName = Parse (Expect<SExpr> (ref sexps, "function name or lambda expression"));
-				Parameters = List.MapReducible (sexps, sexp => Parse (sexp));
 			}
 
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				var te = FuncName.GetTypeExpr ();
+				var te = Function.GetTypeExpr ();
 
 				if (Parameters.IsEmpty)
 					return TypeExpr.Builder.App (te, null);
@@ -96,7 +60,7 @@ namespace NOP.Grammar
 
 			protected override void DoForChildNodes (Action<AstNode> action)
 			{
-				action (FuncName);
+				action (Function);
 				Parameters.Foreach (action);
 			}
 
@@ -116,21 +80,11 @@ namespace NOP.Grammar
 			public readonly Expression ElseExpression;
 
 			public _If (SExpr sexp, Expression condition, Expression thenExpression,
-				Expression elseExpression)
-				: base (sexp)
+				Expression elseExpression) : base (sexp)
 			{
 				Condition = condition;
 				ThenExpression = thenExpression;
 				ElseExpression = elseExpression;
-			}
-
-			public _If (SExpr.List ifExpr)
-				: base (ifExpr)
-			{
-				var sexps = ifExpr.Items.RestL;
-				Condition = Parse (Expect<SExpr> (ref sexps, "condition"));
-				ThenExpression = Parse (Expect<SExpr> (ref sexps, "then expression"));
-				ElseExpression = Parse (Expect<SExpr> (ref sexps, "else expression"));
 			}
 
 			protected override Visual GetVisual ()
@@ -164,38 +118,20 @@ namespace NOP.Grammar
 
 		public class _Lambda : Expression
 		{
-			public readonly StrictList<_Symbol> Parameters;
+			public readonly StrictList<VariableDefinition> Parameters;
 			public readonly Expression FunctionBody;
 
-			public _Lambda (SExpr sexp, StrictList<_Symbol> parameters,
-				Expression functionBody)
+			public _Lambda (SExpr sexp, StrictList<VariableDefinition> parameters, Expression functionBody)
 				: base (sexp)
 			{
 				Parameters = parameters;
 				FunctionBody = functionBody;
 			}
 
-			public _Lambda (SExpr.List lambdaExpr)
-				: base (lambdaExpr)
-			{
-				var sexps = lambdaExpr.Items.RestL;
-				var pars = Expect<SExpr.List> (ref sexps, "list of parameters");
-				Parameters = List.MapReducible (pars.Items, sexp =>
-				{
-					var par = sexp as SExpr.Symbol;
-					if (par == null)
-						ParseError (sexp, "Expected a symbol");
-					return new _Symbol (par);
-				});
-				if (sexps.IsEmpty)
-					ParseError (lambdaExpr, "Function body is missing");
-				FunctionBody = Parse (sexps.First);
-			}
-
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.MultiLam (Parameters.Map (s => s.Symbol.Name),
+				return TypeExpr.Builder.MultiLam (Parameters.Map (p => p.Name.Symbol.Name),
 					FunctionBody.GetTypeExpr ());
 			}
 
@@ -220,12 +156,11 @@ namespace NOP.Grammar
 
 		public class _Let : Expression
 		{
-			public readonly _Symbol Variable;
+			public readonly VariableDefinition Variable;
 			public readonly Expression Value;
 			public readonly Expression Body;
 
-			public _Let (SExpr sexp, _Symbol variable, Expression value,
-				Expression body)
+			public _Let (SExpr sexp, VariableDefinition variable, Expression value, Expression body)
 				: base (sexp)
 			{
 				Variable = variable;
@@ -233,20 +168,11 @@ namespace NOP.Grammar
 				Body = body;
 			}
 
-			public _Let (SExpr.List letExpr)
-				: base (letExpr)
-			{
-				var sexps = letExpr.Items.RestL;
-				Variable = new _Symbol (Expect<SExpr.Symbol> (ref sexps, "variable"));
-				Value = Parse (Expect<SExpr> (ref sexps, "variable value"));
-				Body = Parse (Expect<SExpr> (ref sexps, "body of let expression"));
-			}
-
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.Let (Variable.Symbol.Name, Value.GetTypeExpr (),
-											 Body.GetTypeExpr ());
+				return TypeExpr.Builder.Let (Variable.Name.Symbol.Name, Value.GetTypeExpr (),
+					Body.GetTypeExpr ());
 			}
 
 			protected override void DoForChildNodes (Action<AstNode> action)
@@ -272,10 +198,9 @@ namespace NOP.Grammar
 
 		public class _Literal : Expression
 		{
-			public readonly SExpr.Literal Literal;
+			public readonly new SExpr.Literal Literal;
 
-			public _Literal (SExpr.Literal literal)
-				: base (literal)
+			public _Literal (SExpr.Literal literal) : base (literal)
 			{
 				Literal = literal;
 			}
@@ -298,17 +223,9 @@ namespace NOP.Grammar
 		{
 			public readonly Expression QuotedExpression;
 
-			public _Quoted (SExpr sexp, Expression quotedExpression)
-				: base (sexp)
+			public _Quoted (SExpr sexp, Expression quotedExpression) : base (sexp)
 			{
 				QuotedExpression = quotedExpression;
-			}
-
-			public _Quoted (SExpr.List quoteSExp)
-				: base (quoteSExp)
-			{
-				var sexps = quoteSExp.Items.RestL;
-				QuotedExpression = Parse (Expect<SExpr> (ref sexps, "quoted expression"));
 			}
 
 			public override TypeExpr GetTypeExpr ()
@@ -322,24 +239,16 @@ namespace NOP.Grammar
 				action (QuotedExpression);
 			}
 		}
+
 		public class _Set : Expression
 		{
 			public readonly _Symbol Variable;
 			public readonly Expression Value;
 
-			public _Set (SExpr sexp, _Symbol variable, Expression value)
-				: base (sexp)
+			public _Set (SExpr sexp, _Symbol variable, Expression value) : base (sexp)
 			{
 				Variable = variable;
 				Value = value;
-			}
-
-			public _Set (SExpr.List setExpr)
-				: base (setExpr)
-			{
-				var sexps = setExpr.Items.RestL;
-				Variable = new _Symbol (Expect<SExpr.Symbol> (ref sexps, "variable"));
-				Value = Parse (Expect<SExpr> (ref sexps, "right hand side of set! clause"));
 			}
 
 			public override TypeExpr GetTypeExpr ()
@@ -359,10 +268,9 @@ namespace NOP.Grammar
 
 		public class _Symbol : Expression
 		{
-			public readonly SExpr.Symbol Symbol;
+			public readonly new SExpr.Symbol Symbol;
 
-			public _Symbol (SExpr.Symbol symbol)
-				: base (symbol)
+			public _Symbol (SExpr.Symbol symbol) : base (symbol)
 			{
 				Symbol = symbol;
 			}
@@ -372,6 +280,50 @@ namespace NOP.Grammar
 				base.GetTypeExpr ();
 				return TypeExpr.Builder.Var (Symbol.Name);
 			}
+		}
+
+		public static Expression Application (SExpr sexp, Expression function,
+				StrictList<Expression> parameters)
+		{
+			return new _Application (sexp, function, parameters);
+		}
+
+		public static Expression If (SExpr sexp, Expression condition, Expression thenExpression,
+			Expression elseExpression)
+		{
+			return new _If (sexp, condition, thenExpression, elseExpression);
+		}
+
+		public static Expression Lambda (SExpr sexp, StrictList<VariableDefinition> parameters,
+			Expression functionBody)
+		{
+			return new _Lambda (sexp, parameters, functionBody);
+		}
+
+		public static Expression Let (SExpr sexp, VariableDefinition variable, Expression value, 
+			Expression body)
+		{
+			return new _Let (sexp, variable, value, body);
+		}
+
+		public static Expression Literal (SExpr.Literal literal)
+		{
+			return new _Literal (literal);
+		}
+
+		public static Expression Quoted (SExpr sexp, Expression quotedExpression)
+		{
+			return new _Quoted (sexp, quotedExpression);
+		}
+
+		public static Expression Set (SExpr sexp, _Symbol variable, Expression value)
+		{
+			return new _Set (sexp, variable, value);
+		}
+
+		public static Expression Symbol (SExpr.Symbol symbol)
+		{
+			return new _Symbol (symbol);
 		}
 	}
 }

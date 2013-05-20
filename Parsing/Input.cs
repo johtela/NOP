@@ -107,11 +107,12 @@
 				get 
 				{
 					CheckNotEmpty (this);
-					if (_seq.First is SExpr.List)
+					if (_seq.IsEmpty)
+						return new SExprSeqPath (_parent._parent, _parent._seq.RestL);
+					else if (_seq.First is SExpr.List)
 						return new SExprSeqPath (this, (_seq.First as SExpr.List).Items);
-					return _seq.IsEmpty ?
-						new SExprSeqPath (_parent._parent, _parent._seq.RestL) :
-						new SExprSeqPath (_parent, _seq.RestL);
+					else
+						return new SExprSeqPath (_parent, _seq.RestL);
 				}
 			}
 

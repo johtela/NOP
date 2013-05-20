@@ -1,34 +1,33 @@
-The NOP grammar is expression-based, like in all Lisps. Below is the formal
-definition of the grammar.
+Below is the formal definition of NOP grammar.
 
 SExp:			Literal | Symbol | List ( SExp* )
 		
-Definition			TypeDefinition | MemberDefinition
-TypeDefinition:		List ( Symbol("type") Symbol Definition* )
-MemberDefinition:	List ( Symbol("def") VariableDefinition Expression )
+Definition			List ( TypeDefinition | MemberDefinition )
+TypeDefinition:		Symbol("type") Symbol Definition*
+MemberDefinition:	Symbol("def") VariableDefinition Expression
 
 Expression:		SymbolExpression | 
 				LiteralExpression |
-				QuoteExpression |
-				IfExpression |
-				LetExpression |
-				LambdaExpression |
-				SetExpression |
-				FunctionCallExpression
+				List (	QuoteExpression |
+						IfExpression |
+						LetExpression |
+						LambdaExpression |
+						SetExpression |
+						FunctionCallExpression )
 		
 LiteralExpression:		Literal
 SymbolExpression: 		Symbol
-QuoteExpression: 		List ( Symbol("quote") Expression )
-IfExpression:			List ( Symbol("if") Expression Expression Expression )
-LetExpression:			List ( Symbol("let") VariableDefinition Expression )
-LambdaExpression:		List ( Symbol("lambda") List ( VariableDefinition* ) Expression+ )
-SetExpression:			List ( Symbol("set!") VariableDefinition Expression )
-FunctionCallExpression: List ( Expression+ )
+QuoteExpression: 		Symbol("quote") Expression
+IfExpression:			Symbol("if") Expression Expression Expression
+LetExpression:			Symbol("let") VariableDefinition Expression
+LambdaExpression:		Symbol("lambda") List ( VariableDefinition* ) Expression
+SetExpression:			Symbol("set!") Symbol Expression
+FunctionCallExpression: Expression+
 VariableDefinition:		SymbolExpression | 
 						List ( SymbolExpression TypeReference )
 TypeReference:			BasicTypeRefence | 
-						GenericTypeReference | 
-						LambdaTypeReference 
+						List (	GenericTypeReference | 
+								LambdaTypeReference )
 BasicTypeReference:		SymbolExpression
-GenericTypeReference:	List ( SymbolExpression TypeReference+ )
-LambdaTypeReference:	List ( Symbol("->") TypeReference TypeReference )
+LambdaTypeReference:	Symbol("->") TypeReference TypeReference
+GenericTypeReference:	SymbolExpression TypeReference+

@@ -19,7 +19,7 @@ namespace NOP.Grammar
 		protected override void DoForChildNodes (Action<AstNode> action)
 		{
 			action (Name);
-			action (Type);
+			if (Type != null) action (Type);
 		}
 	}
 }
