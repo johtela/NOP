@@ -1,9 +1,10 @@
 namespace NOP.Testbench
 {
 	using System;
+	using System.Linq;
 	using NOP;
 	using NOP.Collections;
-	using System.Linq;
+	using NOP.Testing;
 
 	public class LazyListTests
 	{

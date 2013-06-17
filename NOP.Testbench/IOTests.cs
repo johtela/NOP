@@ -8,6 +8,7 @@
 	using NOP;
 	using NOP.IO;
 	using NOP.Grammar;
+	using NOP.Testing;
 
 	public class IOTests
 	{

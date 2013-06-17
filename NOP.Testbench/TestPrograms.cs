@@ -1,5 +1,6 @@
 ﻿namespace NOP.Testbench
 {
+	using NOP.Testing;
 	using System.Web.Script.Serialization;
 
 	public class TestPrograms : ExprUser

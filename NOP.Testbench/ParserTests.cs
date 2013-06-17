@@ -2,6 +2,7 @@ namespace NOP.Testbench
 {
 	using NOP;
 	using NOP.Grammar;
+	using NOP.Testing;
 
 	public class ParserTests : ExprUser
 	{

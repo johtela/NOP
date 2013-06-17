@@ -1,8 +1,9 @@
 namespace NOP.Testbench
 {
+	using System;
 	using System.Collections.Generic;
 	using NOP.Collections;
-	using System;
+	using NOP.Testing;
 
 	public class SetTests
 	{

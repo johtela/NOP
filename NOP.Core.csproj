@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Container.cs" />
     <Compile Include="Base\Either.cs" />
     <Compile Include="Base\Functor.cs" />
     <Compile Include="IO\SExprTextStore.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Collections\ArraySegment.cs" />
     <Compile Include="Base\Extensions.cs" />
     <Compile Include="Grammar\SExprParser.cs" />
+    <Compile Include="Testing\Arbitrary.cs" />
     <Compile Include="Testing\VisualConsole.cs">
       <SubType>Form</SubType>
     </Compile>

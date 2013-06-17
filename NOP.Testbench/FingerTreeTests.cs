@@ -5,6 +5,7 @@
 	using System.Linq;
 	using System.Text;
 	using NOP.Collections;
+	using NOP.Testing;
 
 	public class FingerTreeTests
 	{

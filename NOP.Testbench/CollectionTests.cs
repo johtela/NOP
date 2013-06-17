@@ -3,6 +3,7 @@ namespace NOP.Testbench
 	using System;
 	using NOP;
 	using NOP.Collections;
+	using NOP.Testing;
 	using System.Linq;
 
 	public class CollectionTests
@@ -15,6 +16,10 @@ namespace NOP.Testbench
 
 			list = StrictList<int>.Cons (0, list);
 			Check.IsFalse (list.IsEmpty);
+
+			var rnd = new Random();
+			var i = Arbitrary.Generate<int> (rnd, 100);
+			var s = Arbitrary.Generate<string> (rnd, 100);
 		}
 
 		[Test]

@@ -1,4 +1,4 @@
-namespace NOP
+namespace NOP.Testing
 {
 	using System;
 	using System.Collections.Generic;

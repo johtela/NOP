@@ -1,6 +1,7 @@
 ﻿namespace NOP.Testbench
 {
 	using NOP.Collections;
+	using NOP.Testing;
 
 	class SExprPathTests : ExprUser
 	{

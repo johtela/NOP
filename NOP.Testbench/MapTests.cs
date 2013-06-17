@@ -3,6 +3,7 @@ namespace NOP.Testbench
 	using System;
 	using System.Collections.Generic;
 	using NOP.Collections;
+	using NOP.Testing;
 
 	public class MapTests
 	{

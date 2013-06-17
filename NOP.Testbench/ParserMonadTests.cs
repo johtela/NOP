@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NOP.Collections;
-using NOP.Parsing;
-
-namespace NOP.Testbench
+﻿namespace NOP.Testbench
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using NOP.Collections;
+	using NOP.Parsing;
+	using NOP.Testing;
+
 	public class ParserMonadTests
 	{
 		[Test]

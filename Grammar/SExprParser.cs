@@ -67,7 +67,7 @@
 		public static Parser<Definition, Seq> Type (SExpr lst)
 		{
 			return from sym in Symbol ("type").Seq (Symbol ())
-				   from defs in Define ().Many1 ()
+				   from defs in Define ().Many ()
 				   select Definition.Type (lst, sym, defs);
 		}
 

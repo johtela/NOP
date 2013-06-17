@@ -6,6 +6,7 @@ namespace NOP.Testbench
 	using NOP;
 	using NOP.Framework;
 	using NOP.Collections;
+	using NOP.Testing;
 
 	public class Foo
 	{
