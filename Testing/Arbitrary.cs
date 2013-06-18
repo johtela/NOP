@@ -6,11 +6,19 @@
 	using System.Text;
 	using System.Reflection;
 
+	/// <summary>
+	/// The interface for generating random values.
+	/// </summary>
+	/// <typeparam name="T">The type of the arbitrary value created.</typeparam>
 	public interface IArbitrary<out T>
 	{
 		T Generate (Random rnd, int size);
 	}
 
+	/// <summary>
+	/// The basic infrastructure and extension methods for managing
+	/// and composing IArbitrary[T] interfaces.
+	/// </summary>
 	public static class Arbitrary
 	{
 		private static Container _container;
@@ -19,6 +27,11 @@
 		{
 			_container = new Container (typeof (IArbitrary<>));
 			_container.Register (Assembly.GetAssembly (typeof (Arbitrary)));
+		}
+
+		public static void Register<T> (IArbitrary<T> arbitrary)
+		{
+			_container.Register (arbitrary);
 		}
 
 		public static IArbitrary<T> Get<T> ()
@@ -31,46 +44,98 @@
 			return Get<T> ().Generate (rnd, size);
 		}
 
-		private class Integer : IArbitrary<int>
+		/// <summary>
+		/// Monadic return implementation.
+		/// </summary>
+		private class MReturn<T> : IArbitrary<T>
 		{
-			public int Generate (Random rnd, int size)
+			public readonly T Value;
+
+			public MReturn (T value)
 			{
-				return rnd.Next (size);
+				Value = value;
+			}
+
+			public T Generate (Random rnd, int size)
+			{
+				return Value;
 			}
 		}
 
-		private class Char : IArbitrary<char>
+		/// <summary>
+		/// Monadic bind implementation.
+		/// </summary>
+		private class MBind<T, U> : IArbitrary<U>
 		{
-			public char Generate (Random rnd, int size)
+			public readonly IArbitrary<T> Arbitrary;
+			public readonly Func<T, IArbitrary<U>> Function;
+
+			public MBind (IArbitrary<T> arb, Func<T, IArbitrary<U>> func)
 			{
-				return Convert.ToChar (rnd.Next (Convert.ToInt32 (' '), Convert.ToInt32 ('~')));
+				Arbitrary = arb;
+				Function = func;
+			}
+
+			public U Generate (Random rnd, int size)
+			{
+				var a = Arbitrary.Generate (rnd, size);
+				return Function (a).Generate (rnd, size);
 			}
 		}
 
-		private class Enumerable<T> : IArbitrary<IEnumerable<T>>
+		/// <summary>
+		/// Monadic return lifts a value to arbitrary.
+		/// </summary>
+		public static IArbitrary<T> ToArbitrary<T> (this T value)
 		{
-			public IEnumerable<T> Generate (Random rnd, int size)
-			{
-				var len = rnd.Next (size);
-				for (int i = 0; i < len; i++)
-					yield return Generate<T> (rnd, size);
-			}
+			return new MReturn<T> (value);
 		}
 
-		private class Array<T> : IArbitrary<T[]>
+		/// <summary>
+		/// Monadic bind, the magical wand that allows composing arbitraries.
+		/// </summary>
+		public static IArbitrary<U> Bind<T, U> (this IArbitrary<T> arb, Func<T, IArbitrary<U>> func)
 		{
-			public T[] Generate (Random rnd, int size)
-			{
-				return Generate<IEnumerable<T>> (rnd, size).ToArray ();
-			}
+			return new MBind<T, U> (arb, func);
 		}
 
-		private class String : IArbitrary<string>
+		/// <summary>
+		/// Select extension method needed to enable Linq's syntactic sugaring.
+		/// </summary>
+		public static IArbitrary<U> Select<T, U> (this IArbitrary<T> arb, Func<T, U> select)
 		{
-			public string Generate (Random rnd, int size)
-			{
-				return new string (Generate<char[]> (rnd, size));
-			}
+			return arb.Bind (a => select (a).ToArbitrary ());
+		}
+
+		/// <summary>
+		/// SelectMany extension method needed to enable Linq's syntactic sugaring.
+		/// </summary>
+		public static IArbitrary<V> SelectMany<T, U, V> (this IArbitrary<T> arb,
+			Func<T, IArbitrary<U>> project, Func<T, U, V> select)
+		{
+			return arb.Bind (a => project (a).Bind (b => select (a, b).ToArbitrary ()));
+		}
+
+		/// <summary>
+		/// Combine two arbitrary values into a tuple.
+		/// </summary>
+		public static IArbitrary<Tuple<T, U>> Plus<T, U> (this IArbitrary<T> arb1, IArbitrary<U> arb2)
+		{
+			return from a in arb1
+				   from b in arb2
+				   select Tuple.Create (a, b);
+		}
+
+		/// <summary>
+		/// Combine three arbitrary values into a tuple.
+		/// </summary>
+		public static IArbitrary<Tuple<T, U, V>> Plus<T, U, V> (this IArbitrary<T> arb1, IArbitrary<U> arb2,
+			IArbitrary<V> arb3)
+		{
+			return from a in arb1
+				   from b in arb2
+				   from c in arb3
+				   select Tuple.Create (a, b, c);
 		}
 	}
 }

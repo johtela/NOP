@@ -33,6 +33,12 @@
 				_types.Add (GenericDef (argType), GenericDef (type));
 		}
 
+		public void Register (object obj)
+		{
+			foreach (var argType in ArgumentTypes (obj.GetType ()))
+				_objects.Add (GenericDef (argType), obj);
+		}
+
 		public T GetImplementation<T> (Type argType)
 		{
 			object result;

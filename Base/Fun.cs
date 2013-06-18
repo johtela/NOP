@@ -87,6 +87,21 @@
 			return arg1 => (arg2 => (arg3 => (arg4 => func (arg1, arg2, arg3, arg4))));
 		}
 
+		public static Func<Tuple<T1, T2>, TRes> Tuplize<T1, T2, TRes> (this Func<T1, T2, TRes> func)
+		{
+			return t => func (t.Item1, t.Item2);
+		}
+
+		public static Func<Tuple<T1, T2, T3>, TRes> Tuplize<T1, T2, T3, TRes> (this Func<T1, T2, T3, TRes> func)
+		{
+			return t => func (t.Item1, t.Item2, t.Item3);
+		}
+
+		public static Func<Tuple<T1, T2, T3, T4>, TRes> Tuplize<T1, T2, T3, T4, TRes> (this Func<T1, T2, T3, T4, TRes> func)
+		{
+			return t => func (t.Item1, t.Item2, t.Item3, t.Item4);
+		}
+
 		public static T Identity<T> (T arg)
 		{
 			return arg;
