@@ -1,13 +1,24 @@
 namespace NOP.Testbench
 {
 	using System;
+	using System.Linq;
 	using NOP;
 	using NOP.Collections;
 	using NOP.Testing;
-	using System.Linq;
 
 	public class CollectionTests
 	{
+		[Test]
+		public void CheckProperties ()
+		{
+			Prop.Lift<StrictList<int>, int> ((list, item) =>
+			{
+				var newList = item | list;
+				return newList.Length () == list.Length () + 1 &&
+					newList.First == item && newList.Rest.EqualTo (list);
+			}).Label ("Adding arbitrary element").Check ();
+		}
+
 		[Test]
 		public void TestEmptyList ()
 		{
@@ -16,10 +27,6 @@ namespace NOP.Testbench
 
 			list = StrictList<int>.Cons (0, list);
 			Check.IsFalse (list.IsEmpty);
-
-			var rnd = new Random();
-			var i = Arbitrary.Generate<int> (rnd, 100);
-			var s = Arbitrary.Generate<string> (rnd, 100);
 		}
 
 		[Test]

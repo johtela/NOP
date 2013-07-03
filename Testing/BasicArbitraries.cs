@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
+	using NOP.Collections;
 
 	class BasicArbitraries
 	{
@@ -56,5 +57,13 @@
 				return new string (Arbitrary.Generate<char[]> (rnd, size));
 			}
 		}
+
+		private class AList<T> : IArbitrary<StrictList<T>>
+		{
+			public StrictList<T> Generate (Random rnd, int size)
+			{
+				return List.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
+			}
+		}
 	}
-}
+}	
