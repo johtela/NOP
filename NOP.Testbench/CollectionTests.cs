@@ -5,18 +5,65 @@ namespace NOP.Testbench
 	using NOP;
 	using NOP.Collections;
 	using NOP.Testing;
+	using System.Collections.Generic;
 
 	public class CollectionTests
 	{
-		[Test]
-		public void CheckProperties ()
+		private IArbitrary<Tuple<S, int>> StreamAndIndex<S, T> (int lessThanLength) where S : IStream<T>
 		{
-			Prop.Lift<StrictList<int>, int> ((list, item) =>
-			{
-				var newList = item | list;
-				return newList.Length () == list.Length () + 1 &&
-					newList.First == item && newList.Rest.EqualTo (list);
-			}).Label ("Adding arbitrary element").Check ();
+			return from list in Arbitrary.Get<S> ()
+				   from n in Arbitrary.Get<int> ()
+				   where list.Length () >= n - lessThanLength
+				   select Tuple.Create (list, n);
+		}
+
+		public static bool PrependItem<S, T> (Func<S, T, S> prepend, S list, T item) where S : IStream<T>
+		{
+			var newList = prepend (list, item);
+			return newList.Length () == list.Length () + 1 &&
+				newList.First.Equals (item) && newList.Rest.IsEqualTo (list);
+		}
+
+		private static bool DropNElements<S, T> (S list, int n) where S : IStream<T>
+		{
+			var newList = list.Drop (n);
+			return newList.Length () == list.Length () - n &&
+				(newList.IsEmpty ||
+					(newList.First.Equals (list.FindNext (newList.First).First) &&
+					newList.Last ().Equals (list.Last ())));
+		}
+
+		private static bool AppendItem<S, T> (Func<S, T, S> append, S list, T item) where S : IStream<T>
+		{
+		    var newList = append (list, item);
+			return newList.Last ().Equals (item) &&
+				newList.Length () == list.Length () + 1 &&
+				list.IsProperPrefixOf (newList);
+		}
+
+		[Test]
+		public void TestProperties ()
+		{
+			Prop.Lift<StrictList<int>, int> ((list, item) => PrependItem ((l, i) => i | l, list, item))
+				.Label ("Prepend arbitrary int to a strict list").Check ();
+			Prop.Lift<LazyList<char>, char> ((list, item) => PrependItem ((l, i) => i | l, list, item))
+				.Label ("Prepend arbitrary char to a lazy list").Check ();
+			Prop.Lift<Sequence<float>, float> ((list, item) => PrependItem ((l, i) => i + l, list, item))
+				.Label ("Prepend arbitrary float to a sequence").Check ();
+
+			Prop.Create (StreamAndIndex<StrictList<int>, int> (0), DropNElements<StrictList<int>, int>)
+				.Label ("Drop n ints from strict list").Check ();
+			Prop.Create (StreamAndIndex<LazyList<char>, char> (0), DropNElements<LazyList<char>, char>)
+				.Label ("Drop n chars from lazy list").Check ();
+			Prop.Create (StreamAndIndex<Sequence<float>, float> (0), DropNElements<Sequence<float>, float>)
+				.Label ("Drop n floats from sequence").Check ();
+
+			Prop.Lift<StrictList<int>, int> ((list, item) => AppendItem((l, i) => l + i, list, item))
+				.Label ("Append arbitrary int to a strict list").Check ();
+			Prop.Lift<LazyList<char>, char> ((list, item) => AppendItem ((l, i) => l + i, list, item))
+				.Label ("Append arbitrary char to a lazy list").Check ();
+			Prop.Lift<Sequence<float>, float> ((list, item) => AppendItem ((l, i) => l + i, list, item))
+				.Label ("Append arbitrary float to a sequence").Check ();
 		}
 
 		[Test]
@@ -64,14 +111,14 @@ namespace NOP.Testbench
 		{
 			var list = List.FromArray (new int[] { 1, 2, 3 });
 
-			Check.IsTrue (List.Create (1, 2, 3).EqualTo (list.FindNext (1)));
-			Check.IsTrue (List.Create (2, 3).EqualTo (list.FindNext (2)));
-			Check.IsTrue (List.Create (3).EqualTo (list.FindNext (3)));
-			Check.IsTrue (StrictList<int>.Empty.EqualTo (list.FindNext (4)));
+			Check.IsTrue (List.Create (1, 2, 3).IsEqualTo (list.FindNext (1)));
+			Check.IsTrue (List.Create (2, 3).IsEqualTo (list.FindNext (2)));
+			Check.IsTrue (List.Create (3).IsEqualTo (list.FindNext (3)));
+			Check.IsTrue (StrictList<int>.Empty.IsEqualTo (list.FindNext (4)));
 
-			Check.IsTrue (List.Create (1, 2, 3).EqualTo (list.FindNext (i => i > 0)));
-			Check.IsTrue (List.Create (3).EqualTo (list.FindNext (i => i > 2)));
-			Check.IsTrue (StrictList<int>.Empty.EqualTo (list.FindNext (i => i > 3)));
+			Check.IsTrue (List.Create (1, 2, 3).IsEqualTo (list.FindNext (i => i > 0)));
+			Check.IsTrue (List.Create (3).IsEqualTo (list.FindNext (i => i > 2)));
+			Check.IsTrue (StrictList<int>.Empty.IsEqualTo (list.FindNext (i => i > 3)));
 		}
 
 		[Test]
@@ -106,10 +153,10 @@ namespace NOP.Testbench
 		{
 			var list = List.Create (1, 2, 3);
 
-			Check.IsTrue (List.Create (1, 2, 2, 3).EqualTo (list.InsertBefore (2, 3)));
-			Check.IsTrue (List.Create (1, 2, 3, 4).EqualTo (list.InsertBefore (4, 0)));
-			Check.IsTrue (List.Create (0, 1, 2, 3).EqualTo (list.InsertBefore (0, 1)));
-			Check.IsTrue (List.Create (1).EqualTo (StrictList<int>.Empty.InsertBefore (1, 0)));
+			Check.IsTrue (List.Create (1, 2, 2, 3).IsEqualTo (list.InsertBefore (2, 3)));
+			Check.IsTrue (List.Create (1, 2, 3, 4).IsEqualTo (list.InsertBefore (4, 0)));
+			Check.IsTrue (List.Create (0, 1, 2, 3).IsEqualTo (list.InsertBefore (0, 1)));
+			Check.IsTrue (List.Create (1).IsEqualTo (StrictList<int>.Empty.InsertBefore (1, 0)));
 		}
 
 		[Test]
@@ -117,10 +164,10 @@ namespace NOP.Testbench
 		{
 			var list = List.Create (1, 2, 3, 4, 5);
 
-			Check.IsTrue (List.Create (1, 2, 4, 5).EqualTo (list.Remove (3)));
-			Check.IsTrue (List.Create (2, 3, 4, 5).EqualTo (list.Remove (1)));
-			Check.IsTrue (List.Create (1, 2, 3, 4).EqualTo (list.Remove (5)));
-			Check.IsTrue (list.EqualTo (list.Remove (0)));
+			Check.IsTrue (List.Create (1, 2, 4, 5).IsEqualTo (list.Remove (3)));
+			Check.IsTrue (List.Create (2, 3, 4, 5).IsEqualTo (list.Remove (1)));
+			Check.IsTrue (List.Create (1, 2, 3, 4).IsEqualTo (list.Remove (5)));
+			Check.IsTrue (list.IsEqualTo (list.Remove (0)));
 		}
 
 		[Test]
@@ -141,7 +188,7 @@ namespace NOP.Testbench
 			var list = List.Create (1, 2, 3);
 
 			var res = list.Collect (i => List.Create (i + 10, i + 20, i + 30));
-			Check.IsTrue (res.EqualTo (List.Create (11, 21, 31, 12, 22, 32, 13, 23, 33)));
+			Check.IsTrue (res.IsEqualTo (List.Create (11, 21, 31, 12, 22, 32, 13, 23, 33)));
 
 			var res2 = StrictList<int>.Empty.Collect (i => List.Create (i));
 			Check.IsTrue (res2.IsEmpty);
@@ -152,30 +199,30 @@ namespace NOP.Testbench
 		{
 			var list1 = List.Create (1, 2, 3);
 			var list2 = List.Create ('a', 'b', 'c');
-
+			 
 			var zipped = list1.ZipWith (list2);
 			Check.AreEqual (Tuple.Create (1, 'a'), zipped.First);
-			Check.AreEqual (Tuple.Create (3, 'c'), zipped.Last);
+			Check.AreEqual (Tuple.Create (3, 'c'), zipped.Last ());
 
 			var listLonger = List.Create ("one", "two", "three", "four");
 			var listShorter = List.Create (1.0, 2.0, 3.0);
 
 			var zipped2 = listLonger.ZipWith (listShorter);
 			Check.AreEqual (listShorter.Length (), zipped2.Length ());
-			Check.AreEqual (Tuple.Create ("three", 3.0), zipped2.Last);
+			Check.AreEqual (Tuple.Create ("three", 3.0), zipped2.Last ());
 
 			var zipped3 = listLonger.ZipExtendingWith (listShorter);
 			Check.AreEqual (listLonger.Length (), zipped3.Length ());
-			Check.AreEqual (Tuple.Create ("four", 0.0), zipped3.Last);
+			Check.AreEqual (Tuple.Create ("four", 0.0), zipped3.Last ());
 		}
 
 		[Test]
 		public void TestMap ()
 		{
 			Func<int, int> timesTwo = n => n * 2;
-			Check.IsTrue (List.Create (1, 2, 3).Map (timesTwo).EqualTo (List.Create (2, 4, 6)));
-			Check.IsTrue (StrictList<int>.Empty.Map (timesTwo).EqualTo (StrictList<int>.Empty));
-			Check.IsTrue (List.Cons (1).Map (timesTwo).EqualTo (List.Create (2)));
+			Check.IsTrue (List.Create (1, 2, 3).Map (timesTwo).IsEqualTo (List.Create (2, 4, 6)));
+			Check.IsTrue (StrictList<int>.Empty.Map (timesTwo).IsEqualTo (StrictList<int>.Empty));
+			Check.IsTrue (List.Cons (1).Map (timesTwo).IsEqualTo (List.Create (2)));
 		}
 
 		[Test]

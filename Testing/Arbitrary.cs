@@ -6,13 +6,28 @@
 	using System.Text;
 	using System.Reflection;
 
+	public interface IArbitrary
+	{
+		object Generate (Random rnd, int size);
+	}
+
 	/// <summary>
 	/// The interface for generating random values.
 	/// </summary>
 	/// <typeparam name="T">The type of the arbitrary value created.</typeparam>
-	public interface IArbitrary<out T>
+	public interface IArbitrary<out T> : IArbitrary
 	{
-		T Generate (Random rnd, int size);
+		new T Generate (Random rnd, int size);
+	}
+
+	public abstract class ArbitraryBase<T> : IArbitrary<T>
+	{
+		public abstract T Generate (Random rnd, int size);
+
+		object IArbitrary.Generate (Random rnd, int size)
+		{
+			return Generate (rnd, size);
+		}
 	}
 
 	/// <summary>
@@ -36,7 +51,12 @@
 
 		public static IArbitrary<T> Get<T> ()
 		{
-			return _container.GetImplementation<IArbitrary<T>> (typeof (T));
+			return (IArbitrary<T>)_container.GetImplementation (typeof (T));
+		}
+
+		public static IArbitrary Get (Type type)
+		{
+			return (IArbitrary)_container.GetImplementation (type);
 		}
 
 		public static T Generate<T> (Random rnd, int size)
@@ -47,7 +67,7 @@
 		/// <summary>
 		/// Monadic return implementation.
 		/// </summary>
-		private class MReturn<T> : IArbitrary<T>
+		private class MReturn<T> : ArbitraryBase<T>
 		{
 			public readonly T Value;
 
@@ -56,7 +76,7 @@
 				Value = value;
 			}
 
-			public T Generate (Random rnd, int size)
+			public override T Generate (Random rnd, int size)
 			{
 				return Value;
 			}
@@ -65,7 +85,7 @@
 		/// <summary>
 		/// Monadic bind implementation.
 		/// </summary>
-		private class MBind<T, U> : IArbitrary<U>
+		private class MBind<T, U> : ArbitraryBase<U>
 		{
 			public readonly IArbitrary<T> Arbitrary;
 			public readonly Func<T, IArbitrary<U>> Function;
@@ -76,10 +96,30 @@
 				Function = func;
 			}
 
-			public U Generate (Random rnd, int size)
+			public override U Generate (Random rnd, int size)
 			{
 				var a = Arbitrary.Generate (rnd, size);
 				return Function (a).Generate (rnd, size);
+			}
+		}
+
+		private class MWhere<T> : ArbitraryBase<T>
+		{
+			public readonly IArbitrary<T> Arbitrary;
+			public readonly Func<T, bool> Predicate;
+
+			public MWhere (IArbitrary<T> arbitrary, Func<T, bool> predicate)
+			{
+				Arbitrary = arbitrary;
+				Predicate = predicate;
+			}
+
+			public override T Generate (Random rnd, int size)
+			{
+				T result;
+				do { result = Arbitrary.Generate (rnd, size); } 
+				while (!Predicate (result));
+				return result;
 			}
 		}
 
@@ -116,6 +156,11 @@
 			return arb.Bind (a => project (a).Bind (b => select (a, b).ToArbitrary ()));
 		}
 
+		public static IArbitrary<T> Where<T> (this IArbitrary<T> arb, Func<T, bool> predicate)
+		{
+			return new MWhere<T> (arb, predicate);
+		}
+
 		/// <summary>
 		/// Combine two arbitrary values into a tuple.
 		/// </summary>
@@ -136,6 +181,26 @@
 				   from b in arb2
 				   from c in arb3
 				   select Tuple.Create (a, b, c);
+		}
+
+		private class MCombine : ArbitraryBase<object[]>
+		{
+			public readonly IEnumerable<IArbitrary> _arbitraries;
+
+			public MCombine (IEnumerable<IArbitrary> arbs)
+			{
+				_arbitraries = arbs;
+			}
+
+			public override object[] Generate (Random rnd, int size)
+			{
+				return _arbitraries.Select (arb => arb.Generate (rnd, size)).ToArray ();
+			}
+		}
+
+		public static IArbitrary<object[]> Combine (this IEnumerable<IArbitrary> arbs)
+		{
+			return new MCombine (arbs);
 		}
 	}
 }

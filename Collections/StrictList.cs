@@ -133,28 +133,6 @@
 		}
 
 		/// <summary>
-		/// The last cons cell of the list. 
-		/// </summary>
-		public StrictList<T> End
-		{
-			get
-			{
-				var result = this;
-				while (!(result.IsEmpty || result.Rest.IsEmpty))
-					result = result.Rest;
-				return result;
-			}
-		}
-
-		/// <summary>
-		/// The last item in the list.
-		/// </summary>
-		public T Last
-		{
-			get { return End.First; }
-		}
-
-		/// <summary>
 		/// Copy the list upto the given element. 
 		/// </summary>
 		/// <param name="stop">The tail of the list that, when encountered, will 
@@ -427,7 +405,7 @@
 		public override bool Equals (object obj)
 		{
 			var otherList = obj as StrictList<T>;
-			return (otherList != null) && this.EqualTo (otherList);
+			return (otherList != null) && this.IsEqualTo (otherList);
 		}
 		
 		/// <summary>
@@ -463,6 +441,11 @@
 		public static StrictList<T> operator | (T first, StrictList<T> rest)
 		{
 			return Cons (first, rest);
+		}
+
+		public static StrictList<T> operator + (StrictList<T> list, T item)
+		{
+			return list.Append (item);
 		}
 
 		#endregion

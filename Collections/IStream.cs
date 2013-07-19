@@ -25,6 +25,25 @@
 	public static class StreamExtensions
 	{
 		/// <summary>
+		/// The last cell of the stream. 
+		/// </summary>
+		public static IStream<T> End<T> (this IStream<T> seq)
+		{
+			var result = seq;
+			while (!(result.IsEmpty || result.Rest.IsEmpty))
+				result = result.Rest;
+			return result;
+		}
+
+		/// <summary>
+		/// The last item in the stream.
+		/// </summary>
+		public static T Last<T> (this IStream<T> seq)
+		{
+			return seq.End ().First;
+		}
+
+		/// <summary>
 		/// Count the length, i.e. the number of items, in the sequence.
 		/// </summary>
 		public static int Length<T> (this IStream<T> seq)
@@ -86,17 +105,28 @@
 			return -1;
 		}
 
-		/// <summary>
-		/// Check if two lists are equal, that is contain the same items in
-		/// the same order, and have equal lengths.
-		/// </summary>
-		public static bool EqualTo<T> (this IStream<T> seq, IStream<T> other, Func<T, T, bool> equals)
+		private static void CompareUntilDiffersOrExhausts<T> (ref IStream<T> seq, 
+			ref IStream<T> other, Func<T, T, bool> equals)
 		{
 			while (!seq.IsEmpty && !other.IsEmpty && equals (seq.First, other.First))
 			{
 				seq = seq.Rest;
 				other = other.Rest;
 			}
+		}
+
+		private static bool StandardEquals<T> (T item1, T item2)
+		{
+			return item1.Equals (item2);
+		}
+
+		/// <summary>
+		/// Check if two lists are equal, that is contain the same items in
+		/// the same order, and have equal lengths.
+		/// </summary>
+		public static bool IsEqualTo<T> (this IStream<T> seq, IStream<T> other, Func<T, T, bool> equals)
+		{
+			CompareUntilDiffersOrExhausts (ref seq, ref other, equals);
 			return seq.IsEmpty && other.IsEmpty;
 		}
 
@@ -104,9 +134,27 @@
 		/// Check if two lists are equal, that is contain the same items in
 		/// the same order, and have equal lengths.
 		/// </summary>
-		public static bool EqualTo<T> (this IStream<T> seq, IStream<T> other)
+		public static bool IsEqualTo<T> (this IStream<T> seq, IStream<T> other)
 		{
-			return seq.EqualTo (other, (i1, i2) => i1.Equals (i2));
+			return seq.IsEqualTo (other, StandardEquals);
+		}
+
+		/// <summary>
+		/// Checks if the first list (this) is a prefix of the second list;
+		/// </summary>
+		public static bool IsPrefixOf<T> (this IStream<T> seq, IStream<T> other)
+		{
+			CompareUntilDiffersOrExhausts (ref seq, ref other, StandardEquals);
+			return seq.IsEmpty;
+		}
+
+		/// <summary>
+		/// Checks if the first list (this) is a proper prefix of the second list;
+		/// </summary>
+		public static bool IsProperPrefixOf<T> (this IStream<T> seq, IStream<T> other)
+		{
+			CompareUntilDiffersOrExhausts (ref seq, ref other, StandardEquals);
+			return seq.IsEmpty && !other.IsEmpty;
 		}
 
 		/// <summary>

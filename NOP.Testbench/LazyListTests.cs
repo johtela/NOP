@@ -52,14 +52,14 @@ namespace NOP.Testbench
 		{
 			var list = LazyList.FromArray (new int[] { 1, 2, 3 });
 
-			Check.IsTrue (LazyList.Create (1, 2, 3).EqualTo (list.FindNext (1)));
-			Check.IsTrue (LazyList.Create (2, 3).EqualTo (list.FindNext (2)));
-			Check.IsTrue (LazyList.Create (3).EqualTo (list.FindNext (3)));
-			Check.IsTrue (LazyList<int>.Empty.EqualTo (list.FindNext (4)));
+			Check.IsTrue (LazyList.Create (1, 2, 3).IsEqualTo (list.FindNext (1)));
+			Check.IsTrue (LazyList.Create (2, 3).IsEqualTo (list.FindNext (2)));
+			Check.IsTrue (LazyList.Create (3).IsEqualTo (list.FindNext (3)));
+			Check.IsTrue (LazyList<int>.Empty.IsEqualTo (list.FindNext (4)));
 
-			Check.IsTrue (LazyList.Create (1, 2, 3).EqualTo (list.FindNext (i => i > 0)));
-			Check.IsTrue (LazyList.Create (3).EqualTo (list.FindNext (i => i > 2)));
-			Check.IsTrue (LazyList<int>.Empty.EqualTo (list.FindNext (i => i > 3)));
+			Check.IsTrue (LazyList.Create (1, 2, 3).IsEqualTo (list.FindNext (i => i > 0)));
+			Check.IsTrue (LazyList.Create (3).IsEqualTo (list.FindNext (i => i > 2)));
+			Check.IsTrue (LazyList<int>.Empty.IsEqualTo (list.FindNext (i => i > 3)));
 		}
 
 		[Test]
@@ -104,7 +104,7 @@ namespace NOP.Testbench
 			var list = LazyList.Create (1, 2, 3);
 
 			var res = list.Collect (i => LazyList.Create (i + 10, i + 20, i + 30));
-			Check.IsTrue (res.EqualTo (LazyList.Create (11, 21, 31, 12, 22, 32, 13, 23, 33)));
+			Check.IsTrue (res.IsEqualTo (LazyList.Create (11, 21, 31, 12, 22, 32, 13, 23, 33)));
 
 			var res2 = LazyList<int>.Empty.Collect (i => LazyList<int>.Cons (i, () => LazyList<int>.Empty));
 			Check.IsTrue (res2.IsEmpty);
@@ -132,9 +132,9 @@ namespace NOP.Testbench
 		public void TestMap ()
 		{
 			Func<int, int> timesTwo = n => n * 2;
-			Check.IsTrue (LazyList.Create (1, 2, 3).Map (timesTwo).EqualTo (List.Create (2, 4, 6)));
-			Check.IsTrue (LazyList<int>.Empty.Map (timesTwo).EqualTo (LazyList<int>.Empty));
-			Check.IsTrue (LazyList.Create (1).Map (timesTwo).EqualTo (List.Create (2)));
+			Check.IsTrue (LazyList.Create (1, 2, 3).Map (timesTwo).IsEqualTo (List.Create (2, 4, 6)));
+			Check.IsTrue (LazyList<int>.Empty.Map (timesTwo).IsEqualTo (LazyList<int>.Empty));
+			Check.IsTrue (LazyList.Create (1).Map (timesTwo).IsEqualTo (List.Create (2)));
 		}
 	
 		[Test]

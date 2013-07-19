@@ -208,7 +208,7 @@
 
 		public override bool Equals (object obj)
 		{
-			return (obj is Sequence<T>) && this.EqualTo ((Sequence<T>)obj);
+			return (obj is Sequence<T>) && this.IsEqualTo ((Sequence<T>)obj);
 		}
 
 		public override int GetHashCode ()

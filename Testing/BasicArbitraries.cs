@@ -8,33 +8,49 @@
 
 	class BasicArbitraries
 	{
-		private class AChar : IArbitrary<Char>
+		private class AChar : ArbitraryBase<Char>
 		{
-			public Char Generate (Random rnd, int size)
+			public override Char Generate (Random rnd, int size)
 			{
 				return Convert.ToChar (rnd.Next (Convert.ToInt32 (' '), Convert.ToInt32 ('~')));
 			}
 		}
 
-		private class AInt32 : IArbitrary<Int32>
+		private class AInt32 : ArbitraryBase<Int32>
 		{
-			public Int32 Generate (Random rnd, int size)
+			public override Int32 Generate (Random rnd, int size)
 			{
 				return rnd.Next (size);
 			}
 		}
 
-		private class AInt64 : IArbitrary<Int64>
+		private class AInt64 : ArbitraryBase<Int64>
 		{
-			public Int64 Generate (Random rnd, int size)
+			public override Int64 Generate (Random rnd, int size)
 			{
 				return rnd.Next (size) << 32 + rnd.Next (size);
 			}
 		}
 
-		private class AEnumerable<T> : IArbitrary<IEnumerable<T>>
+		private class AFloat : ArbitraryBase<float>
 		{
-			public IEnumerable<T> Generate (Random rnd, int size)
+			public override float Generate (Random rnd, int size)
+			{
+				return (float)rnd.NextDouble () * size;
+			}
+		}
+
+		private class ADouble : ArbitraryBase<double>
+		{
+			public override double Generate (Random rnd, int size)
+			{
+				return rnd.NextDouble () * size;
+			}
+		}
+
+		private class AEnumerable<T> : ArbitraryBase<IEnumerable<T>>
+		{
+			public override IEnumerable<T> Generate (Random rnd, int size)
 			{
 				var len = rnd.Next (size);
 				for (int i = 0; i < len; i++)
@@ -42,28 +58,44 @@
 			}
 		}
 
-		private class Array<T> : IArbitrary<T[]>
+		private class Array<T> : ArbitraryBase<T[]>
 		{
-			public T[] Generate (Random rnd, int size)
+			public override T[] Generate (Random rnd, int size)
 			{
 				return Arbitrary.Generate<IEnumerable<T>> (rnd, size).ToArray ();
 			}
 		}
 
-		private class String : IArbitrary<string>
+		private class String : ArbitraryBase<string>
 		{
-			public string Generate (Random rnd, int size)
+			public override string Generate (Random rnd, int size)
 			{
 				return new string (Arbitrary.Generate<char[]> (rnd, size));
 			}
 		}
 
-		private class AList<T> : IArbitrary<StrictList<T>>
+		private class AStrictList<T> : ArbitraryBase<StrictList<T>>
 		{
-			public StrictList<T> Generate (Random rnd, int size)
+			public override StrictList<T> Generate (Random rnd, int size)
 			{
 				return List.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
 			}
 		}
+
+		private class ALazyList<T> : ArbitraryBase<LazyList<T>>
+		{
+			public override LazyList<T> Generate (Random rnd, int size)
+			{
+				return LazyList.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
+			}
+		}
+
+		private class ASequence<T> : ArbitraryBase<Sequence<T>>
+		{
+			public override Sequence<T> Generate (Random rnd, int size)
+			{
+				return Sequence.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
+			}
+		}	
 	}
 }	

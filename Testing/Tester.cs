@@ -27,6 +27,16 @@ namespace NOP.Testing
 	}
 
 	/// <summary>
+	/// Attribute to mark testable properties.
+	/// </summary>
+	public class PropertyAttribute : Attribute
+	{
+		public PropertyAttribute ()
+		{
+		}
+	}
+
+	/// <summary>
 	/// Methods to check conditions in tests.
 	/// </summary>
 	public static class Check
@@ -152,7 +162,17 @@ namespace NOP.Testing
 			}
 			GC.Collect ();
 		}
-	
+
+		private static bool IsTest (this MethodInfo mi)
+		{
+			return mi.IsDefined (typeof (TestAttribute), false);
+		}
+
+		private static bool IsProperty (this MethodInfo mi)
+		{
+			return mi.IsDefined (typeof (PropertyAttribute), false);
+		}
+
 		/// <summary>
 		/// Run tests in a single fixture.
 		/// </summary>
@@ -160,8 +180,10 @@ namespace NOP.Testing
 		{
 			Console.ForegroundColor = ConsoleColor.Blue;
 			Console.WriteLine ("Executing tests for fixture: " + fixture.GetType ().Name);
-			
-			var tests = fixture.GetType ().GetMethods ().Where (m => m.IsDefined (typeof(TestAttribute), false));
+
+			var tests = from m in fixture.GetType ().GetMethods ()
+						where m.IsTest () || m.IsProperty ()
+						select m;
 			var stopWatch = timed ? new Stopwatch () : null;
 			
 			Console.ResetColor ();
@@ -174,7 +196,10 @@ namespace NOP.Testing
 						stopWatch.Reset ();
 						stopWatch.Start ();
 					}
-					test.Invoke (fixture, null);
+					if (test.IsProperty ())
+						Prop.FromMethodInfo (test).Check ();
+					else
+						test.Invoke (fixture, null);
 					if (timed)
 					{
 						stopWatch.Stop ();
@@ -188,9 +213,22 @@ namespace NOP.Testing
 					OutputFailure (test.Name, ex.InnerException);
 					failed++;
 				}
+				catch (TestFailed ex)
+				{
+					OutputFailedProperty (ex);
+					failed++;
+				}
 				run++;
 			}
 			Console.WriteLine ();
+		}
+
+		private static void OutputFailedProperty (TestFailed ex)
+		{
+			Console.WriteLine ();
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine (ex.Message);
+			Console.ResetColor ();
 		}
 		
 		/// <summary>

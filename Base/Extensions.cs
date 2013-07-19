@@ -38,6 +38,21 @@ namespace NOP
 			return acc;
 		}
 
+		public static string ToString<T> (this T[] array, string openBracket, string closeBracket, string separator)
+		{
+			StringBuilder sb = new StringBuilder (openBracket);
+
+			for (int i = 0; i < array.Length; i++)
+			{
+				sb.Append (array[i]);
+
+				if (i < (array.Length - 1))
+					sb.Append (separator);
+			}
+			sb.Append (closeBracket);
+			return sb.ToString ();			
+		}
+
 		#endregion
 
 		#region IEnumerable extensions

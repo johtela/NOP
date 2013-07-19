@@ -7,8 +7,7 @@
 
 	public class LazyList<T> : ISequence<T>
 	{
-		protected static readonly LazyList<T> _empty = 
-			new LazyList<T> (default (T), (LazyList<T>)null);
+		protected static readonly LazyList<T> _empty = new LazyList<T> (default (T), (LazyList<T>)null);
 		private T _first;
 		private LazyList<T> _rest;
 		private Func<LazyList<T>> _getRest;
@@ -110,6 +109,14 @@
 		}
 
 		/// <summary>
+		/// Append an item at the end of the list.
+		/// </summary>
+		public LazyList<T> Append (T item)
+		{
+			return Concat (Cons (item, Empty));
+		}
+
+		/// <summary>
 		/// Concatenate two lazy lists
 		/// </summary>
 		public LazyList<T> Concat (LazyList<T> other)
@@ -208,6 +215,11 @@
 			return new LazyList<T> (first, rest);
 		}
 
+		public static LazyList<T> operator + (LazyList<T> list, T item)
+		{
+			return list.Append (item);
+		}
+
 		public static LazyList<T> operator + (LazyList<T> list, LazyList<T> other)
 		{
 			return list.Concat (other);
@@ -220,7 +232,7 @@
 		public override bool Equals (object obj)
 		{
 			var otherList = obj as LazyList<T>;
-			return (otherList != null) && this.EqualTo (otherList);
+			return (otherList != null) && this.IsEqualTo (otherList);
 		}
 
 		/// <summary>

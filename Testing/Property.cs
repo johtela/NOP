@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
+using System.Reflection;
 
 	public delegate void Property (TestState state);
 
@@ -27,8 +28,11 @@
 	{
 		private static void Failed<T> (TestState state, T input)
 		{
-			throw new TestFailed (string.Format ("Property '{0}' failed for input {1}", 
-				state.Label, input));
+			throw new TestFailed (string.Format ("Property '{0}' failed for input {1}",
+				state.Label, 
+				input is object[] ? 
+					(input as object[]).ToString ("(", ")", ", ") : 
+					input.ToString ()));
 		}
 
 		private static void Test<T> (IArbitrary<T> arb, TestState state, Func<T, bool> func)
@@ -38,20 +42,45 @@
 				Failed (state, input);
 		}
 
+		public static Property Create<T> (IArbitrary<T> arb, Func<T, bool> func)
+		{
+			return s => Test (arb, s, func);
+		}
+
+		public static Property Create<T, U> (IArbitrary<T> arb1, IArbitrary<U> arb2, Func<T, U, bool> func) 
+		{
+			return Create (arb1.Plus (arb2), Fun.Tuplize (func));
+		}
+
+		public static Property Create<T, U> (IArbitrary<Tuple<T, U>> arb, Func<T, U, bool> func)
+		{
+			return Create (arb, Fun.Tuplize (func));
+		}
+
 		public static Property Lift<T> (Func<T, bool> func)
 		{
-			return s => Test (Arbitrary.Get<T> (), s, func);
+			return Create (Arbitrary.Get<T> (), func);
 		}
 
 		public static Property Lift<T, U> (Func<T, U, bool> func)
 		{
-			return s => Test (Arbitrary.Get<T> ().Plus (Arbitrary.Get<U> ()), s, Fun.Tuplize(func));
+			return Create (Arbitrary.Get<T> ().Plus (Arbitrary.Get<U> ()), Fun.Tuplize(func));
 		}
 
 		public static Property Lift<T, U, V> (Func<T, U, V, bool> func)
 		{
-			return s => Test (Arbitrary.Get<T> ().Plus (Arbitrary.Get<U> (), Arbitrary.Get<V> ()), 
-				s, Fun.Tuplize (func));
+			return Create (Arbitrary.Get<T> ().Plus (Arbitrary.Get<U> (), Arbitrary.Get<V> ()), 
+				Fun.Tuplize (func));
+		}
+
+		public static Property FromMethodInfo (MethodInfo mi)
+		{
+			if (!mi.IsStatic)
+				throw new ArgumentException  ("Method must be static");
+			if (mi.ReturnType != typeof (bool))
+				throw new ArgumentException ("Return type must be bool");
+			return Create (mi.GetParameters ().Select (pi => Arbitrary.Get (pi.ParameterType)).Combine (),
+				objs => (bool)mi.Invoke (null, objs)).Label (mi.Name);
 		}
 
 		public static Property Label (this Property property, string label)

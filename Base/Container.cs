@@ -39,7 +39,7 @@
 				_objects.Add (GenericDef (argType), obj);
 		}
 
-		public T GetImplementation<T> (Type argType)
+		public object GetImplementation (Type argType)
 		{
 			object result;
 
@@ -49,7 +49,7 @@
 				result = Activator.CreateInstance (implementingType);
 				_objects.Add (argType, result);
 			}
-			return (T)result;
+			return result;
 		}
 
 		private static Type GenericDef (Type type)
