@@ -7,7 +7,7 @@
 
 	public delegate Tuple<TestResult, T> Property<T> (TestState state);
 
-	public enum TestResult { Succeeded, Failed, Discarded };
+	public enum TestResult { Succeeded, Discarded };
 
 	public class TestState
 	{
@@ -16,6 +16,7 @@
 		public string Label;
 		public int SuccessfulTests;
 		public int DiscardedTests;
+		public SortedDictionary<string, int> Classes;
 
 		public TestState () : this (new Random (), 10, null) {}
 
@@ -24,6 +25,7 @@
 			Random = random;
 			Size = size;
 			Label = label;
+			Classes = new SortedDictionary<string, int> ();
 		}
 	}
 
@@ -36,7 +38,11 @@
 
 		public static Property<T> Fail<T> (this T value)
 		{
-			return state => Tuple.Create (TestResult.Failed, value);
+			return state =>
+			{
+				throw new TestFailed (string.Format ("Property '{0}' failed for input {1}",
+							state.Label, value));
+			};
 		}
 
 		public static Property<T> Discard<T> (this T value)
@@ -94,6 +100,19 @@
 			return prop.Bind (value => predicate (value) ? value.ToProperty () : value.Discard ());
 		}
 
+		public static Property<T> OrderBy<T, U>(this Property<T> prop, Func<T, U> classify)
+		{
+			return state => 
+			{
+				var res = prop (state);
+				var cl = classify (res.Item2).ToString ();
+				int cnt = 0;
+				state.Classes.TryGetValue (cl, out cnt);
+				state.Classes[cl] = cnt + 1;
+				return res;
+			};
+		}
+
 		public static Property<T> FailIf<T> (this Property<T> prop, Func<T, bool> predicate)
 		{
 			return prop.Bind (value => predicate (value) ? value.ToProperty () : value.Fail ());
@@ -121,16 +140,22 @@
 					case TestResult.Succeeded:
 						state.SuccessfulTests++;
 						break;
-					case TestResult.Failed:
-						throw new TestFailed (string.Format ("Property '{0}' failed for input {1}",
-							state.Label, result.Item2));
 					case TestResult.Discarded:
 						state.DiscardedTests++;
 						break;
 				}
 			}
+			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine ("'{0}' passed {1} tests. Discarded: {2}", 
 				state.Label, state.SuccessfulTests, state.DiscardedTests);
+			if (state.Classes.Count > 0)
+			{
+				Console.ForegroundColor = ConsoleColor.DarkGray;
+				Console.WriteLine ("Test case distribution:");
+				foreach (var cl in state.Classes)
+					Console.WriteLine ("{0}: {1:p}", cl.Key, (double)cl.Value / tries);
+			}
+			Console.ResetColor ();
 		}
 	}
 }

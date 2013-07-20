@@ -11,10 +11,12 @@ namespace NOP.Testbench
 	{
 		public static void CheckPrependProperties<S, T> (Func<T, S, S> prepend) where S : IStream<T>
 		{
-			var test = (from list in Prop.Choose<S> ()
-						from item in Prop.Choose<T> ()
-						let newList = prepend (item, list)
-						select new { newList, list, item });
+			var test = from list in Prop.Choose<S> ()
+					   from item in Prop.Choose<T> ()
+					   let newList = prepend (item, list)
+					   orderby list.Length () == 0 ? "empty list" : 
+									list.Length () == 1 ? "one item" : "many items"
+					   select new { newList, list, item };
 
 			test.Label ("Length is incremented by one")
 				.Check (t => t.newList.Length () == t.list.Length () + 1);
@@ -36,7 +38,7 @@ namespace NOP.Testbench
 			test.Label ("Either list is empty or tail is present")
 				.Check (t => t.newList.IsEmpty ||
 					(t.newList.First.Equals (t.list.FindNext (t.newList.First).First) &&
-					t.list.IndexOf (t.newList.First).IsBetween (0, t.index - 1) &&
+					t.list.IndexOf (t.newList.First).IsBetween (0, t.index) &&
 					t.newList.Last ().Equals (t.list.Last ())));
 		}
 
