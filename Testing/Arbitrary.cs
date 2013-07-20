@@ -8,21 +8,12 @@
 	using NOP.Collections;
 
 	/// <summary>
-	/// Non generic base interface for arbitrary values. This is needed because 
-	/// contravariance in the generic type parameter does not work with value types.
-	/// </summary>
-	public interface IArbitrary
-	{
-		object Generate (Random rnd, int size);
-	}
-
-	/// <summary>
 	/// Interface for generating random values.
 	/// </summary>
 	/// <typeparam name="T">The type of the arbitrary value created.</typeparam>
-	public interface IArbitrary<T> : IArbitrary
+	public interface IArbitrary<T>
 	{
-		new T Generate (Random rnd, int size);
+		T Generate (Random rnd, int size);
 		IEnumerable<T> Shrink (T value);
 	}
 
@@ -32,11 +23,6 @@
 	/// <typeparam name="T"></typeparam>
 	public abstract class ArbitraryBase<T> : IArbitrary<T>
 	{
-		object IArbitrary.Generate (Random rnd, int size)
-		{
-			return Generate (rnd, size);
-		}
-
 		public abstract T Generate (Random rnd, int size);
 
 		public IEnumerable<T> Shrink (T value)
@@ -71,74 +57,12 @@
 	/// </summary>
 	public static class Arbitrary
 	{
-		private class Enumerable<T> : ArbitraryBase<IEnumerable<T>>
-		{
-			public override IEnumerable<T> Generate (Random rnd, int size)
-			{
-				var len = rnd.Next (size);
-				for (int i = 0; i < len; i++)
-					yield return Arbitrary.Generate<T> (rnd, size);
-			}
-		}
-
-		private class Array<T> : ArbitraryBase<T[]>
-		{
-			public override T[] Generate (Random rnd, int size)
-			{
-				return Arbitrary.Generate<IEnumerable<T>> (rnd, size).ToArray ();
-			}
-		}
-
-		private class AStrictList<T> : ArbitraryBase<StrictList<T>>
-		{
-			public override StrictList<T> Generate (Random rnd, int size)
-			{
-				return List.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
-			}
-		}
-
-		private class ALazyList<T> : ArbitraryBase<LazyList<T>>
-		{
-			public override LazyList<T> Generate (Random rnd, int size)
-			{
-				return LazyList.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
-			}
-		}
-
-		private class ASequence<T> : ArbitraryBase<Sequence<T>>
-		{
-			public override Sequence<T> Generate (Random rnd, int size)
-			{
-				return Sequence.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
-			}
-		}	
-
 		private static Container _container;
 
 		static Arbitrary ()
 		{
 			_container = new Container (typeof (IArbitrary<>));
-			RegisterStandardArbitraries ();
-		}
-
-		private static void RegisterStandardArbitraries ()
-		{
-			_container.Register (new Arbitrary<char> ((rnd, size) =>
-				Convert.ToChar (rnd.Next (Convert.ToInt32 (' '), Convert.ToInt32 ('~')))));
-			_container.Register (new Arbitrary<int> ((rnd, size) => rnd.Next (size)));
-			_container.Register (new Arbitrary<long> ((rnd, size) =>
-				rnd.Next (size) << 32 + rnd.Next (size)));
-			_container.Register (new Arbitrary<float> ((rnd, size) =>
-				(float)rnd.NextDouble () * size));
-			_container.Register (new Arbitrary<double> ((rnd, size) =>
-				rnd.NextDouble () * size));
-			_container.Register (typeof (Enumerable<>));
-			_container.Register (typeof (Array<>));
-			_container.Register (new Arbitrary<string> ((rnd, size) =>
-				new string (Arbitrary.Generate<char[]> (rnd, size))));
-			_container.Register (typeof (AStrictList<>));
-			_container.Register (typeof (ALazyList<>));
-			_container.Register (typeof (ASequence<>));
+			DefaultArbitrary.Register ();
 		}
 
 		public static void Register<T> (IArbitrary<T> arbitrary)
@@ -146,14 +70,14 @@
 			_container.Register (arbitrary);
 		}
 
+		public static void Register (Type type)
+		{
+			_container.Register (type);
+		}
+
 		public static IArbitrary<T> Get<T> ()
 		{
 			return (IArbitrary<T>)_container.GetImplementation (typeof (T));
-		}
-
-		public static IArbitrary Get (Type type)
-		{
-			return (IArbitrary)_container.GetImplementation (type);
 		}
 
 		public static T Generate<T> (Random rnd, int size)
@@ -232,14 +156,6 @@
 				   from b in arb2
 				   from c in arb3
 				   select Tuple.Create (a, b, c);
-		}
-
-		public static IArbitrary<object[]> Combine (this IEnumerable<IArbitrary> arbs)
-		{
-			return new Arbitrary<object[]> ((rnd, size) =>
-			{
-				return arbs.Select (arb => arb.Generate (rnd, size)).ToArray ();
-			});
 		}
 	}
 }

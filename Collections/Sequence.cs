@@ -305,6 +305,16 @@
 	/// </summary>
 	public static class Sequence
 	{
+		public static Sequence<T> Cons<T> (T first, Sequence<T> rest)
+		{
+			return first + rest;
+		}
+
+		public static Sequence<T> Cons<T> (T first)
+		{
+			return first + Sequence<T>.Empty;
+		}
+
 		public static Sequence<T> Create<T> (ISequence<T> seq)
 		{
 			return Sequence<T>.FromSequence (seq);

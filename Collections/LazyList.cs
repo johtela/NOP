@@ -257,6 +257,22 @@
 	public static class LazyList
 	{
 		/// <summary>
+		/// Helper to create a cons list without explicitly specifying the item type. 
+		/// </summary>
+		public static LazyList<T> Cons<T> (T first, LazyList<T> rest)
+		{
+			return LazyList<T>.Cons (first, rest);
+		}
+
+		/// <summary>
+		/// Helper to create a cons list without explicitly specifying the item type. 
+		/// </summary>
+		public static LazyList<T> Cons<T> (T first)
+		{
+			return LazyList<T>.Cons (first, LazyList<T>.Empty);
+		}
+
+		/// <summary>
 		/// Constructs a new list from an array.
 		/// </summary>
 		public static LazyList<T> FromArray<T> (T[] array)

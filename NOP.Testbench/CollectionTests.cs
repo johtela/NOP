@@ -9,62 +9,74 @@ namespace NOP.Testbench
 
 	public class CollectionTests
 	{
-		private IArbitrary<Tuple<S, int>> StreamAndIndex<S, T> (int lessThanLength) where S : IStream<T>
+		public static void CheckPrependProperties<S, T> (Func<T, S, S> prepend) where S : IStream<T>
 		{
-			return from list in Arbitrary.Get<S> ()
-				   from n in Arbitrary.Get<int> ()
-				   where list.Length () >= n - lessThanLength
-				   select Tuple.Create (list, n);
+			var test = (from list in Prop.Choose<S> ()
+						from item in Prop.Choose<T> ()
+						let newList = prepend (item, list)
+						select new { newList, list, item });
+
+			test.Label ("Length is incremented by one")
+				.Check (t => t.newList.Length () == t.list.Length () + 1);
+			test.Label ("First item is correct")
+				.Check (t => t.newList.First.Equals (t.item));
+			test.Label ("The tail is equal to original list")
+				.Check (t => t.newList.Rest.IsEqualTo (t.list));
 		}
 
-		public static bool PrependItem<S, T> (Func<S, T, S> prepend, S list, T item) where S : IStream<T>
+		private static void CheckDropProperties<S, T> () where S : IStream<T>
 		{
-			var newList = prepend (list, item);
-			return newList.Length () == list.Length () + 1 &&
-				newList.First.Equals (item) && newList.Rest.IsEqualTo (list);
+			var test = from list in Prop.Choose<S> ()
+					   from index in Prop.Choose<int> ().Restrict (list.Length ())
+					   let newList = list.Drop (index)
+					   select new { newList, list, index };
+
+			test.Label ("Length is incremented by drop count")
+				.Check (t => t.newList.Length () == t.list.Length () - t.index);
+			test.Label ("Either list is empty or tail is present")
+				.Check (t => t.newList.IsEmpty ||
+					(t.newList.First.Equals (t.list.FindNext (t.newList.First).First) &&
+					t.list.IndexOf (t.newList.First).IsBetween (0, t.index - 1) &&
+					t.newList.Last ().Equals (t.list.Last ())));
 		}
 
-		private static bool DropNElements<S, T> (S list, int n) where S : IStream<T>
+		private static void CheckAppendProperties<S, T> (Func<S, T, S> append) where S : IStream<T>
 		{
-			var newList = list.Drop (n);
-			return newList.Length () == list.Length () - n &&
-				(newList.IsEmpty ||
-					(newList.First.Equals (list.FindNext (newList.First).First) &&
-					list.IndexOf (newList.First).IsBetween (0, n) &&
-					newList.Last ().Equals (list.Last ())));
-		}
+			var test = (from list in Prop.Choose<S> ()
+						from item in Prop.Choose<T> ()
+						let newList = append (list, item)
+						select new { newList, list, item });
 
-		private static bool AppendItem<S, T> (Func<S, T, S> append, S list, T item) where S : IStream<T>
-		{
-		    var newList = append (list, item);
-			return newList.Last ().Equals (item) &&
-				newList.Length () == list.Length () + 1 &&
-				list.IsProperPrefixOf (newList);
+			test.Label ("Last item is correct")
+				.Check (t => t.newList.Last ().Equals (t.item));
+			test.Label ("Length is incremented by one")
+				.Check (t => t.newList.Length () == t.list.Length () + 1);
+			test.Label ("Original list is a proper prefix of new list")
+				.Check (t => t.list.IsProperPrefixOf (t.newList));
 		}
 
 		[Test]
-		public void TestProperties ()
+		public void TestPrepend ()
 		{
-			Prop.Lift<StrictList<int>, int> ((list, item) => PrependItem ((l, i) => i | l, list, item))
-				.Label ("Prepend arbitrary int to a strict list").Check ();
-			Prop.Lift<LazyList<char>, char> ((list, item) => PrependItem ((l, i) => i | l, list, item))
-				.Label ("Prepend arbitrary char to a lazy list").Check ();
-			Prop.Lift<Sequence<float>, float> ((list, item) => PrependItem ((l, i) => i + l, list, item))
-				.Label ("Prepend arbitrary float to a sequence").Check ();
+			CheckPrependProperties <StrictList<int>, int> (List.Cons); 
+			CheckPrependProperties <LazyList<char>, char> (LazyList.Cons); 
+			CheckPrependProperties <Sequence<float>, float> (Sequence.Cons); 
+		}
 
-			Prop.Create (StreamAndIndex<StrictList<int>, int> (0), DropNElements<StrictList<int>, int>)
-				.Label ("Drop n ints from strict list").Check ();
-			Prop.Create (StreamAndIndex<LazyList<char>, char> (0), DropNElements<LazyList<char>, char>)
-				.Label ("Drop n chars from lazy list").Check ();
-			Prop.Create (StreamAndIndex<Sequence<float>, float> (0), DropNElements<Sequence<float>, float>)
-				.Label ("Drop n floats from sequence").Check ();
+		[Test]
+		public void TestDrop ()
+		{
+			CheckDropProperties <StrictList<int>, int> ();
+			CheckDropProperties <LazyList<char>, char> ();
+			CheckDropProperties <Sequence<float>, float> ();
+		}
 
-			Prop.Lift<StrictList<int>, int> ((list, item) => AppendItem((l, i) => l + i, list, item))
-				.Label ("Append arbitrary int to a strict list").Check ();
-			Prop.Lift<LazyList<char>, char> ((list, item) => AppendItem ((l, i) => l + i, list, item))
-				.Label ("Append arbitrary char to a lazy list").Check ();
-			Prop.Lift<Sequence<float>, float> ((list, item) => AppendItem ((l, i) => l + i, list, item))
-				.Label ("Append arbitrary float to a sequence").Check ();
+		[Test]
+		public void TestAppend ()
+		{
+			CheckAppendProperties<StrictList<int>, int> ((l, i) => l + i);
+			CheckAppendProperties<LazyList<char>, char> ((l, i) => l + i);
+			CheckAppendProperties<Sequence<float>, float> ((l, i) => l + i);
 		}
 
 		[Test]

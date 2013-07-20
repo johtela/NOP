@@ -4,15 +4,18 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
-using System.Reflection;
 
-	public delegate void Property (TestState state);
+	public delegate Tuple<TestResult, T> Property<T> (TestState state);
+
+	public enum TestResult { Succeeded, Failed, Discarded };
 
 	public class TestState
 	{
-		public readonly Random Random;
-		public readonly int Size;
-		public readonly string Label;
+		public Random Random;
+		public int Size;
+		public string Label;
+		public int SuccessfulTests;
+		public int DiscardedTests;
 
 		public TestState () : this (new Random (), 10, null) {}
 
@@ -26,79 +29,108 @@ using System.Reflection;
 
 	public static class Prop
 	{
-		private static void Failed<T> (TestState state, T input)
+		public static Property<T> ToProperty<T> (this T value)
 		{
-			throw new TestFailed (string.Format ("Property '{0}' failed for input {1}",
-				state.Label, 
-				input is object[] ? 
-					(input as object[]).ToString ("(", ")", ", ") : 
-					input.ToString ()));
+			return state => Tuple.Create (TestResult.Succeeded, value);
 		}
 
-		private static void Test<T> (IArbitrary<T> arb, TestState state, Func<T, bool> func)
+		public static Property<T> Fail<T> (this T value)
 		{
-			var input = arb.Generate (state.Random, state.Size); 
-			if (!func (input))
-				Failed (state, input);
+			return state => Tuple.Create (TestResult.Failed, value);
 		}
 
-		public static Property Create<T> (IArbitrary<T> arb, Func<T, bool> func)
+		public static Property<T> Discard<T> (this T value)
 		{
-			return s => Test (arb, s, func);
+			return state => Tuple.Create (TestResult.Discarded, value);
 		}
 
-		public static Property Create<T, U> (IArbitrary<T> arb1, IArbitrary<U> arb2, Func<T, U, bool> func) 
+		public static Property<T> ForAll<T> (this IArbitrary<T> arbitrary)
 		{
-			return Create (arb1.Plus (arb2), Fun.Tuplize (func));
+			return state => Tuple.Create (TestResult.Succeeded, 
+				arbitrary.Generate (state.Random, state.Size));
 		}
 
-		public static Property Create<T, U> (IArbitrary<Tuple<T, U>> arb, Func<T, U, bool> func)
+		public static Property<T> Choose<T> ()
 		{
-			return Create (arb, Fun.Tuplize (func));
+			return ForAll (Arbitrary.Get<T> ());
 		}
 
-		public static Property Lift<T> (Func<T, bool> func)
+		public static Property<T> Restrict<T> (this Property<T> prop, int size)
 		{
-			return Create (Arbitrary.Get<T> (), func);
+			return state =>
+			{
+				var oldSize = state.Size;
+				state.Size = size;
+				var res = prop (state);
+				state.Size = oldSize;
+				return res;
+			};
 		}
 
-		public static Property Lift<T, U> (Func<T, U, bool> func)
+		public static Property<U> Bind<T, U> (this Property<T> prop, Func<T, Property<U>> func)
 		{
-			return Create (Arbitrary.Get<T> ().Plus (Arbitrary.Get<U> ()), Fun.Tuplize(func));
+			return state =>
+			{
+				var res = prop (state);
+				if (res.Item1 == TestResult.Succeeded)
+					return func (res.Item2) (state);
+				return Tuple.Create (res.Item1, default(U));
+			};
 		}
 
-		public static Property Lift<T, U, V> (Func<T, U, V, bool> func)
+		public static Property<U> Select<T, U> (this Property<T> prop, Func<T, U> select)
 		{
-			return Create (Arbitrary.Get<T> ().Plus (Arbitrary.Get<U> (), Arbitrary.Get<V> ()), 
-				Fun.Tuplize (func));
+			return prop.Bind (a => select (a).ToProperty ());
 		}
 
-		public static Property FromMethodInfo (MethodInfo mi)
+		public static Property<V> SelectMany<T, U, V> (this Property<T> prop,
+			Func<T, Property<U>> project, Func<T, U, V> select)
 		{
-			if (!mi.IsStatic)
-				throw new ArgumentException  ("Method must be static");
-			if (mi.ReturnType != typeof (bool))
-				throw new ArgumentException ("Return type must be bool");
-			return Create (mi.GetParameters ().Select (pi => Arbitrary.Get (pi.ParameterType)).Combine (),
-				objs => (bool)mi.Invoke (null, objs)).Label (mi.Name);
+			return prop.Bind (a => project (a).Bind (b => select (a, b).ToProperty ()));
 		}
 
-		public static Property Label (this Property property, string label)
+		public static Property<T> Where<T> (this Property<T> prop, Func<T, bool> predicate)
 		{
-			return s => property (new TestState (s.Random, s.Size, label));
+			return prop.Bind (value => predicate (value) ? value.ToProperty () : value.Discard ());
 		}
 
-		public static void Check (this Property prop, int tries)
+		public static Property<T> FailIf<T> (this Property<T> prop, Func<T, bool> predicate)
+		{
+			return prop.Bind (value => predicate (value) ? value.ToProperty () : value.Fail ());
+		}
+
+		public static Property<T> Label<T> (this Property<T> property, string label)
+		{
+			return state =>
+			{
+				state.Label = label;
+				return property (state);
+			};
+		}
+
+		public static void Check<T> (this Property<T> prop, Func<T, bool> test, int tries = 100)
 		{
 			var state = new TestState ();
+			var testProp = prop.FailIf (test);
 
-			for (int i = 0; i < tries; i++)
-				prop (state);
-		}
-
-		public static void Check (this Property prop)
-		{
-			Check (prop, 100);
+			while (state.SuccessfulTests + state.DiscardedTests < tries)
+			{
+				var result = testProp (state);
+				switch (result.Item1)
+				{
+					case TestResult.Succeeded:
+						state.SuccessfulTests++;
+						break;
+					case TestResult.Failed:
+						throw new TestFailed (string.Format ("Property '{0}' failed for input {1}",
+							state.Label, result.Item2));
+					case TestResult.Discarded:
+						state.DiscardedTests++;
+						break;
+				}
+			}
+			Console.WriteLine ("'{0}' passed {1} tests. Discarded: {2}", 
+				state.Label, state.SuccessfulTests, state.DiscardedTests);
 		}
 	}
 }

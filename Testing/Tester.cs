@@ -27,16 +27,6 @@ namespace NOP.Testing
 	}
 
 	/// <summary>
-	/// Attribute to mark testable properties.
-	/// </summary>
-	public class PropertyAttribute : Attribute
-	{
-		public PropertyAttribute ()
-		{
-		}
-	}
-
-	/// <summary>
 	/// Methods to check conditions in tests.
 	/// </summary>
 	public static class Check
@@ -168,11 +158,6 @@ namespace NOP.Testing
 			return mi.IsDefined (typeof (TestAttribute), false);
 		}
 
-		private static bool IsProperty (this MethodInfo mi)
-		{
-			return mi.IsDefined (typeof (PropertyAttribute), false);
-		}
-
 		/// <summary>
 		/// Run tests in a single fixture.
 		/// </summary>
@@ -182,7 +167,7 @@ namespace NOP.Testing
 			Console.WriteLine ("Executing tests for fixture: " + fixture.GetType ().Name);
 
 			var tests = from m in fixture.GetType ().GetMethods ()
-						where m.IsTest () || m.IsProperty ()
+						where m.IsTest ()
 						select m;
 			var stopWatch = timed ? new Stopwatch () : null;
 			
@@ -196,10 +181,7 @@ namespace NOP.Testing
 						stopWatch.Reset ();
 						stopWatch.Start ();
 					}
-					if (test.IsProperty ())
-						Prop.FromMethodInfo (test).Check ();
-					else
-						test.Invoke (fixture, null);
+					test.Invoke (fixture, null);
 					if (timed)
 					{
 						stopWatch.Stop ();
@@ -213,24 +195,11 @@ namespace NOP.Testing
 					OutputFailure (test.Name, ex.InnerException);
 					failed++;
 				}
-				catch (TestFailed ex)
-				{
-					OutputFailedProperty (ex);
-					failed++;
-				}
 				run++;
 			}
 			Console.WriteLine ();
 		}
 
-		private static void OutputFailedProperty (TestFailed ex)
-		{
-			Console.WriteLine ();
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine (ex.Message);
-			Console.ResetColor ();
-		}
-		
 		/// <summary>
 		/// Outputs the failure information.
 		/// </summary>
@@ -241,7 +210,7 @@ namespace NOP.Testing
 			Console.WriteLine ("Test '{0}' failed.", test);
 			Console.ResetColor ();
 			Console.Write ("Reason: ");
-			Console.ForegroundColor = ConsoleColor.DarkRed;
+			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.WriteLine (ex.Message);
 			Console.ResetColor ();
 			var st = ex.StackTrace.Split ('\n');
