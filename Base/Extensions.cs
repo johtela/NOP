@@ -184,5 +184,14 @@ namespace NOP
 		}
 
 		#endregion
+
+		#region Numeric extensions
+
+		public static bool IsBetween (this int number, int floor, int ceil)
+		{
+			return number >= floor && number <= ceil;
+		}
+
+		#endregion
 	}
 }

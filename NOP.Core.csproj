@@ -75,7 +75,6 @@
     <Compile Include="Base\Extensions.cs" />
     <Compile Include="Grammar\SExprParser.cs" />
     <Compile Include="Testing\Arbitrary.cs" />
-    <Compile Include="Testing\BasicArbitraries.cs" />
     <Compile Include="Testing\Property.cs" />
     <Compile Include="Testing\VisualConsole.cs">
       <SubType>Form</SubType>

@@ -30,6 +30,7 @@ namespace NOP.Testbench
 			return newList.Length () == list.Length () - n &&
 				(newList.IsEmpty ||
 					(newList.First.Equals (list.FindNext (newList.First).First) &&
+					list.IndexOf (newList.First).IsBetween (0, n) &&
 					newList.Last ().Equals (list.Last ())));
 		}
 

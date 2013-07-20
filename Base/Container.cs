@@ -29,14 +29,23 @@
 
 		public void Register (Type type)
 		{
+			if (_types.ContainsKey (type))
+				throw new ArgumentException (string.Format ("Type {0} is already registered", type));
+			if (!type.GetConstructors ().Any (x => x.GetParameters ().Length == 0))
+				throw new ArgumentException (string.Format ("Type {0} does not contain a default constructor", type));
+
 			foreach (var argType in ArgumentTypes (type))
 				_types.Add (GenericDef (argType), GenericDef (type));
 		}
 
 		public void Register (object obj)
 		{
-			foreach (var argType in ArgumentTypes (obj.GetType ()))
-				_objects.Add (GenericDef (argType), obj);
+			var type = obj.GetType ();
+			if (_objects.ContainsKey (type))
+				throw new ArgumentException (string.Format ("Type {0} is already registered", type));
+
+			foreach (var argType in ArgumentTypes (type))
+				_objects.Add (argType, obj);
 		}
 
 		public object GetImplementation (Type argType)
@@ -63,9 +72,6 @@
 
 		private IEnumerable<Type> ArgumentTypes (Type type)
 		{
-			if (type.GetConstructors ().All (x => x.GetParameters ().Length > 0))
-				return new Type[0];
-
 			return from i in type.GetInterfaces ()
 				   where i.IsGenericType && i.GetGenericTypeDefinition () == _interface
 				   select i.GetGenericArguments ().First ();
