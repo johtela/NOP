@@ -4,25 +4,29 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
+	using Collections;
 
 	public delegate Tuple<TestResult, T> Property<T> (TestState state);
 
 	public enum TestResult { Succeeded, Discarded };
 
+	public enum TestPhase { Generate, StartShrink, Shrink }
+
 	public class TestState
 	{
-		public Random Random;
+		public readonly TestPhase Phase;
+		public readonly Random Random;
 		public int Size;
 		public string Label;
 		public int SuccessfulTests;
 		public int DiscardedTests;
-		public SortedDictionary<string, int> Classes;
+		public readonly SortedDictionary<string, int> Classes;
+		public StrictList<IStream> ShrunkValues;
 
-		public TestState () : this (new Random (), 10, null) {}
-
-		public TestState (Random random, int size, string label)
+		public TestState (TestPhase phase, int seed, int size, string label)
 		{
-			Random = random;
+			Phase = phase;
+			Random = new Random (seed);
 			Size = size;
 			Label = label;
 			Classes = new SortedDictionary<string, int> ();
@@ -52,8 +56,22 @@
 
 		public static Property<T> ForAll<T> (this IArbitrary<T> arbitrary)
 		{
-			return state => Tuple.Create (TestResult.Succeeded, 
-				arbitrary.Generate (state.Random, state.Size));
+			return state => 
+			{
+				switch (state.Phase) 
+				{
+					case TestPhase.Generate:
+						return Tuple.Create (TestResult.Succeeded, arbitrary.Generate (state.Random, state.Size));
+					case TestPhase.StartShrink:
+						var values = arbitrary.Shrink (arbitrary.Generate (state.Random, state.Size));
+						state.ShrunkValues = values | state.ShrunkValues;
+						return Tuple.Create (TestResult.Succeeded, values.First);
+					default:
+						var value = state.ShrunkValues.First.First;
+						state.ShrunkValues = state.ShrunkValues.Rest;
+						return Tuple.Create (TestResult.Succeeded, (T)value);
+				}
+			};
 		}
 
 		public static Property<T> Choose<T> ()
@@ -129,7 +147,8 @@
 
 		public static void Check<T> (this Property<T> prop, Func<T, bool> test, int tries = 100)
 		{
-			var state = new TestState ();
+			var seed = DateTime.Now.Millisecond;
+			var state = new TestState (TestPhase.Generate, seed, 10, null);
 			var testProp = prop.FailIf (test);
 
 			while (state.SuccessfulTests + state.DiscardedTests < tries)

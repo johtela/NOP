@@ -40,7 +40,6 @@
     <Compile Include="FingerTreeTests.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="CollectionTests.cs" />
     <Compile Include="InterpreterTests.cs" />
     <Compile Include="MapTests.cs" />
     <Compile Include="ParserMonadTests.cs" />
@@ -51,6 +50,7 @@
     <Compile Include="SetTests.cs" />
     <Compile Include="TypeCheckingTests.cs" />
     <Compile Include="ParserTests.cs" />
+    <Compile Include="CollectionTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -61,9 +61,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="SamplePrograms\ComplexIf.nop">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="SamplePrograms\NestedLambdas.nop">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -77,6 +74,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="SamplePrograms\SimpleLet.nop">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SamplePrograms\ComplexIf.nop">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

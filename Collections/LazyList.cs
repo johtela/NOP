@@ -40,6 +40,16 @@
 			}
 		}
 
+		object IStream.First
+		{
+			get { return First; }
+		}
+
+		IStream IStream.Rest
+		{
+			get { return Rest; }
+		}
+
 		IStream<T> IStream<T>.Rest
 		{
 			get { return Rest; }

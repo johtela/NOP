@@ -29,7 +29,8 @@ namespace NOP.Testbench
 		private static void CheckDropProperties<S, T> () where S : IStream<T>
 		{
 			var test = from list in Prop.Choose<S> ()
-					   from index in Prop.Choose<int> ().Restrict (list.Length ())
+					   from index in Prop.Choose<int> ()
+					   where index <= list.Length ()
 					   let newList = list.Drop (index)
 					   select new { newList, list, index };
 

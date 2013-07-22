@@ -24,42 +24,42 @@
 		public void TestSimpleLet ()
 		{
 			ParserTests.AssertParsesTo<Expression._Let> ("System.Int32", 
-				ReadFile (@"SamplePrograms\SimpleLet.nop"));
+				ReadFile (@"SamplePrograms/SimpleLet.nop"));
 		}
 
 		[Test]
 		public void TestSimpleLambda ()
 		{
 			ParserTests.AssertParsesTo<Expression._Let> ("System.String",
-				ReadFile (@"SamplePrograms\SimpleLambda.nop"));
+				ReadFile (@"SamplePrograms/SimpleLambda.nop"));
 		}
 
 		[Test]
 		public void TestSimpleIf ()
 		{
 			ParserTests.AssertParsesTo<Expression._If> ("System.String",
-				ReadFile (@"SamplePrograms\SimpleIf.nop"));
+				ReadFile (@"SamplePrograms/SimpleIf.nop"));
 		}
 
 		[Test]
 		public void TestComplexIf ()
 		{
 			ParserTests.AssertParsesTo<Expression._Let> ("System.String",
-				ReadFile (@"SamplePrograms\ComplexIf.nop"));
+				ReadFile (@"SamplePrograms/ComplexIf.nop"));
 		}
 
 		[Test]
 		public void TestNestedLets ()
 		{
 			ParserTests.AssertParsesTo<Expression._Let> ("System.Boolean",
-				ReadFile (@"SamplePrograms\NestedLets.nop"));
+				ReadFile (@"SamplePrograms/NestedLets.nop"));
 		}
 		
 		[Test]
 		public void TestNestedLambdas ()
 		{
 			ParserTests.AssertParsesTo<Expression._Application> ("System.Boolean",
-				ReadFile (@"SamplePrograms\NestedLambdas.nop"));
+				ReadFile (@"SamplePrograms/NestedLambdas.nop"));
 		}
 	}
 }

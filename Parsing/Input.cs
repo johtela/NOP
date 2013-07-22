@@ -44,6 +44,16 @@
 				return _pos;
 			}
 
+			object IStream.First
+			{
+				get { return First; }
+			}
+
+			IStream IStream.Rest
+			{
+				get { return Rest; }
+			}
+
 			public char First
 			{
 				get 
@@ -94,6 +104,16 @@
 					path += sp._seq.IsEmpty ? pseq.Length : pseq.IndexOf (sp._seq.First);
 				}
 				return new SExprPath (path);
+			}
+
+			object IStream.First
+			{
+				get { return First; }
+			}
+
+			IStream IStream.Rest
+			{
+				get { return Rest; }
 			}
 
 			public Sequence<SExpr> First

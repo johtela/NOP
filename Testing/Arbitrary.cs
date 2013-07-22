@@ -14,7 +14,7 @@
 	public interface IArbitrary<T>
 	{
 		T Generate (Random rnd, int size);
-		IEnumerable<T> Shrink (T value);
+		IStream<T> Shrink (T value);
 	}
 
 	/// <summary>
@@ -25,9 +25,9 @@
 	{
 		public abstract T Generate (Random rnd, int size);
 
-		public IEnumerable<T> Shrink (T value)
+		public IStream<T> Shrink (T value)
 		{
-			return new T [] { value };
+			return List.Cons (value);
 		}
 	}
 
