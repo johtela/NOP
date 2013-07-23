@@ -5,7 +5,6 @@
 	using System.Linq;
 	using System.Text;
 	using System.Reflection;
-	using NOP.Collections;
 
 	/// <summary>
 	/// Interface for generating random values.
@@ -14,7 +13,7 @@
 	public interface IArbitrary<T>
 	{
 		T Generate (Random rnd, int size);
-		IStream<T> Shrink (T value);
+		IEnumerable<T> Shrink (T value);
 	}
 
 	/// <summary>
@@ -25,9 +24,9 @@
 	{
 		public abstract T Generate (Random rnd, int size);
 
-		public IStream<T> Shrink (T value)
+		public virtual IEnumerable<T> Shrink (T value)
 		{
-			return List.Cons (value);
+			return new T[0];
 		}
 	}
 
@@ -39,15 +38,29 @@
 	public class Arbitrary<T> : ArbitraryBase<T>
 	{
 		public readonly Func<Random, int, T> Generator;
+		public readonly Func<T, IEnumerable<T>> Shrinker;
 
 		public Arbitrary (Func<Random, int, T> generator)
 		{
 			Generator = generator;
 		}
 
+		public Arbitrary (Func<Random, int, T> generator, Func<T, IEnumerable<T>> shrinker)
+		{
+			Generator = generator;
+			Shrinker = shrinker;
+		}
+
 		public override T Generate (Random rnd, int size)
 		{
 			return Generator (rnd, size);
+		}
+
+		public override IEnumerable<T> Shrink (T value)
+		{
+			return Shrinker == null ?
+				base.Shrink (value) :
+				Shrinker (value);
 		}
 	}
 

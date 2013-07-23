@@ -100,6 +100,17 @@ namespace NOP.Collections
 		}
 
 		/// <summary>
+		/// Replace the value of a key. 
+		/// </summary>
+		/// <param name="key">The key whose value is changed.</param>
+		/// <param name="value">The new value.</param>
+		/// <returns>A new map that with the key value changed.</returns>
+		public Map<K, V> Replace (K key, V value)
+		{
+			return Tree<Map<K, V>, K>.Replace(this, key, new _MapNode(key, value, Empty, Empty));
+		}
+
+		/// <summary>
 		/// Tests if the map contains a key.
 		/// </summary>
 		/// <param name="key">The key to be searched for.</param>
@@ -108,6 +119,15 @@ namespace NOP.Collections
 		{
 			return !Tree<Map<K, V>, K>.Search (this, key).IsEmpty ();
 		}
+
+        public Option<V> TryGetValue (K key)
+        {
+            var node = Tree<Map<K, V>, K>.Search(this, key);
+
+            return node.IsEmpty() ?
+                new Option<V> () :
+                new Option<V>(node.Value);
+        }
 
 		/// <summary>
 		/// Returns the value associated with the key.
@@ -144,9 +164,7 @@ namespace NOP.Collections
 			get
 			{
 				foreach (_MapNode node in Tree<Map<K, V>, K>.TraverseDepthFirst(this))
-				{
 					yield return node.Key;
-				}             
 			}
 		}
 
@@ -158,9 +176,7 @@ namespace NOP.Collections
 			get
 			{
 				foreach (_MapNode node in Tree<Map<K, V>, K>.TraverseDepthFirst(this))
-				{
 					yield return node.Value;
-				}
 			}
 		}
 

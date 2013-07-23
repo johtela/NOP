@@ -16,17 +16,17 @@ namespace NOP.Testbench
 		{
 			Task.Factory.StartNew (() =>
 				Tester.RunTestsTimed (
-					new CollectionTests (),
-					new LazyListTests (),
-					new MapTests (),
-					new SetTests (),
-					new FingerTreeTests (),
-					new TypeDefinitionTests (),
-					new TypeCheckingTests (),
-					new ParserTests (),
-					new SExprPathTests (),
-					new ParserMonadTests (),
-					new IOTests ())
+					new CollectionTests ())
+//					new LazyListTests (),
+//					new MapTests (),
+//					new SetTests (),
+//					new FingerTreeTests (),
+//					new TypeDefinitionTests (),
+//					new TypeCheckingTests (),
+//					new ParserTests (),
+//					new SExprPathTests (),
+//					new ParserMonadTests (),
+//					new IOTests ())
 			);
 			Application.Run (VConsole);
 			VConsole.Dispose ();

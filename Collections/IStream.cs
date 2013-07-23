@@ -4,36 +4,23 @@
 	using System.Collections.Generic;
 	using System.Text;
 
-	public interface IStream
+	public interface IStream<T>
 	{
 		/// <summary>
 		/// The first element of the sequence.
 		/// </summary>
-		object First { get; }
+		T First { get; }
 
 		/// <summary>
 		/// The rest of the sequence.
 		/// </summary>
-		IStream Rest { get; }
+		IStream<T> Rest { get; }
 
-		/// <summary>
-		/// Is the sequence empty.
-		/// </summary>
-		bool IsEmpty { get; }
-	}
-
-	public interface IStream<T> : IStream
-	{
-		/// <summary>
-		/// The first element of the sequence.
-		/// </summary>
-		new T First { get; }
-
-		/// <summary>
-		/// The rest of the sequence.
-		/// </summary>
-		new IStream<T> Rest { get; }
-	}
+        /// <summary>
+        /// Is the sequence empty.
+        /// </summary>
+        bool IsEmpty { get; }
+    }
 
 	public static class StreamExtensions
 	{

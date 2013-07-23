@@ -29,17 +29,17 @@ namespace NOP.Testbench
 		private static void CheckDropProperties<S, T> () where S : IStream<T>
 		{
 			var test = from list in Prop.Choose<S> ()
-					   from index in Prop.Choose<int> ()
-					   where index <= list.Length ()
-					   let newList = list.Drop (index)
-					   select new { newList, list, index };
+					   from count in Prop.Choose<int> ()
+					   where count <= list.Length ()
+					   let newList = list.Drop (count)
+					   select new { newList, list, count };
 
 			test.Label ("Length is incremented by drop count")
-				.Check (t => t.newList.Length () == t.list.Length () - t.index);
+				.Check (t => t.newList.Length () == t.list.Length () - t.count);
 			test.Label ("Either list is empty or tail is present")
 				.Check (t => t.newList.IsEmpty ||
 					(t.newList.First.Equals (t.list.FindNext (t.newList.First).First) &&
-					t.list.IndexOf (t.newList.First).IsBetween (0, t.index) &&
+					t.list.IndexOf (t.newList.First).IsBetween (0, t.count) &&
 					t.newList.Last ().Equals (t.list.Last ())));
 		}
 
@@ -55,7 +55,7 @@ namespace NOP.Testbench
 			test.Label ("Length is incremented by one")
 				.Check (t => t.newList.Length () == t.list.Length () + 1);
 			test.Label ("Original list is a proper prefix of new list")
-				.Check (t => t.list.IsProperPrefixOf (t.newList));
+				.Check (t => t.list.IsProperPrefixOf (t.newList.Rest));
 		}
 
 		[Test]

@@ -130,16 +130,6 @@
 			get { return _tree.Last; }
 		}
 
-		object IStream.First
-		{
-			get { return First; }
-		}
-
-		IStream IStream.Rest
-		{
-			get { return Rest; }
-		}
-
 		public Sequence<T> RestL
 		{
 			get { return new Sequence<T> (_tree.RestL); }
