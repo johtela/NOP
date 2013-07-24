@@ -22,7 +22,7 @@
 			return state =>
 			{
 				throw new TestFailed (string.Format ("Property '{0}' failed for input {1}",
-				    state.Label, value)
+					state.Label, value)
 				);
 			};
 		}
@@ -48,7 +48,7 @@
 					value = (T)state.Values [state.CurrentValue++];
 					if (state.Phase == TestPhase.StartShrink)
 						state.ShrunkValues.Add (
-                            new List<object> (arbitrary.Shrink (value).Append (value).Cast<object> ()));
+							new List<object> (arbitrary.Shrink (value).Append (value).Cast<object> ()));
 				}
 				return Tuple.Create (TestResult.Succeeded, value);
 			};
@@ -132,6 +132,11 @@
 			{
 				while (state.SuccessfulTests + state.DiscardedTests < tries)
 				{
+					if (state.Phase == TestPhase.Generate)
+					{
+						state.CurrentValue = 0;
+						state.Values.Clear ();
+					}
 					switch (testProp (state).Item1)
 					{
 						case TestResult.Succeeded:
@@ -143,10 +148,7 @@
 					}
 				}
 			}
-			catch (TestFailed)
-			{
-				return false;
-			}
+			catch (TestFailed) { return false; }
 			return true;
 		}
 
@@ -171,7 +173,7 @@
 		}
 
 		private static List<object> Optimize<T> (Property<T> testProp, List<List<object>> shrunkValues, 
-            List<object> values)
+			List<object> values)
 		{
 			var current = new List<int> (shrunkValues.Select (l => l.Count - 1));
 			var best = values;
@@ -207,15 +209,17 @@
 				// Shrinking phase.
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.Write ("Falsifiable after {1} tests. Shrinking input.",
-                    state.Label, state.SuccessfulTests + 1);
+					state.Label, state.SuccessfulTests + 1);
 				state = new TestState (TestPhase.StartShrink, seed, size, state.Values,
-                    new List<List<object>> ());
+					new List<List<object>> ());
 				Test (testProp, 1, state);
+				System.Diagnostics.Debug.Assert (state.Values.Count == state.ShrunkValues.Count);
 				var optimized = Optimize (testProp, state.ShrunkValues, state.Values);
 				Console.ResetColor ();
 				state = new TestState (TestPhase.Shrink, 0, 0, optimized, null);
 				// Fail again with optimized input without catching the exception.
 				testProp (state);
+				System.Diagnostics.Debug.Assert (true, "Code should not enter here");
 			}
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine ("'{0}' passed {1} tests. Discarded: {2}", 

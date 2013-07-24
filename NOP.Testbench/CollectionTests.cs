@@ -55,15 +55,15 @@ namespace NOP.Testbench
 			test.Label ("Length is incremented by one")
 				.Check (t => t.newList.Length () == t.list.Length () + 1);
 			test.Label ("Original list is a proper prefix of new list")
-				.Check (t => t.list.IsProperPrefixOf (t.newList.Rest));
+				.Check (t => t.list.IsProperPrefixOf (t.newList));
 		}
 
 		[Test]
 		public void TestPrepend ()
 		{
-			CheckPrependProperties <StrictList<int>, int> (List.Cons); 
-			CheckPrependProperties <LazyList<char>, char> (LazyList.Cons); 
-			CheckPrependProperties <Sequence<float>, float> (Sequence.Cons); 
+			CheckPrependProperties<StrictList<int>, int> (List.Cons);
+			CheckPrependProperties<LazyList<char>, char> (LazyList.Cons); 
+			CheckPrependProperties <Sequence<string>, string> (Sequence.Cons); 
 		}
 
 		[Test]
@@ -80,6 +80,16 @@ namespace NOP.Testbench
 			CheckAppendProperties<StrictList<int>, int> ((l, i) => l + i);
 			CheckAppendProperties<LazyList<char>, char> ((l, i) => l + i);
 			CheckAppendProperties<Sequence<float>, float> ((l, i) => l + i);
+		}
+
+		[Test]
+		public void TestString ()
+		{
+			var test = from s in Prop.Choose<string> ()
+					   select new { s, s.Length };
+
+			test.Label ("Length is correct")
+				.Check (t => t.s.Length < 3 || char.IsLetterOrDigit (t.s[2]));
 		}
 
 		[Test]
@@ -148,8 +158,7 @@ namespace NOP.Testbench
 				Check.AreEqual (2, list.Drop (1).First);
 				Check.AreEqual (3, list.Drop (2).First);
 				Fun.Ignore (list.Drop (3).First);
-			}
-			);
+			});
 		}
 
 		[Test]
