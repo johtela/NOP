@@ -72,6 +72,11 @@
 			return arg1 => func2 (func1 (arg1));
 		}
 
+		public static Func<T1, T2, TRes> Compose2<T1, T2, T3, TRes> (this Func<T1, T2, T3> func1, Func<T3, TRes> func2)
+		{
+			return (arg1, arg2) => func2 (func1 (arg1, arg2));
+		}
+
 		public static Func<T1, Func<T2, TRes>> Curry<T1, T2, TRes> (this Func<T1, T2, TRes> func)
 		{
 			return arg1 => (arg2 => func (arg1, arg2));

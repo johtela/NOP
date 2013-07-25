@@ -12,28 +12,32 @@
 		{
 			var charCandidates = CharCandidates ().ToArray ();
 
-			Arbitrary.Register (new Arbitrary<char> ((rnd, size) =>
-				charCandidates[rnd.Next (charCandidates.Length)],
+			Arbitrary.Register (new Arbitrary<char> (
+				(rnd, size) => charCandidates[rnd.Next (charCandidates.Length)],
 				ShrinkChar));
 
-			Arbitrary.Register (new Arbitrary<int> ((rnd, size) => rnd.Next (size),
+			Arbitrary.Register (new Arbitrary<int> (
+				(rnd, size) => rnd.Next (size),
 				x => ShrinkInteger (x).Distinct ()));
 
-			Arbitrary.Register (new Arbitrary<long> ((rnd, size) => rnd.Next (size), 
+			Arbitrary.Register (new Arbitrary<long> (
+				(rnd, size) => rnd.Next (size), 
 				x => ShrinkInteger ((int)x).Distinct ().Cast<long> ()));
 
-			Arbitrary.Register (new Arbitrary<float> ((rnd, size) =>
-				(float)rnd.NextDouble () * size));
+			Arbitrary.Register (new Arbitrary<float> (
+				(rnd, size) => (float)rnd.NextDouble () * size,
+				x => ShrinkDouble (x).Select (y => (float)y)));
 
-			Arbitrary.Register (new Arbitrary<double> ((rnd, size) =>
-				rnd.NextDouble () * size));
+			Arbitrary.Register (new Arbitrary<double> (
+				(rnd, size) => rnd.NextDouble () * size,
+				ShrinkDouble));
+
+			Arbitrary.Register (new Arbitrary<string> (
+				(rnd, size) => new string (Arbitrary.Generate<char[]> (rnd, size)),
+				x => ShrinkEnumerable (x).Select (cs => new string (cs.ToArray ()))));
 
 			Arbitrary.Register (typeof (Enumerable<>));
 			Arbitrary.Register (typeof (Array<>));
-			Arbitrary.Register (new Arbitrary<string> ((rnd, size) =>
-				new string (Arbitrary.Generate<char[]> (rnd, size)),
-				x => ShrinkEnumerable (x).Select (cs => new string (cs.ToArray ()))));
-
 			Arbitrary.Register (typeof (AStrictList<>));
 			Arbitrary.Register (typeof (ALazyList<>));
 			Arbitrary.Register (typeof (ASequence<>));
@@ -71,6 +75,12 @@
 				yield return x - i;
 		}
 
+		private static IEnumerable<double> ShrinkDouble (double x)
+		{
+			if (x < 0) yield return -x;
+			yield return Math.Floor (x);
+		}
+
 		private static IEnumerable<IEnumerable<T>> ShrinkEnumerable<T> (IEnumerable<T> e)
 		{
 			return RemoveUntil (e).Collect (Fun.Identity).Concat (ShrinkOne (e)).Prepend (new T[0]);
@@ -103,13 +113,18 @@
 					select xs.Append (first));
 		}
 
+		public static IEnumerable<T> GenerateEnumerable<T> (Random rnd, int size)
+		{
+			var len = rnd.Next (size);
+			for (int i = 0; i < len; i++)
+				yield return Arbitrary.Generate<T> (rnd, size);
+		}
+
 		private class Enumerable<T> : ArbitraryBase<IEnumerable<T>>
 		{
-			public override IEnumerable<T> Generate (Random rnd, int size)
+			public override Gen<IEnumerable<T>> Generate 
 			{
-				var len = rnd.Next (size);
-				for (int i = 0; i < len; i++)
-					yield return Arbitrary.Generate<T> (rnd, size);
+				get { return GenerateEnumerable<T>; }
 			}
 
 			public override IEnumerable<IEnumerable<T>> Shrink (IEnumerable<T> value)
@@ -120,9 +135,9 @@
 
 		private class Array<T> : ArbitraryBase<T[]>
 		{
-			public override T[] Generate (Random rnd, int size)
+			public override Gen<T[]> Generate
 			{
-				return Arbitrary.Generate<IEnumerable<T>> (rnd, size).ToArray ();
+				get { return (rnd, size) => GenerateEnumerable<T> (rnd, size).ToArray(); }
 			}
 
 			public override IEnumerable<T[]> Shrink (T[] value)
@@ -133,9 +148,9 @@
 
 		private class AStrictList<T> : ArbitraryBase<StrictList<T>>
 		{
-			public override StrictList<T> Generate (Random rnd, int size)
+			public override Gen<StrictList<T>> Generate
 			{
-				return List.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
+				get { return (rnd, size) => List.FromEnumerable (GenerateEnumerable<T> (rnd, size)); }
 			}
 
 			public override IEnumerable<StrictList<T>> Shrink (StrictList<T> value)
@@ -146,9 +161,9 @@
 
 		private class ALazyList<T> : ArbitraryBase<LazyList<T>>
 		{
-			public override LazyList<T> Generate (Random rnd, int size)
+			public override Gen<LazyList<T>> Generate
 			{
-				return LazyList.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
+				get { return (rnd, size) => LazyList.FromEnumerable (GenerateEnumerable<T> (rnd, size)); }
 			}
 
 			public override IEnumerable<LazyList<T>> Shrink (LazyList<T> value)
@@ -159,9 +174,9 @@
 
 		private class ASequence<T> : ArbitraryBase<Sequence<T>>
 		{
-			public override Sequence<T> Generate (Random rnd, int size)
+			public override Gen<Sequence<T>> Generate
 			{
-				return Sequence.FromEnumerable (Arbitrary.Generate<IEnumerable<T>> (rnd, size));
+				get { return (rnd, size) => Sequence.FromEnumerable (GenerateEnumerable<T> (rnd, size)); }
 			}
 
 			public override IEnumerable<Sequence<T>> Shrink (Sequence<T> value)

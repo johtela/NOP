@@ -7,12 +7,27 @@
 	using Collections;
     using System.Diagnostics;
 
+	/// <summary>
+	/// Result of a single test run. Test can either succeed, fail, or be discarded. When test
+	/// fails an TestFailed exception is thrown. Discarded test means that the precondition of
+	/// the test is not met.
+	/// </summary>
 	public enum TestResult	{ Succeeded, Discarded };
 
+	/// <summary>
+	/// The property monad wraps a function that tests some property. A property represents
+	/// arbitrarily complex expression that describes how the code to be tested should behave.
+	/// </summary>
 	public delegate Tuple<TestResult, T> Property<T> (TestState state);
 
+	/// <summary>
+	/// The primitives and combinators dealing with properties.
+	/// </summary>
 	public static class Prop
 	{
+		/// <summary>
+		/// Wrap a value in the Property monad.
+		/// </summary>
 		public static Property<T> ToProperty<T> (this T value)
 		{
 			return state => Tuple.Create (TestResult.Succeeded, value);

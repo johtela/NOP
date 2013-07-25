@@ -12,7 +12,7 @@
 	/// <typeparam name="T">The type of the arbitrary value created.</typeparam>
 	public interface IArbitrary<T>
 	{
-		T Generate (Random rnd, int size);
+		Gen<T> Generate { get; }
 		IEnumerable<T> Shrink (T value);
 	}
 
@@ -22,7 +22,7 @@
 	/// <typeparam name="T"></typeparam>
 	public abstract class ArbitraryBase<T> : IArbitrary<T>
 	{
-		public abstract T Generate (Random rnd, int size);
+		public abstract Gen<T> Generate { get; }
 
 		public virtual IEnumerable<T> Shrink (T value)
 		{
@@ -37,23 +37,23 @@
 	/// <typeparam name="T"></typeparam>
 	public class Arbitrary<T> : ArbitraryBase<T>
 	{
-		public readonly Func<Random, int, T> Generator;
+		public readonly Gen<T> Generator;
 		public readonly Func<T, IEnumerable<T>> Shrinker;
 
-		public Arbitrary (Func<Random, int, T> generator)
+		public Arbitrary (Gen<T> generator)
 		{
 			Generator = generator;
 		}
 
-		public Arbitrary (Func<Random, int, T> generator, Func<T, IEnumerable<T>> shrinker)
+		public Arbitrary (Gen<T> generator, Func<T, IEnumerable<T>> shrinker)
 		{
 			Generator = generator;
 			Shrinker = shrinker;
 		}
 
-		public override T Generate (Random rnd, int size)
+		public override Gen<T> Generate
 		{
-			return Generator (rnd, size);
+			get { return Generator; }
 		}
 
 		public override IEnumerable<T> Shrink (T value)
@@ -96,79 +96,6 @@
 		public static T Generate<T> (Random rnd, int size)
 		{
 			return Get<T> ().Generate (rnd, size);
-		}
-
-		/// <summary>
-		/// Monadic return lifts a value to arbitrary.
-		/// </summary>
-		public static IArbitrary<T> ToArbitrary<T> (this T value)
-		{
-			return new Arbitrary<T> ((rnd, size) => value);
-		}
-
-		/// <summary>
-		/// Monadic bind, the magical wand that allows composing arbitraries.
-		/// </summary>
-		public static IArbitrary<U> Bind<T, U> (this IArbitrary<T> arb, Func<T, IArbitrary<U>> func)
-		{
-			return new Arbitrary<U> ((rnd, size) =>
-			{
-				var a = arb.Generate (rnd, size);
-				return func (a).Generate (rnd, size);
-			});
-		}
-
-		/// <summary>
-		/// Select extension method needed to enable Linq's syntactic sugaring.
-		/// </summary>
-		public static IArbitrary<U> Select<T, U> (this IArbitrary<T> arb, Func<T, U> select)
-		{
-			return arb.Bind (a => select (a).ToArbitrary ());
-		}
-
-		/// <summary>
-		/// SelectMany extension method needed to enable Linq's syntactic sugaring.
-		/// </summary>
-		public static IArbitrary<V> SelectMany<T, U, V> (this IArbitrary<T> arb,
-			Func<T, IArbitrary<U>> project, Func<T, U, V> select)
-		{
-			return arb.Bind (a => project (a).Bind (b => select (a, b).ToArbitrary ()));
-		}
-
-		/// <summary>
-		/// Where extension method needed to enable Linq's syntactic sugaring.
-		/// </summary>
-		public static IArbitrary<T> Where<T> (this IArbitrary<T> arb, Func<T, bool> predicate)
-		{
-			return new Arbitrary<T> ((rnd, size) =>
-			{
-				T result;
-				do { result = arb.Generate (rnd, size); }
-				while (!predicate (result));
-				return result;
-			});
-		}
-
-		/// <summary>
-		/// Combine two arbitrary values into a tuple.
-		/// </summary>
-		public static IArbitrary<Tuple<T, U>> Plus<T, U> (this IArbitrary<T> arb1, IArbitrary<U> arb2)
-		{
-			return from a in arb1
-				   from b in arb2
-				   select Tuple.Create (a, b);
-		}
-
-		/// <summary>
-		/// Combine three arbitrary values into a tuple.
-		/// </summary>
-		public static IArbitrary<Tuple<T, U, V>> Plus<T, U, V> (this IArbitrary<T> arb1, IArbitrary<U> arb2,
-			IArbitrary<V> arb3)
-		{
-			return from a in arb1
-				   from b in arb2
-				   from c in arb3
-				   select Tuple.Create (a, b, c);
 		}
 	}
 }
