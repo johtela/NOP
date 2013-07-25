@@ -13,7 +13,7 @@
 			var charCandidates = CharCandidates ().ToArray ();
 
 			Arbitrary.Register (new Arbitrary<char> (
-				(rnd, size) => charCandidates[rnd.Next (charCandidates.Length)],
+				(rnd, size) => charCandidates[rnd.Next (Math.Min (size, charCandidates.Length))],
 				ShrinkChar));
 
 			Arbitrary.Register (new Arbitrary<int> (
@@ -26,7 +26,7 @@
 
 			Arbitrary.Register (new Arbitrary<float> (
 				(rnd, size) => (float)rnd.NextDouble () * size,
-				x => ShrinkDouble (x).Select (y => (float)y)));
+				x => ShrinkDouble (x).Cast<float> ()));
 
 			Arbitrary.Register (new Arbitrary<double> (
 				(rnd, size) => rnd.NextDouble () * size,
@@ -45,7 +45,9 @@
 
 		private static IEnumerable<char> CharCandidates ()
 		{
-			for (char c = ' '; c <= '~'; c++)
+			for (char c = 'A'; c <= '~'; c++)
+				yield return c;
+			for (char c = ' '; c < 'A'; c++)
 				yield return c;
 			yield return '\t';
 			yield return '\n';
