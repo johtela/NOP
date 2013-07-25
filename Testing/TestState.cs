@@ -34,5 +34,15 @@
             Values = values ?? new List<object>();
             ShrunkValues = shrunkValues;
         }
+
+        public void ResetValues ()
+        {
+            if (Phase == TestPhase.Generate)
+            {
+                CurrentValue = 0;
+                Values.Clear();
+            }
+        }
+
     }
 }

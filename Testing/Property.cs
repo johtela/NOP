@@ -5,6 +5,7 @@
 	using System.Linq;
 	using System.Text;
 	using Collections;
+    using System.Diagnostics;
 
 	public enum TestResult	{ Succeeded, Discarded };
 
@@ -132,11 +133,8 @@
 			{
 				while (state.SuccessfulTests + state.DiscardedTests < tries)
 				{
-					if (state.Phase == TestPhase.Generate)
-					{
-						state.CurrentValue = 0;
-						state.Values.Clear ();
-					}
+					state.ResetValues ();
+
 					switch (testProp (state).Item1)
 					{
 						case TestResult.Succeeded:
@@ -213,13 +211,13 @@
 				state = new TestState (TestPhase.StartShrink, seed, size, state.Values,
 					new List<List<object>> ());
 				Test (testProp, 1, state);
-				System.Diagnostics.Debug.Assert (state.Values.Count == state.ShrunkValues.Count);
+				Debug.Assert (state.Values.Count == state.ShrunkValues.Count);
 				var optimized = Optimize (testProp, state.ShrunkValues, state.Values);
 				Console.ResetColor ();
 				state = new TestState (TestPhase.Shrink, 0, 0, optimized, null);
 				// Fail again with optimized input without catching the exception.
 				testProp (state);
-				System.Diagnostics.Debug.Assert (true, "Code should not enter here");
+				Debug.Assert (false, "Code should not enter here");
 			}
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine ("'{0}' passed {1} tests. Discarded: {2}", 

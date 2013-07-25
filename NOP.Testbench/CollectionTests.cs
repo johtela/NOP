@@ -85,11 +85,11 @@ namespace NOP.Testbench
 		[Test]
 		public void TestString ()
 		{
-			var test = from s in Prop.Choose<string> ()
+            var test = from s in Prop.Choose<string>()
 					   select new { s, s.Length };
 
-			test.Label ("Length is correct")
-				.Check (t => t.s.Length < 3 || char.IsLetterOrDigit (t.s[2]));
+            test.Label("Length is correct").Restrict(20)
+				.Check (t => t.Length < 10 || t.s.Any (char.IsLetterOrDigit), 100000);
 		}
 
 		[Test]
