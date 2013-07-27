@@ -14,8 +14,8 @@ namespace NOP.Testbench
 			var test = from list in Prop.Choose<S> ()
 					   from item in Prop.Choose<T> ()
 					   let newList = prepend (item, list)
-					   orderby list.Length () == 0 ? "empty list" : 
-									list.Length () == 1 ? "one item" : "many items"
+					   //orderby list.Length () == 0 ? "empty list" : 
+					   //             list.Length () == 1 ? "one item" : "many items"
 					   select new { newList, list, item };
 
 			test.Label ("Length is incremented by one")
@@ -29,8 +29,8 @@ namespace NOP.Testbench
 		private static void CheckDropProperties<S, T> () where S : IStream<T>
 		{
 			var test = from list in Prop.Choose<S> ()
-					   from count in Prop.Choose<int> ()
-					   where count <= list.Length ()
+					   from count in Prop.ForAll (Gen.Choose (0, list.Length ()))
+					   //where count <= list.Length ()
 					   let newList = list.Drop (count)
 					   select new { newList, list, count };
 
@@ -80,16 +80,6 @@ namespace NOP.Testbench
 			CheckAppendProperties<StrictList<int>, int> ((l, i) => l + i);
 			CheckAppendProperties<LazyList<char>, char> ((l, i) => l + i);
 			CheckAppendProperties<Sequence<float>, float> ((l, i) => l + i);
-		}
-
-		[Test]
-		public void TestString ()
-		{
-            var test = from s in Prop.Choose<string>()
-					   select new { s, s.Length };
-
-            test.Label("Length is correct")
-				.Check (t => t.Length < 5 || !t.s.All (char.IsLetterOrDigit), 100000);
 		}
 
 		[Test]

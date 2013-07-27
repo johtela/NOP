@@ -93,6 +93,11 @@
 			return (IArbitrary<T>)_container.GetImplementation (typeof (T));
 		}
 
+		public static Gen<T> Gen<T> ()
+		{
+			return Get<T> ().Generate;
+		}
+
 		public static T Generate<T> (Random rnd, int size)
 		{
 			return Get<T> ().Generate (rnd, size);

@@ -16,14 +16,68 @@
 		/// </summary>
 		IStream<T> Rest { get; }
 
-        /// <summary>
-        /// Is the sequence empty.
-        /// </summary>
-        bool IsEmpty { get; }
-    }
+		/// <summary>
+		/// Is the sequence empty.
+		/// </summary>
+		bool IsEmpty { get; }
+	}
 
-	public static class StreamExtensions
+	public static class Strm
 	{
+		private static Container _container;
+
+		static Strm ()
+		{
+			_container = new Container (typeof (IStreamBuilder<,>));
+			Register (typeof (List.Builder<>));
+		}
+
+		/// <summary>
+		/// Register a new stream builder type. The type must implement the IStreamBuilder
+		/// interface.
+		/// </summary>
+		public static void Register (Type type)
+		{
+			_container.Register (type);
+		}
+
+		/// <summary>
+		/// Get the builer for given type.
+		/// </summary>
+		/// <typeparam name="S">The stream type.</typeparam>
+		/// <typeparam name="T">The item type.</typeparam>
+		/// <returns></returns>
+		public static IStreamBuilder<S, T> Builder<S, T> () where S : IStream<T>
+		{
+			return (IStreamBuilder<S, T>)_container.GetImplementation (typeof (S));
+		}
+
+		public static S Empty<S, T> () where S : IStream<T>
+		{
+			return Builder<S, T> ().Empty;
+		}
+
+		public static S Cons<S, T> (T first) where S : IStream<T>
+		{
+			var b = Builder<S, T> ();
+			return b.Cons (first, b.Empty);
+		}
+
+		public static S Cons<S, T> (T first, S rest) where S : IStream<T>
+		{
+			return Builder<S, T> ().Cons (first, rest);
+		}
+
+		public static S Create<S, T> (params T[] items) where S : IStream<T>
+		{
+			return Builder<S, T> ().FromEnumerable (items);
+		}
+
+		public static S FromEnumerable<S, T> (IEnumerable<T> items) where S : IStream<T>
+		{
+			return Builder<S, T> ().FromEnumerable (items);
+		}
+
 		/// <summary>
 		/// The last cell of the stream. 
 		/// </summary>
@@ -188,5 +242,20 @@
 				seq = seq.Rest;
 			}
 		}
+
+		/// <summary>
+		/// Reverses the list making the first item the last one, and vice versa. 
+		/// </summary>
+		/// <returns>This list in reverse order.</returns>
+		public static S Reverse<S, T> (this S stream) where S : IStream<T>
+		{
+			var result = Empty<S, T> ();
+
+			for (var list = stream; !list.IsEmpty; list = (S)list.Rest)
+				result = Cons (list.First, result);
+			return result;
+		}
+
+
 	}
 }

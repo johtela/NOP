@@ -5,7 +5,7 @@
 	using System.Linq;
 	using System.Text;
 	using Collections;
-    using System.Diagnostics;
+	using System.Diagnostics;
 
 	/// <summary>
 	/// Result of a single test run. Test can either succeed, fail, or be discarded. When test
@@ -46,6 +46,11 @@
 		public static Property<T> Discard<T> (this T value)
 		{
 			return state => Tuple.Create (TestResult.Discarded, value);
+		}
+
+		public static Property<T> ForAll<T> (this Gen<T> gen)
+		{
+			return ForAll (new Arbitrary<T> (gen));
 		}
 
 		public static Property<T> ForAll<T> (this IArbitrary<T> arbitrary)

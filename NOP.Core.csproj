@@ -49,6 +49,7 @@
     <Compile Include="Base\Container.cs" />
     <Compile Include="Base\Either.cs" />
     <Compile Include="Base\Functor.cs" />
+    <Compile Include="Collections\IStreamBuilder.cs" />
     <Compile Include="IO\SExprTextStore.cs" />
     <Compile Include="Base\Unit.cs" />
     <Compile Include="Collections\ISequence.cs" />

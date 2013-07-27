@@ -210,19 +210,6 @@
 		}
 
 		/// <summary>
-		/// Reverses the list making the first item the last one, and vice versa. 
-		/// </summary>
-		/// <returns>This list in reverse order.</returns>
-		public StrictList<T> Reverse ()
-		{
-			var result = Empty;
-			
-			for (var list = this; !list.IsEmpty; list = list.Rest)
-				result = Cons (list.First, result);
-			return result;
-		}
-
-		/// <summary>
 		/// Collect the list of lists into another list.
 		/// </summary>
 		public StrictList<U> Collect<U> (Func<T, IStream<U>> func)
@@ -334,7 +321,7 @@
 		/// <typeparam name='U'>The type of the accumulator.</typeparam>
 		public U ReduceRight<U> (Func<T, U, U> func, U acc)
 		{
-			for (var list = Reverse (); !list.IsEmpty; list = list.Rest)
+			for (var list = this.Reverse<StrictList<T>, T> (); !list.IsEmpty; list = list.Rest)
 				acc = func (list.First, acc);
 			return acc;
 		}
@@ -456,6 +443,34 @@
 	/// </summary>
 	public static class List
 	{
+		internal class Builder<T> : IStreamBuilder<StrictList<T>, T>
+		{
+			public StrictList<T> Empty
+			{
+				get { return StrictList<T>.Empty; }
+			}
+
+			public StrictList<T> Cons (T first, StrictList<T> rest)
+			{
+				return List.Cons (first, rest);
+			}
+
+			public StrictList<T> Cons (T first)
+			{
+				return List.Cons (first);
+			}
+
+			public StrictList<T> Create (params T[] items)
+			{
+				return List.Create (items);
+			}
+
+			public StrictList<T> FromEnumerable (IEnumerable<T> items)
+			{
+				return List.FromEnumerable (items);
+			}
+		}
+
 		/// <summary>
 		/// Helper to create a cons list without explicitly specifying the item type. 
 		/// </summary>

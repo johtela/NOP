@@ -80,6 +80,110 @@ namespace NOP.Testing
 				   from c in gen3
 				   select Tuple.Create (a, b, c);
 		}
+
+		/// <summary>
+		/// Primitive generator to choose an integer.
+		/// </summary>
+		public static Gen<int> Choose (int min)
+		{
+			return (rnd, size) => rnd.Next (min, min + size);
+		}
+
+		/// <summary>
+		/// Primitive generator to choose an integer in the given range.
+		/// </summary>
+		public static Gen<int> Choose (int min, int max)
+		{
+			return (rnd, size) => rnd.Next (min, max);
+		}
+
+		/// <summary>
+		/// Primitive generator to choose a double.
+		/// </summary>
+		public static Gen<double> Choose (double min, double max)
+		{
+			return (rnd, size) => (rnd.NextDouble () * (max - min)) + min;
+		}
+
+		/// <summary>
+		/// Primitive generator to choose a double in the given range.
+		/// </summary>
+		public static Gen<double> Choose (double min)
+		{
+			return (rnd, size) => (rnd.NextDouble () * size) + min;
+		}
+
+		/// <summary>
+		/// Randomly choose an value from an array.
+		/// </summary>
+		public static Gen<T> Elements<T> (T[] values)
+		{
+			return (rnd, size) => values[rnd.Next (values.Length)];
+		}
+
+		/// <summary>
+		/// Cast the gen to its base type.
+		/// </summary>
+		public static Gen<U> Cast<T, U> (this Gen<T> gen) where T : U
+		{
+			return gen.Bind (x => ((U)x).ToGen ());
+		}
+
+		public static Gen<long> ToLong (this Gen<int> gen)
+		{
+			return gen.Bind (x => ((long)x).ToGen ());
+		}
+
+		public static Gen<float> ToFloat (this Gen<double> gen)
+		{
+			return gen.Bind (x => ((float)x).ToGen ());
+		}
+
+		/// <summary>
+		/// Helper function that generates an enumerable of values.
+		/// </summary>
+		private static IEnumerable<T> GenerateEnumerable<T> (Gen<T> gen, Random rnd, int size)
+		{
+			var len = rnd.Next (size);
+			for (int i = 0; i < len; i++)
+				yield return gen (rnd, size);
+		}
+
+		/// <summary>
+		/// Returns a list (enumeration) of generated values.
+		/// </summary>
+		public static Gen<IEnumerable<T>> EnumerableOf<T> (this Gen<T> gen)
+		{
+			return (rnd, size) => GenerateEnumerable (gen, rnd, size);
+		}
+
+		/// <summary>
+		/// Returns an array of generated values.
+		/// </summary>
+		public static Gen<T[]> ArrayOf<T> (this Gen<T> gen)
+		{
+			return (rnd, size) => GenerateEnumerable (gen, rnd, size).ToArray ();
+		}
+
+		/// <summary>
+		/// Randomly chooses one of given generators.
+		/// </summary>
+		public static Gen<T> OneOf<T> (params Gen<T>[] gens)
+		{
+			return Choose (0, gens.Length - 1).Bind (i => gens[i]);
+		}
+
+		/// <summary>
+		/// Choose a generator randomly from a list based on frequencies.
+		/// </summary>
+		public static Gen<T> Frequency<T> (params Tuple<int, Gen<T>>[] freqGens)
+		{
+			var sum = 0;
+			for (int i = 0; i < freqGens.Length; i++)
+				freqGens[i] = Tuple.Create (sum += freqGens[0].Item1, freqGens[i].Item2);
+
+			return Choose (1, sum).Bind (x => freqGens.First (fg => fg.Item1 >= x).Item2);
+		}
 	}
 }
 
