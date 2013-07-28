@@ -2,6 +2,7 @@ namespace NOP.Testbench
 {
 	using System;
 	using NOP;
+	using NOP.Collections;
 
 	public class Arithmetic
 	{

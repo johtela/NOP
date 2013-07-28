@@ -95,7 +95,7 @@
 			);
 		}
 
-		public static IReducible<T> Concat<T> (this IReducible<T> first, IReducible<T> second)
+		public static IReducible<T> Concat<T> (IReducible<T> first, IReducible<T> second)
 		{
 			return new _Concat<T> (first, second);
 		}

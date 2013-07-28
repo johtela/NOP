@@ -10,9 +10,7 @@
 	/// </summary>
 	public class EmptyListException : Exception
 	{
-		public EmptyListException () : base ("The list is empty")
-		{
-		}
+		public EmptyListException () : base ("The list is empty") {}
 	}
 
 	/// <summary>
@@ -56,6 +54,22 @@
 			}
 		}
 
+		/// <summary>
+		/// Return an empty list.
+		/// </summary>
+		public static StrictList<T> Empty
+		{
+			get { return _empty; }
+		}
+
+		/// <summary>
+		/// Is the list empty.
+		/// </summary>
+		public bool IsEmpty
+		{
+			get { return this == Empty; }
+		}
+
 		IStream<T> IStream<T>.Rest
 		{
 			get { return Rest; }
@@ -80,7 +94,6 @@
 		/// <summary>
 		/// Construct a list from an enumerable.
 		/// </summary>
-		/// <param name='values'>The enumeration of values.</param>
 		public static StrictList<T> FromEnumerable (IEnumerable<T> values)
 		{
 			var result = Empty;
@@ -98,6 +111,9 @@
 			return result;
 		}
 
+		/// <summary>
+		/// Construct a list from a stream.
+		/// </summary>
 		public static StrictList<T> FromStream (IStream<T> seq)
 		{
 			if (seq is StrictList<T>)
@@ -114,22 +130,6 @@
 				last = cons;
 			}
 			return result;
-		}
-
-		/// <summary>
-		/// Return an empty list, i.e. null.
-		/// </summary>
-		public static StrictList<T> Empty
-		{
-			get { return _empty; }
-		}
-		
-		/// <summary>
-		/// Is the list empty.
-		/// </summary>
-		public bool IsEmpty
-		{
-			get { return this == Empty; }
 		}
 
 		/// <summary>
@@ -167,8 +167,7 @@
 				var cons = Cons (item, Empty);
 				prefixLast.Rest = cons;
 				return prefixFirst.IsEmpty ? cons : prefixFirst;
-			}
-			);
+			});
 		}
 
 		/// <summary>
@@ -187,8 +186,7 @@
 				var cons = Cons (item, tail);
 				prefixLast.Rest = cons;
 				return prefixFirst.IsEmpty ? cons : prefixFirst;
-			}
-			);
+			});
 		}
 
 		/// <summary>
@@ -207,6 +205,18 @@
 				return prefixFirst.IsEmpty ? rest : prefixFirst;
 			}
 			);
+		}
+
+		/// <summary>
+		/// Concatenate two lists together.
+		/// </summary>
+		public StrictList<T> Concat (StrictList<T> other)
+		{
+			return CopyUpTo (Empty).Bind ((prefixFirst, prefixLast) =>
+			{
+				prefixLast.Rest = other;
+				return prefixFirst.IsEmpty ? other : prefixFirst;
+			});
 		}
 
 		/// <summary>
@@ -231,15 +241,10 @@
 			return result;
 		}
 
-		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
-		{
-			return Collect ((Func<T, IStream<U>>)func);
-		}
-
 		/// <summary>
 		/// Zip two lists together. 
 		/// </summary>
-		public StrictList<Tuple<T, U>> ZipWith<U> (StrictList<U> other)
+		public StrictList<Tuple<T, U>> ZipWith<U> (IStream<U> other)
 		{
 			var result = StrictList<Tuple<T, U>>.Empty;
 			var resultLast = result;
@@ -263,7 +268,7 @@
 		/// <summary>
 		/// Zip two lists together extending the shorter one with default values.
 		/// </summary>
-		public StrictList<Tuple<T, U>> ZipExtendingWith<U> (StrictList<U> other)
+		public StrictList<Tuple<T, U>> ZipExtendingWith<U> (IStream<U> other)
 		{
 			var result = StrictList<Tuple<T, U>>.Empty;
 			var resultLast = result;
@@ -334,7 +339,7 @@
 		/// <param name='acc'>Initial accumulator value.</param>
 		/// <param name='func'>The function applied to the lists' items.</param>
 		/// <param name='other'>The list to be reduced with.</param>
-		public U ReduceWith<U, V> (U acc, Func<U, T, V, U> func, StrictList<V> other)
+		public U ReduceWith<U, V> (U acc, Func<U, T, V, U> func, IStream<V> other)
 		{
 			for (var list = this; !(list.IsEmpty || other.IsEmpty); 
 				 list = list.Rest, other = other.Rest)
@@ -360,11 +365,9 @@
 			return result;
 		}
 
-		ISequence<U> ISequence<T>.Map<U> (Func<T, U> map)
-		{
-			return Map (map);
-		}
-
+		/// <summary>
+		/// Filter the list according to a predicate.
+		/// </summary>
 		public StrictList<T> Filter (Func<T, bool> predicate)
 		{
 			var result = Empty;
@@ -381,11 +384,8 @@
 			return result;
 		}
 
-		ISequence<T> ISequence<T>.Filter (Func<T, bool> predicate)
-		{
-			return Filter (predicate);
-		}
-		
+		#region Overridden from Object
+
 		/// <summary>
 		/// Determines whether the specified object is equal to the current list.
 		/// </summary>
@@ -412,7 +412,38 @@
 				this.ToString (null, null,  null) :
 				this.ToString ("[", "]", ", ");
 		}
-		
+
+		#endregion
+
+		#region ISequence<T> members
+
+		ISequence<T> ISequence<T>.Concat (ISequence<T> other)
+		{
+			return Concat (StrictList<T>.FromStream (other));
+		}
+
+		ISequence<U> ISequence<T>.Map<U> (Func<T, U> map)
+		{
+			return Map (map);
+		}
+
+		ISequence<T> ISequence<T>.Filter (Func<T, bool> predicate)
+		{
+			return Filter (predicate);
+		}
+
+		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
+		{
+			return Collect ((Func<T, IStream<U>>)func);
+		}
+
+		ISequence<Tuple<T, U>> ISequence<T>.ZipWith<U> (ISequence<U> other)
+		{
+			return ZipWith (other);
+		}
+
+		#endregion
+
 		#region IVisualizable members
 
 		public Visual ToVisual ()

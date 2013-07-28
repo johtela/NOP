@@ -4,11 +4,15 @@
 
 	/// <summary>
 	/// Immutable sequence that can be strict or lazy. A sequence
-	/// has to implement also IFunctor to provide mapping support
-	/// plus IReducible to provide folding functions.
+	/// has to implement IReducible to provide folding functions.
 	/// </summary>
 	public interface ISequence<T> : IStream<T>, IReducible<T>
 	{
+		/// <summary>
+		/// Concatenate two sequences.
+		/// </summary>
+		ISequence<T> Concat (ISequence<T> other);
+
 		/// <summary>
 		/// Map over the sequence.
 		/// </summary>
@@ -24,6 +28,11 @@
 		/// </summary>
 		/// <returns></returns>
 		ISequence<U> Collect<U> (Func<T, ISequence<U>> func);
+
+		/// <summary>
+		/// Zip two lists to a list of tuples.
+		/// </summary>
+		ISequence<Tuple<T, U>> ZipWith<U> (ISequence<U> other);
 	}
 
 	/// <summary>
@@ -31,6 +40,22 @@
 	/// </summary>
 	public static class SequenceExtensions
 	{
+		public static S Reverse<S, T> (this S seq) where S : ISequence<T>
+		{
+			var b = Strm.Builder<S, T> ();
+			return seq.ReduceLeft (b.Empty, (s, i) => b.Cons (i, s));
+		}
+
+		public static S AddToFront<S, T> (this S seq, T item) where S : ISequence<T>
+		{
+			return Strm.Cons<S, T> (item, seq);
+		}
+
+		public static S AddToBack<S, T> (this S seq, T item) where S : ISequence<T>
+		{
+			return (S)seq.Concat (Strm.Cons<S, T> (item));
+		}
+
 		public static ISequence<U> Select<T, U> (this ISequence<T> seq, Func<T, U> select)
 		{
 			return seq.Map (select);

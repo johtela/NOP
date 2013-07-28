@@ -126,6 +126,15 @@
 		}
 
 		/// <summary>
+		/// Map list to another list. 
+		/// </summary>
+		public LazyList<U> Map<U> (Func<T, U> map)
+		{
+			return IsEmpty ? LazyList<U>.Empty :
+				new LazyList<U> (map (First), Fun.Partial (Rest.Map, map));
+		}
+
+		/// <summary>
 		/// Collect the list of lists into another list.
 		/// </summary>
 		public LazyList<U> Collect<U> (Func<T, LazyList<U>> func)
@@ -138,42 +147,6 @@
 				new LazyList<U> (lst.First, () => lst.Rest.Concat (Rest.Collect (func)));
 		}
 
-		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
-		{
-			return Collect (e => LazyList<U>.FromStream (func (e)));
-		}
-
-		public LazyList<T> Reverse ()
-		{
-			var result = Empty;
-			for (var list = this; !list.IsEmpty; list = list.Rest)
-				result = new LazyList<T> (list.First, result);
-			return result;
-		}
-
-		public LazyList<Tuple<T, U>> ZipWith<U> (LazyList<U> other)
-		{
-			return IsEmpty || other.IsEmpty ? LazyList<Tuple<T, U>>.Empty :
-				new LazyList<Tuple<T, U>> (Tuple.Create (First, other.First), 
-					() => Rest.ZipWith (other.Rest));
-		}
-
-		#region ISequence<T> implementation
-
-		/// <summary>
-		/// Map list to another list. 
-		/// </summary>
-		public LazyList<U> Map<U> (Func<T, U> map)
-		{
-			return IsEmpty ? LazyList<U>.Empty :
-				new LazyList<U> (map (First), Fun.Partial (Rest.Map, map));
-		}
-
-		ISequence<U> ISequence<T>.Map<U> (Func<T, U> map)
-		{
-			return Map (map);
-		}
-
 		public LazyList<T> Filter (Func<T, bool> predicate)
 		{
 			var list = this;
@@ -183,9 +156,38 @@
 				new LazyList<T> (list.First, Fun.Partial (list.Rest.Filter, predicate));
 		}
 
+		public LazyList<Tuple<T, U>> ZipWith<U> (IStream<U> other)
+		{
+			return IsEmpty || other.IsEmpty ? LazyList<Tuple<T, U>>.Empty :
+				new LazyList<Tuple<T, U>> (Tuple.Create (First, other.First), 
+					() => Rest.ZipWith (other.Rest));
+		}
+
+		#region ISequence<T> implementation
+
+		ISequence<T> ISequence<T>.Concat (ISequence<T> other)
+		{
+			return Concat (LazyList<T>.FromStream (other));
+		}
+
+		ISequence<U> ISequence<T>.Map<U> (Func<T, U> map)
+		{
+			return Map (map);
+		}
+
 		ISequence<T> ISequence<T>.Filter (Func<T, bool> predicate)
 		{
 			return Filter (predicate);
+		}
+
+		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
+		{
+			return Collect (e => LazyList<U>.FromStream (func (e)));
+		}
+
+		ISequence<Tuple<T, U>> ISequence<T>.ZipWith<U> (ISequence<U> other)
+		{
+			return ZipWith (other);
 		}
 
 		#endregion
@@ -201,7 +203,7 @@
 
 		public U ReduceRight<U> (Func<T, U, U> func, U acc)
 		{
-			for (var list = Reverse (); !list.IsEmpty; list = list.Rest)
+			for (var list = this.Reverse<LazyList<T>, T> (); !list.IsEmpty; list = list.Rest)
 				acc = func (list.First, acc);
 			return acc;
 		}

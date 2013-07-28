@@ -204,6 +204,27 @@
 			return result;
 		}
 
+		public Sequence<U> Map<U> (Func<T, U> map)
+		{
+			return ReduceLeft (Sequence<U>.Empty, (s, e) => s + map (e));
+		}
+
+		public Sequence<T> Filter (Func<T, bool> predicate)
+		{
+			return ReduceLeft (Empty, (s, e) => predicate (e) ? s + e : s);
+		}
+
+		public Sequence<U> Collect<U> (Func<T, Sequence<U>> func)
+		{
+			return ReduceLeft (Sequence<U>.Empty, (s, e) => s + func (e));
+		}
+
+		public Sequence<Tuple<T, U>> ZipWith<U> (IStream<U> other)
+		{
+			return ReduceLeft (Tuple.Create (Sequence<Tuple<T, U>>.Empty, other),
+				(t, e) => Tuple.Create (t.Item1 + Tuple.Create (e, t.Item2.First), t.Item2.Rest)).Item1;
+		}
+
 		#region Overridden from Object
 
 		public override bool Equals (object obj)
@@ -244,9 +265,9 @@
 
 		#region ISequence<T> implementation
 
-		public Sequence<U> Map<U> (Func<T, U> map)
+		ISequence<T> ISequence<T>.Concat (ISequence<T> other)
 		{
-			return ReduceLeft (Sequence<U>.Empty, (s, e) => s + map (e));
+			return this + Sequence<T>.FromSequence (other);
 		}
 
 		ISequence<U> ISequence<T>.Map<U> (Func<T, U> map)
@@ -254,24 +275,19 @@
 			return Map (map);
 		}
 
-		public Sequence<T> Filter (Func<T, bool> predicate)
-		{
-			return ReduceLeft (Empty, (s, e) => predicate (e) ? s + e : s);
-		}
-
 		ISequence<T> ISequence<T>.Filter (Func<T, bool> predicate)
 		{
 			return Filter (predicate);
 		}
 
-		public Sequence<U> Collect<U> (Func<T, Sequence<U>> func)
-		{
-			return ReduceLeft (Sequence<U>.Empty, (s, e) => s + func (e));
-		}
-
 		ISequence<U> ISequence<T>.Collect<U> (Func<T, ISequence<U>> func)
 		{
 			return Collect (e => Sequence<U>.FromSequence (func (e)));
+		}
+
+		ISequence<Tuple<T, U>> ISequence<T>.ZipWith<U> (ISequence<U> other)
+		{
+			return ZipWith (other);
 		}
 
 		#endregion

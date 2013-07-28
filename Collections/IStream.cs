@@ -242,20 +242,5 @@
 				seq = seq.Rest;
 			}
 		}
-
-		/// <summary>
-		/// Reverses the list making the first item the last one, and vice versa. 
-		/// </summary>
-		/// <returns>This list in reverse order.</returns>
-		public static S Reverse<S, T> (this S stream) where S : IStream<T>
-		{
-			var result = Empty<S, T> ();
-
-			for (var list = stream; !list.IsEmpty; list = (S)list.Rest)
-				result = Cons (list.First, result);
-			return result;
-		}
-
-
 	}
 }
