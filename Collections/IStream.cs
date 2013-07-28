@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Text;
 
 	public interface IStream<T>
@@ -142,6 +143,32 @@
 			while (n-- > 0)
 				seq = seq.Rest;
 			return seq;
+		}
+
+		/// <summary>
+		/// Drop items from the sequence as long as the predicate holds.
+		/// </summary>
+		public static IStream<T> DropWhile<T> (this IStream<T> seq, Func<T, bool> predicate)
+		{
+			while (!seq.IsEmpty && predicate (seq.First))
+				seq = seq.Rest;
+			return seq;
+		}
+
+		/// <summary>
+		/// Takes n first items from the sequence.
+		/// </summary>
+		public static S Take<S, T> (this S seq, int n) where S : IStream<T>
+		{
+			return FromEnumerable<S, T> (Enumerable.Take (seq.ToEnumerable (), n));
+		}
+
+		/// <summary>
+		/// Takes n first items from the sequence.
+		/// </summary>
+		public static S TakeWhile<S, T> (this S seq, Func<T, bool> predicate) where S : IStream<T>
+		{
+			return FromEnumerable<S, T> (Enumerable.TakeWhile (seq.ToEnumerable (), predicate));
 		}
 
 		/// <summary>
