@@ -38,7 +38,7 @@
 	/// <summary>
 	/// Linq extension methods for sequences.
 	/// </summary>
-	public static class SequenceExtensions
+	public static class Seq
 	{
 		public static S Reverse<S, T> (this S seq) where S : ISequence<T>
 		{

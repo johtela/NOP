@@ -321,6 +321,24 @@
 	/// </summary>
 	public static class Sequence
 	{
+		internal class Builder<T> : IStreamBuilder<Sequence<T>, T>
+		{
+			public Sequence<T> Empty
+			{
+				get { return Sequence<T>.Empty; }
+			}
+
+			public Sequence<T> Cons (T first, Sequence<T> rest)
+			{
+				return Sequence.Cons (first, rest);
+			}
+
+			public Sequence<T> FromEnumerable (IEnumerable<T> items)
+			{
+				return Sequence.FromEnumerable (items);
+			}
+		}
+
 		public static Sequence<T> Cons<T> (T first, Sequence<T> rest)
 		{
 			return first + rest;

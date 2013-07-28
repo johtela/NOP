@@ -109,14 +109,6 @@
 		}
 
 		/// <summary>
-		/// Append an item at the end of the list.
-		/// </summary>
-		public LazyList<T> Append (T item)
-		{
-			return Concat (Cons (item, Empty));
-		}
-
-		/// <summary>
 		/// Concatenate two lazy lists
 		/// </summary>
 		public LazyList<T> Concat (LazyList<T> other)
@@ -219,7 +211,7 @@
 
 		public static LazyList<T> operator + (LazyList<T> list, T item)
 		{
-			return list.Append (item);
+			return list.AddToBack<LazyList<T>, T> (item);
 		}
 
 		public static LazyList<T> operator + (LazyList<T> list, LazyList<T> other)
@@ -258,6 +250,24 @@
 
 	public static class LazyList
 	{
+		internal class Builder<T> : IStreamBuilder<LazyList<T>, T>
+		{
+			public LazyList<T> Empty
+			{
+				get { return LazyList<T>.Empty; }
+			}
+
+			public LazyList<T> Cons (T first, LazyList<T> rest)
+			{
+				return LazyList.Cons (first, rest);
+			}
+
+			public LazyList<T> FromEnumerable (IEnumerable<T> items)
+			{
+				return LazyList.FromEnumerable (items);
+			}
+		}
+
 		/// <summary>
 		/// Helper to create a cons list without explicitly specifying the item type. 
 		/// </summary>

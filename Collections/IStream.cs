@@ -30,6 +30,8 @@
 		{
 			_container = new Container (typeof (IStreamBuilder<,>));
 			Register (typeof (List.Builder<>));
+			Register (typeof (LazyList.Builder<>));
+			Register (typeof (Sequence.Builder<>));
 		}
 
 		/// <summary>
