@@ -45,12 +45,18 @@
 			get { return Rest; }
 		}
 
+		/// <summary>
+		/// Private constructor. Use Cons to create a list.
+		/// </summary>
 		private LazyList (T first, Func<LazyList<T>> getRest)
 		{
 			_first = first;
 			_getRest = getRest;
 		}
 
+		/// <summary>
+		/// Private constructor. Use Cons to create a list.
+		/// </summary>
 		private LazyList (T first, LazyList<T> rest)
 		{
 			_first = first;
@@ -65,6 +71,9 @@
 			return new LazyList<T> (first, getRest);
 		}
 
+		/// <summary>
+		/// Construct a list with non-lazy value.
+		/// </summary>
 		public static LazyList<T> Cons (T first, LazyList<T> rest)
 		{
 			return new LazyList<T> (first, rest);
@@ -76,6 +85,7 @@
 				new LazyList<T> (e.Current, Fun.Partial (Enumerate, e));
 		}
 
+		/// <summary>
 		/// Construct a list from an enumerable.
 		/// </summary>
 		public static LazyList<T> FromEnumerable (IEnumerable<T> values)
@@ -83,7 +93,7 @@
 			return Enumerate (values.GetEnumerator ());
 		}
 
-		/// Construct a list from an enumerable.
+		/// Construct a list from a stream.
 		/// </summary>
 		public static LazyList<T> FromStream (IStream<T> seq)
 		{
@@ -139,6 +149,9 @@
 				new LazyList<U> (lst.First, () => lst.Rest.Concat (Rest.Collect (func)));
 		}
 
+		/// <summary>
+		/// Filter the list according to a predicate.
+		/// </summary>
 		public LazyList<T> Filter (Func<T, bool> predicate)
 		{
 			var list = this;
@@ -148,6 +161,11 @@
 				new LazyList<T> (list.First, Fun.Partial (list.Rest.Filter, predicate));
 		}
 
+
+		/// <summary>
+		/// Zip this list with a stream creating list of tuples. The zipping stops when
+		/// either the this list or the stream runs out.
+		/// </summary>
 		public LazyList<Tuple<T, U>> ZipWith<U> (IStream<U> other)
 		{
 			return IsEmpty || other.IsEmpty ? LazyList<Tuple<T, U>>.Empty :
@@ -248,8 +266,14 @@
 		#endregion		
 	}
 
+	/// <summary>
+	/// Static class that provides constructor methods for lazy lists.
+	/// </summary>
 	public static class LazyList
 	{
+		/// <summary>
+		/// The builder object that allows creating lazy lists generically.
+		/// </summary>
 		internal class Builder<T> : IStreamBuilder<LazyList<T>, T>
 		{
 			public LazyList<T> Empty

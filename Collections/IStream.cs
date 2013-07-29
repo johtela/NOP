@@ -23,6 +23,17 @@
 		bool IsEmpty { get; }
 	}
 
+	/// <summary>
+	/// Exception that is thrown if empty list is accessed.
+	/// </summary>
+	public class EmptyListException : Exception
+	{
+		public EmptyListException () : base ("The list is empty") { }
+	}
+
+	/// <summary>
+	/// Extension methods for IStreams.
+	/// </summary>
 	public static class Strm
 	{
 		private static Container _container;
@@ -55,27 +66,42 @@
 			return (IStreamBuilder<S, T>)_container.GetImplementation (typeof (S));
 		}
 
+		/// <summary>
+		/// Generically get the empty stream of given type.
+		/// </summary>
 		public static S Empty<S, T> () where S : IStream<T>
 		{
 			return Builder<S, T> ().Empty;
 		}
 
+		/// <summary>
+		/// Construct a singleton stream of given type generically.
+		/// </summary>
 		public static S Cons<S, T> (T first) where S : IStream<T>
 		{
 			var b = Builder<S, T> ();
 			return b.Cons (first, b.Empty);
 		}
 
+		/// <summary>
+		/// Construct a stream of given type generically.
+		/// </summary>
 		public static S Cons<S, T> (T first, S rest) where S : IStream<T>
 		{
 			return Builder<S, T> ().Cons (first, rest);
 		}
 
+		/// <summary>
+		/// Create a stream generically with given items.
+		/// </summary>
 		public static S Create<S, T> (params T[] items) where S : IStream<T>
 		{
 			return Builder<S, T> ().FromEnumerable (items);
 		}
 
+		/// <summary>
+		/// Construct a stream generically from an enumerable.
+		/// </summary>
 		public static S FromEnumerable<S, T> (IEnumerable<T> items) where S : IStream<T>
 		{
 			return Builder<S, T> ().FromEnumerable (items);

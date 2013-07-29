@@ -6,14 +6,6 @@
 	using NOP.Visuals;
 
 	/// <summary>
-	/// Exception that is thrown if empty list is accessed.
-	/// </summary>
-	public class EmptyListException : Exception
-	{
-		public EmptyListException () : base ("The list is empty") {}
-	}
-
-	/// <summary>
 	/// An immutable linked list.
 	/// </summary>
 	/// <typeparam name="T">The item type of the list.</typeparam>
@@ -74,7 +66,10 @@
 		{
 			get { return Rest; }
 		}
-		
+
+		/// <summary>
+		/// Private constructor. Use Cons to create a list.
+		/// </summary>
 		private StrictList (T first, StrictList<T> rest)
 		{
 			_first = first;
@@ -227,7 +222,8 @@
 		}
 
 		/// <summary>
-		/// Zip two lists together. 
+		/// Zip this list with a stream creating list of tuples. The zipping stops when
+		/// either the this list or the stream runs out.
 		/// </summary>
 		public StrictList<Tuple<T, U>> ZipWith<U> (IStream<U> other)
 		{
@@ -251,7 +247,7 @@
 		}
 
 		/// <summary>
-		/// Zip two lists together extending the shorter one with default values.
+		/// Zip a list with atream extending the shorter one with default values.
 		/// </summary>
 		public StrictList<Tuple<T, U>> ZipExtendingWith<U> (IStream<U> other)
 		{

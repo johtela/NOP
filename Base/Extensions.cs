@@ -205,5 +205,14 @@ namespace NOP
 		}
 
 		#endregion
+
+		#region bool extensions
+
+		public static bool Implies (this bool antecedent, bool consequent)
+		{
+			return !antecedent || consequent;
+		}
+
+		#endregion
 	}
 }

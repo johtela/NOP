@@ -99,52 +99,83 @@
 			return sz => index < sz;
 		}
 
+		/// <summary>
+		/// Create a sequence from enumerable.
+		/// </summary>
 		public static Sequence<T> FromEnumerable (IEnumerable<T> items)
 		{
 			return new Sequence<T> (FingerTree<Elem, Size>.FromEnumerable (items.Select (CreateElem)));
 		}
 
+		/// <summary>
+		/// Create a sequence from ISequence.
+		/// </summary>
 		public static Sequence<T> FromSequence (ISequence<T> seq)
 		{
 			return seq is Sequence<T> ? (Sequence<T>)seq : 
 				new Sequence<T> (FingerTree<Elem, Size>.FromReducible ((IReducible<Elem>)seq.Map (CreateElem)));
 		}
 
+		/// <summary>
+		/// Return the empty sequence.
+		/// </summary>
 		public static Sequence<T> Empty
 		{
 			get { return new Sequence<T> (FingerTree<Elem, Size>.Empty); }
 		}
 
+		/// <summary>
+		/// Is this sequence empty?
+		/// </summary>
 		public bool IsEmpty
 		{
 			get { return _tree.IsEmpty; }
 		}
 
+		/// <summary>
+		/// The first item of the sequence.
+		/// </summary>
 		public T First
 		{
 			get { return _tree.First; }
 		}
 
+		/// <summary>
+		/// The last item of the sequence.
+		/// </summary>
 		public T Last
 		{
 			get { return _tree.Last; }
 		}
 
+		/// <summary>
+		/// The left sided (from beginning) tail of the sequence.
+		/// </summary>
 		public Sequence<T> RestL
 		{
 			get { return new Sequence<T> (_tree.RestL); }
 		}
 
+		/// <summary>
+		/// The right sided (from end) tail of the sequence.
+		/// </summary>
 		public Sequence<T> RestR
 		{
 			get { return new Sequence<T> (_tree.RestR); }
 		}
 
+		/// <summary>
+		/// The left sided tail.
+		/// </summary>
 		public IStream<T> Rest
 		{
 			get { return RestL; }
 		}
 
+		/// <summary>
+		/// Return the left view of the sequence. Returns both the first item and
+		/// left tail.
+		/// </summary>
 		public Tuple<T, Sequence<T>> LeftView
 		{
 			get
@@ -155,6 +186,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Return the riht view of the sequence. Returns both the last item and
+		/// right tail.
+		/// </summary>
 		public Tuple<Sequence<T>, T> RightView
 		{
 			get
@@ -165,6 +200,9 @@
 			}
 		}
 
+		/// <summary>
+		/// Return an item by its position in the sequence.
+		/// </summary>
 		public T this [int index]
 		{
 			get
@@ -175,16 +213,26 @@
 			}
 		}
 
+		/// <summary>
+		/// Return the length of the sequence.
+		/// </summary>
 		public int Length
 		{
 			get { return _tree.Measure (); }
 		}
 
+		/// <summary>
+		/// Appends items to the beginning of the sequence.
+		/// </summary>
 		public Sequence<T> AppendWith (StrictList<T> items, Sequence<T> other)
 		{
 			return new Sequence<T> (_tree.AppendTree (items.Map (CreateElem), other._tree));
 		}
 
+		/// <summary>
+		/// Split a sequence in a position indicated by the index. Returns the prefix sequence, 
+		/// the item at the given position, and the postfix sequence.
+		/// </summary>
 		public Tuple<Sequence<T>, T, Sequence<T>> SplitAt (int index)
 		{
 			var split = _tree.Split (FindP (index), new Size ());
@@ -192,6 +240,10 @@
 				new Sequence<T> (split.Right));
 		}
 
+		/// <summary>
+		/// Convert to sequence to an array.
+		/// </summary>
+		/// <returns></returns>
 		public T[] AsArray ()
 		{
 			var result = new T[Length];
@@ -204,21 +256,34 @@
 			return result;
 		}
 
+		/// <summary>
+		/// Map this sequence to another.
+		/// </summary>
 		public Sequence<U> Map<U> (Func<T, U> map)
 		{
 			return ReduceLeft (Sequence<U>.Empty, (s, e) => s + map (e));
 		}
 
+		/// <summary>
+		/// Filter this sequence according to a predicate.
+		/// </summary>
 		public Sequence<T> Filter (Func<T, bool> predicate)
 		{
 			return ReduceLeft (Empty, (s, e) => predicate (e) ? s + e : s);
 		}
 
+		/// <summary>
+		/// Collect (flatten) the sequences return by a function to a single sequence.
+		/// </summary>
 		public Sequence<U> Collect<U> (Func<T, Sequence<U>> func)
 		{
 			return ReduceLeft (Sequence<U>.Empty, (s, e) => s + func (e));
 		}
 
+		/// <summary>
+		/// Zip this sequence with a stream creating list of tuples. The zipping stops when
+		/// either the this list or the stream runs out.
+		/// </summary>
 		public Sequence<Tuple<T, U>> ZipWith<U> (IStream<U> other)
 		{
 			return ReduceLeft (Tuple.Create (Sequence<Tuple<T, U>>.Empty, other),
@@ -321,6 +386,9 @@
 	/// </summary>
 	public static class Sequence
 	{
+		/// <summary>
+		/// The builder implementation that allows creating sequences generically.
+		/// </summary>
 		internal class Builder<T> : IStreamBuilder<Sequence<T>, T>
 		{
 			public Sequence<T> Empty
@@ -339,26 +407,41 @@
 			}
 		}
 
+		/// <summary>
+		/// Construct a sequense from a head and tail.
+		/// </summary>
 		public static Sequence<T> Cons<T> (T first, Sequence<T> rest)
 		{
 			return first + rest;
 		}
 
+		/// <summary>
+		/// Construct a singleton sequence.
+		/// </summary>
 		public static Sequence<T> Cons<T> (T first)
 		{
 			return first + Sequence<T>.Empty;
 		}
 
+		/// <summary>
+		/// Construct a sequence from ISequence.
+		/// </summary>
 		public static Sequence<T> Create<T> (ISequence<T> seq)
 		{
 			return Sequence<T>.FromSequence (seq);
 		}
 
+		/// <summary>
+		/// Create a sequence from enumerable.
+		/// </summary>
 		public static Sequence<T> FromEnumerable<T> (IEnumerable<T> items)
 		{
 			return Sequence<T>.FromEnumerable (items);
 		}
 
+		/// <summary>
+		/// Create a sequence with given elements.
+		/// </summary>
 		public static Sequence<T> Create<T> (params T[] items)
 		{
 			return Sequence<T>.FromEnumerable (items);
