@@ -6,6 +6,7 @@ namespace NOP.Testbench
 	using NOP.Testing;
 	using System.Windows.Forms;
 	using System.Threading.Tasks;
+	using NOP.Testbench.Collections;
 
 	class Runner
 	{
@@ -16,11 +17,13 @@ namespace NOP.Testbench
 		{
 			Task.Factory.StartNew (() =>
 				Tester.RunTestsTimed (
-					new CollectionTests ())
-//					new LazyListTests (),
-//					new MapTests (),
-//					new SetTests (),
-//					new FingerTreeTests (),
+					new IStreamTests (),
+					new ISequenceTests (),
+					new StrictListTests (),
+					new LazyListTests (),
+					new MapTests (),
+					new SetTests (),
+					new FingerTreeTests ())
 //					new TypeDefinitionTests (),
 //					new TypeCheckingTests (),
 //					new ParserTests (),

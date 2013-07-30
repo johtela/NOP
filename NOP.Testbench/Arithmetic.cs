@@ -43,6 +43,9 @@ namespace NOP.Testbench
 		public MutableNumber (int value)
 		{
 			_value = value;
+			Func<double, double> sin = Math.Sin;
+			Func<double, double> cos = Math.Cos; 
+			var sincos = Fun.Compose (sin, cos);
 		}
 		
 		public int Value

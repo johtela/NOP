@@ -162,6 +162,14 @@
 		}
 
 		/// <summary>
+		/// Check if the stream contains given item.
+		/// </summary>
+		public static bool Contains<T> (this IStream<T> seq, T item)
+		{
+			return !FindNext (seq, item).IsEmpty;
+		}
+
+		/// <summary>
 		/// Drop n items from the sequence.
 		/// </summary>
 		public static IStream<T> Drop<T> (this IStream<T> seq, int n)
@@ -212,6 +220,14 @@
 				i++;
 			}
 			return -1;
+		}
+
+		/// <summary>
+		/// Return the item in the specified position.
+		/// </summary>
+		public static T ItemAt<T> (this IStream<T> seq, int index)
+		{
+			return seq.Drop (index).First;
 		}
 
 		private static void CompareUntilDiffersOrExhausts<T> (ref IStream<T> seq, 

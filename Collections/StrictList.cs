@@ -357,10 +357,12 @@
 			for (var list = this; !list.IsEmpty; list = list.Rest)
 				if (predicate (list.First))
 				{
-					last.Rest = Cons (list.First, Empty);
+					var tail = Cons (list.First, Empty);
 					if (result.IsEmpty)
-						result = last;
-					last = last.Rest;
+						result = tail;
+					else
+						last.Rest = tail;
+					last = tail;
 				}
 			return result;
 		}

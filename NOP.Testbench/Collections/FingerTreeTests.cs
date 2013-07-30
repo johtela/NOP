@@ -1,4 +1,4 @@
-﻿namespace NOP.Testbench
+﻿namespace NOP.Testbench.Collections
 {
 	using System;
 	using System.Collections.Generic;

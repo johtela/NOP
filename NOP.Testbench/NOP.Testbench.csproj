@@ -35,22 +35,24 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ISequenceTests.cs" />
+    <Compile Include="Collections\IStreamTests.cs" />
     <Compile Include="IOTests.cs" />
-    <Compile Include="LazyListTests.cs" />
-    <Compile Include="FingerTreeTests.cs" />
+    <Compile Include="Collections\LazyListTests.cs" />
+    <Compile Include="Collections\FingerTreeTests.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="InterpreterTests.cs" />
-    <Compile Include="MapTests.cs" />
+    <Compile Include="Collections\MapTests.cs" />
     <Compile Include="ParserMonadTests.cs" />
     <Compile Include="SExprPathTests.cs" />
     <Compile Include="TestPrograms.cs" />
     <Compile Include="TypeDefinitionTests.cs" />
     <Compile Include="Arithmetic.cs" />
-    <Compile Include="SetTests.cs" />
+    <Compile Include="Collections\SetTests.cs" />
     <Compile Include="TypeCheckingTests.cs" />
     <Compile Include="ParserTests.cs" />
-    <Compile Include="CollectionTests.cs" />
+    <Compile Include="Collections\StrictListTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -287,7 +287,9 @@
 		public Sequence<Tuple<T, U>> ZipWith<U> (IStream<U> other)
 		{
 			return ReduceLeft (Tuple.Create (Sequence<Tuple<T, U>>.Empty, other),
-				(t, e) => Tuple.Create (t.Item1 + Tuple.Create (e, t.Item2.First), t.Item2.Rest)).Item1;
+				(t, e) => t.Item2.IsEmpty ? t :
+					Tuple.Create (t.Item1 + Tuple.Create (e, t.Item2.First), t.Item2.Rest)
+				).Item1;
 		}
 
 		#region Overridden from Object

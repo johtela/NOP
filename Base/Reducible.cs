@@ -75,8 +75,7 @@
 			{
 				action (item);
 				return null;
-			}
-			);
+			});
 		}
 
 		public static void Foreach<T> (this IReducible<T> reducible, int initial, Action<T, int> action)
@@ -91,8 +90,16 @@
 			{
 				action (item, i);
 				return i + increment;
-			}
-			);
+			});
+		}
+
+		public static bool IterateWhile<T> (this IReducible<T> reducible, int initial, Func<T, int, bool> func)
+		{
+			return reducible.ReduceLeft (Tuple.Create (initial, true), (res, item) =>
+				res.Item2 ?
+					Tuple.Create (res.Item1 + 1, func (item, res.Item1)) :
+					Tuple.Create (0, false)
+				).Item2;
 		}
 
 		public static IReducible<T> Concat<T> (IReducible<T> first, IReducible<T> second)
