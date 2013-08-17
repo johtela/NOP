@@ -4,16 +4,17 @@ namespace NOP
 	using System.Linq;
 	using Collections;
 	using System.Collections.Generic;
+	using System.Reflection;
 	
 	/// <summary>
-	/// The type environment maps expression variables (NOT type variables) to polytupes.
+	/// The type environment maps expression variables (NOT type variables) to polytypes.
 	/// It is used to track the symbols in the expression to be checked and their types.
 	/// </summary>
 	public class TypeEnv
 	{
-		private readonly Map<string, Polytype> _map;
+		private readonly Map<Name, Polytype> _map;
 			
-		private TypeEnv (Map<string, Polytype> map)
+		private TypeEnv (Map<Name, Polytype> map)
 		{
 			_map = map;
 		}
@@ -21,7 +22,7 @@ namespace NOP
 		/// <summary>
 		/// Returns type of variable with the given name.
 		/// </summary>
-		public Polytype Find (string name)
+		public Polytype Find (Name name)
 		{
 			return _map [name];
 		}
@@ -29,7 +30,7 @@ namespace NOP
 		/// <summary>
 		/// Check whether a type environment has a variable with the specified name defined.
 		/// </summary>
-		public bool Contains (string name)
+		public bool Contains (Name name)
 		{
 			return _map.Contains (name);
 		}
@@ -37,7 +38,7 @@ namespace NOP
 		/// <summary>
 		/// Add a variable with the given type to the enironment.
 		/// </summary>
-		public TypeEnv Add (string name, Polytype type)
+		public TypeEnv Add (Name name, Polytype type)
 		{
 			return new TypeEnv (_map.Add (name, type));
 		}
@@ -77,16 +78,30 @@ namespace NOP
 				return new Polytype (Lambda (List.Create (parameters), result), GetTypeVars (parameters));
 			}
 
-			private static Tuple<string, Polytype> Ft(string funcName, Polytype pt)
+			private static Tuple<Name, Polytype> Ft (string funcName, Polytype pt)
 			{
-				return Tuple.Create (funcName, pt);
+				return Tuple.Create (new Name(funcName), pt);
 			}
 
 			public static readonly TypeEnv Value =
-				new TypeEnv (Map<string, Polytype>.FromPairs (
-					Ft ("set!", Pt (Constant ("System.Void"), Variable ("a"), Variable ("a"))),
-					Ft ("eq?", Pt (Constant ("System.Boolean"), Variable ("a"), Variable ("a")))
+				new TypeEnv (Map<Name, Polytype>.FromPairs (
+					Ft ("set!", Pt (Constant (new Name ("Void", "System")), Variable ("a"), Variable ("a"))),
+					Ft ("eq?", Pt (Constant (new Name ("Boolean", "System")), Variable ("a"), Variable ("a")))
 				));
+
+			//private static IEnumerable<Tuple<string, Polytype>> TypesInAssembly (Assembly assy)
+			//{
+			//    var types = from t in assy.GetTypes ()
+			//                select t;
+			//}
+
+			private static Polytype TypeToPolytype (Type type)
+			{
+				if (type.IsGenericTypeDefinition)
+					return new Polytype (Constant (new Name (type.Name, type.Namespace)), 
+						type.GetGenericArguments ().Select (t => t.Name));
+				return null;
+			}
 		}
 	}
 }

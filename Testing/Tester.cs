@@ -136,9 +136,17 @@ namespace NOP.Testing
 		{
 			int run = 0;
 			int failed = 0;
-			
+			Stopwatch stopWatch = null;
+
+			if (timed)
+			{
+				stopWatch = new Stopwatch ();
+				stopWatch.Reset ();
+				stopWatch.Start ();
+			}
 			foreach (object fixture in fixtures)
-				TestFixture (fixture, timed, ref run, ref failed);	
+				TestFixture (fixture, timed, ref run, ref failed);
+			if (timed) stopWatch.Stop ();
 			
 			if (failed > 0)
 			{
@@ -148,7 +156,10 @@ namespace NOP.Testing
 			else
 			{
 				Console.ForegroundColor = ConsoleColor.Green;
-				System.Console.WriteLine ("All tests succeeded. {0} tests run.", run);
+				if (timed)
+					System.Console.WriteLine ("All tests succeeded. {0} tests run in {1}.", run, stopWatch.Elapsed);
+				else
+					System.Console.WriteLine ("All tests succeeded. {0} tests run.", run);
 			}
 			Console.ResetColor ();
 			GC.Collect ();

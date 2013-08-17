@@ -52,9 +52,9 @@ namespace NOP
 		/// </summary>
 		public class Symbol : SExpr
 		{
-			public readonly string Name;
+			public readonly Name Name;
 
-			public Symbol (string name)
+			public Symbol (Name name)
 			{
 				Name = name;
 				Depiction = Visual.Symbol (this);
@@ -63,7 +63,7 @@ namespace NOP
 			public override bool Equals (object obj)
 			{
 				var other = obj as Symbol;
-				return other != null && other.Name == Name;
+				return other != null && other.Name.Equals (Name);
 			}
 			
 			public override int GetHashCode ()
@@ -112,9 +112,9 @@ namespace NOP
 			return new Literal (value);
 		}
 
-		public static SExpr Sym (string value)
+		public static SExpr Sym (Name name)
 		{
-			return new Symbol (value);
+			return new Symbol (name);
 		}
 
 		public static SExpr Lst (params SExpr[] items)

@@ -1,12 +1,10 @@
 namespace NOP.Testbench
 {
 	using System;
-	using System.Collections.Generic;
-	using NOP;
-	using NOP.Testing;
-	using System.Windows.Forms;
 	using System.Threading.Tasks;
+	using System.Windows.Forms;
 	using NOP.Testbench.Collections;
+	using NOP.Testing;
 
 	class Runner
 	{
@@ -23,13 +21,12 @@ namespace NOP.Testbench
 					new LazyListTests (),
 					new MapTests (),
 					new SetTests (),
-					new FingerTreeTests ())
-//					new TypeDefinitionTests (),
-//					new TypeCheckingTests (),
-//					new ParserTests (),
-//					new SExprPathTests (),
-//					new ParserMonadTests (),
-//					new IOTests ())
+					new FingerTreeTests (),
+					new TypeCheckingTests (),
+					new ParserTests (),
+					new SExprPathTests (),
+					new ParserMonadTests (),
+					new IOTests ())
 			);
 			Application.Run (VConsole);
 			VConsole.Dispose ();

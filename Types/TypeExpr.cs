@@ -44,7 +44,8 @@ namespace NOP
 			
 			private MonoType GetMonoType ()
 			{
-				return new MonoType.Con (Value.GetType ().ToString (), StrictList<MonoType>.Empty);
+				var type = Value.GetType ();
+				return new MonoType.Con (new Name(type.Name, type.Namespace), StrictList<MonoType>.Empty);
 			}
 			
 			public override void TypeCheck (TypeEnv env, MonoType expected)
@@ -59,9 +60,9 @@ namespace NOP
 		/// </summary>
 		private class Variable : TypeExpr
 		{
-			public readonly string Name;
+			public readonly Name Name;
 			
-			public Variable (string name)
+			public Variable (Name name)
 			{
 				Name = name;
 			}
@@ -82,10 +83,10 @@ namespace NOP
 		/// </summary>
 		private class Lambda : TypeExpr
 		{
-			public readonly string Argument;
+			public readonly Name Argument;
 			public readonly TypeExpr Body;
 			
-			public Lambda (string arg, TypeExpr body)
+			public Lambda (Name arg, TypeExpr body)
 			{
 				Argument = arg;
 				Body = body;
@@ -96,7 +97,7 @@ namespace NOP
 				CurrentExpression = _expression;
 				var a = Argument != null ? 
 					MonoType.NewTypeVar () : 
-					new MonoType.Con ("System.Void");
+					new MonoType.Con (new Name("Void", "System"));
 				var b = MonoType.NewTypeVar ();
 				
 				MonoType.Unify (expected, new MonoType.Lam (a, b));
@@ -125,7 +126,7 @@ namespace NOP
 				CurrentExpression = _expression;
 				var a = Argument != null ? 
 					MonoType.NewTypeVar () : 
-					new MonoType.Con ("System.Void");
+					new MonoType.Con (new Name("Void", "System"));
 				Function.TypeCheck (env, new MonoType.Lam (a, expected));
 				if (Argument != null)
 					Argument.TypeCheck (env, a);
@@ -154,7 +155,7 @@ namespace NOP
 				CurrentExpression = _expression;
 				var c = MonoType.NewTypeVar ();
 				Condition.TypeCheck (env, c);
-				MonoType.Unify (c, new MonoType.Con ("System.Boolean"));
+				MonoType.Unify (c, new MonoType.Con (new Name ("Boolean", "System")));
 				
 				var t = MonoType.NewTypeVar ();
 				ThenExpr.TypeCheck (env, t);
@@ -173,11 +174,11 @@ namespace NOP
 		/// </summary>
 		private class LetIn : TypeExpr
 		{
-			public readonly string VarName;
+			public readonly Name VarName;
 			public readonly TypeExpr Value;
 			public readonly TypeExpr Body;
 			
-			public LetIn (string variable, TypeExpr value, TypeExpr body)
+			public LetIn (Name variable, TypeExpr value, TypeExpr body)
 			{
 				VarName = variable;
 				Value = value;
@@ -223,23 +224,33 @@ namespace NOP
 			/// <summary>
 			/// Construct a variable with the specified name.
 			/// </summary>
-			public static TypeExpr Var (string name)
+			public static TypeExpr Var (Name name)
 			{
 				return new Variable (name);
 			}
-			
+
+			public static TypeExpr Var (string name)
+			{
+				return Var (new Name (name));
+			}
+
 			/// <summary>
 			/// Constuct a lambda expression.
 			/// </summary>
-			public static TypeExpr Lam (string arg, TypeExpr body)
+			public static TypeExpr Lam (Name arg, TypeExpr body)
 			{
 				return new Lambda (arg, body);
+			}
+
+			public static TypeExpr Lam (string arg, TypeExpr body)
+			{
+				return Lam (new Name (arg), body);
 			}
 
 			/// <summary>
 			/// Construct a lambda expression that has zero or more arguments.
 			/// </summary>
-			public static TypeExpr MultiLam (StrictList<string> args, TypeExpr body)
+			public static TypeExpr MultiLam (StrictList<Name> args, TypeExpr body)
 			{
 				if (args.IsEmpty)
 					return Lam (null, body);
@@ -248,6 +259,11 @@ namespace NOP
 					return Lam (args.First, body);
 				else
 					return Lam (args.First, MultiLam (args.Rest, body));
+			}
+
+			public static TypeExpr MultiLam (StrictList<string> args, TypeExpr body)
+			{
+				return MultiLam (args.Map (a => new Name (a)), body);
 			}
 			
 			/// <summary>
@@ -269,9 +285,14 @@ namespace NOP
 			/// <summary>
 			/// Construct a let-in expression.
 			/// </summary>
-			public static TypeExpr Let (string variable, TypeExpr value, TypeExpr body)
+			public static TypeExpr Let (Name variable, TypeExpr value, TypeExpr body)
 			{
 				return new LetIn (variable, value, body);
+			}
+
+			public static TypeExpr Let (string variable, TypeExpr value, TypeExpr body)
+			{
+				return Let (new Name (variable), value, body);
 			}
 		}
 	}

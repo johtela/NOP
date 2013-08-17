@@ -1,14 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace NOP
+﻿namespace NOP
 {
+	using System;
+
 	public class Option<T>
 	{
+		private readonly T _value;
+		
 		public readonly bool HasValue;
-		public readonly T Value;
+
+		public T Value
+		{
+			get
+			{
+				if (HasValue)
+					return _value;
+				throw new InvalidOperationException ("Option has no value.");
+			}
+		}
 
 		public Option()
 		{
@@ -18,7 +26,12 @@ namespace NOP
 		public Option(T value)
 		{
 			HasValue = true;
-			Value = value;
+			_value = value;
+		}
+
+		public static implicit operator T (Option<T> option)
+		{
+			return option.Value;
 		}
 	}
 }

@@ -183,16 +183,16 @@
 		/// </summary>
 		public class Con : MonoType
 		{
-			public readonly string Name;
+			public readonly Name Name;
 			public readonly StrictList<MonoType> TypeArgs;
 
-			public Con (string name, StrictList<MonoType> typeArgs)
+			public Con (Name name, StrictList<MonoType> typeArgs)
 			{
 				Name = name;
 				TypeArgs = typeArgs;
 			}
 			
-			public Con (string name) : this (name, StrictList<MonoType>.Empty)
+			public Con (Name name) : this (name, StrictList<MonoType>.Empty)
 			{
 			}
 			
@@ -214,7 +214,7 @@
 			public override bool Equals (object obj)
 			{
 				var other = obj as Con;
-				return other != null && other.Name == Name && other.TypeArgs.Equals (TypeArgs);
+				return other != null && other.Name.Equals (Name) && other.TypeArgs.Equals (TypeArgs);
 			}
 			
 			public override int GetHashCode ()
@@ -265,7 +265,7 @@
 			}
 			var ca = a as Con;
 			var cb = b as Con;
-			if (ca != null && cb != null && ca.Name == cb.Name)
+			if (ca != null && cb != null && ca.Equals (cb))
 			{
 				var taa = ca.TypeArgs;
 				var tab = cb.TypeArgs;
@@ -297,7 +297,7 @@
 			/// <summary>
 			/// Builder method for creating a type constant.
 			/// </summary>
-			public static MonoType Constant (string name)
+			public static MonoType Constant (Name name)
 			{
 				return new Con (name);
 			}

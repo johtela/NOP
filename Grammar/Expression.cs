@@ -6,6 +6,7 @@ namespace NOP.Grammar
 	using Parsing;
 	using Visuals;
 	using V = NOP.Visuals.Visual;
+	using TB = NOP.TypeExpr.Builder;
 
 	/// <summary>
 	/// Abstract class representing any language expression. The root class of the 
@@ -51,10 +52,10 @@ namespace NOP.Grammar
 				var te = Function.GetTypeExpr ();
 
 				if (Parameters.IsEmpty)
-					return TypeExpr.Builder.App (te, null);
+					return TB.App (te, null);
 
 				for (var pars = Parameters; !pars.IsEmpty; pars = pars.Rest)
-					te = TypeExpr.Builder.App (te, pars.First.GetTypeExpr ());
+					te = TB.App (te, pars.First.GetTypeExpr ());
 				return te;
 			}
 
@@ -104,7 +105,7 @@ namespace NOP.Grammar
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.If (Condition.GetTypeExpr (), ThenExpression.GetTypeExpr (),
+				return TB.If (Condition.GetTypeExpr (), ThenExpression.GetTypeExpr (),
 											ElseExpression.GetTypeExpr ());
 			}
 
@@ -131,7 +132,7 @@ namespace NOP.Grammar
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.MultiLam (Parameters.Map (p => p.Name.Symbol.Name),
+				return TB.MultiLam (Parameters.Map (p => p.Name.Symbol.Name),
 					FunctionBody.GetTypeExpr ());
 			}
 
@@ -171,7 +172,7 @@ namespace NOP.Grammar
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.Let (Variable.Name.Symbol.Name, Value.GetTypeExpr (),
+				return TB.Let (Variable.Name.Symbol.Name, Value.GetTypeExpr (),
 					Body.GetTypeExpr ());
 			}
 
@@ -208,7 +209,7 @@ namespace NOP.Grammar
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.Lit (Literal.Value);
+				return TB.Lit (Literal.Value);
 			}
 
 			protected override Visual GetVisual ()
@@ -231,7 +232,7 @@ namespace NOP.Grammar
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.Lit (SExp);
+				return TB.Lit (SExp);
 			}
 
 			protected override void DoForChildNodes (Action<AstNode> action)
@@ -254,8 +255,8 @@ namespace NOP.Grammar
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.App (
-					TypeExpr.Builder.App (TypeExpr.Builder.Var ("set!"), Variable.GetTypeExpr ()),
+				return TB.App (
+					TB.App (TB.Var (new Name ("set!")), Variable.GetTypeExpr ()),
 					Value.GetTypeExpr ());
 			}
 
@@ -278,7 +279,7 @@ namespace NOP.Grammar
 			public override TypeExpr GetTypeExpr ()
 			{
 				base.GetTypeExpr ();
-				return TypeExpr.Builder.Var (Symbol.Name);
+				return TB.Var (Symbol.Name);
 			}
 		}
 

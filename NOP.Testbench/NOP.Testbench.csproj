@@ -42,12 +42,10 @@
     <Compile Include="Collections\FingerTreeTests.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="InterpreterTests.cs" />
     <Compile Include="Collections\MapTests.cs" />
     <Compile Include="ParserMonadTests.cs" />
     <Compile Include="SExprPathTests.cs" />
     <Compile Include="TestPrograms.cs" />
-    <Compile Include="TypeDefinitionTests.cs" />
     <Compile Include="Arithmetic.cs" />
     <Compile Include="Collections\SetTests.cs" />
     <Compile Include="TypeCheckingTests.cs" />
