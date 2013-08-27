@@ -89,18 +89,69 @@ namespace NOP
 					Ft ("eq?", Pt (Constant (new Name ("Boolean", "System")), Variable ("a"), Variable ("a")))
 				));
 
-			//private static IEnumerable<Tuple<string, Polytype>> TypesInAssembly (Assembly assy)
-			//{
-			//    var types = from t in assy.GetTypes ()
-			//                select t;
-			//}
+			private static IEnumerable<Tuple<Name, Polytype>> TypesInAssembly (Assembly assy)
+			{
+				return (from t in assy.GetTypes ()
+						let ns = Namespace.Get (t.Namespace)
+						select Members (t, ns).Prepend (Tuple.Create (new Name (t.Name, ns), TypeToPolytype (t))))
+					   .Collect ();
+			}
+
+			private static IEnumerable<Tuple<Name, Polytype>> Member (MemberInfo mi, Namespace ns)
+			{
+				var name = new Name (mi.Name, ns);
+				if (mi is MethodInfo)
+					return Tuple.Create (name, MethodToPolytype (mi as MethodInfo)).AsEnumerable ();
+				if (mi is FieldInfo)
+					return Tuple.Create (name, TypeToPolytype ((mi as FieldInfo).FieldType)).AsEnumerable ();
+				if (mi is PropertyInfo)
+					return Tuple.Create (name, PropertyToPolytype (mi as PropertyInfo)).AsEnumerable ();
+				if (mi is Type)
+				{
+					var type = mi as Type;
+					return Members (type, ns + type.Name).Prepend (Tuple.Create (name, TypeToPolytype (type)));
+				}
+				throw new ArgumentException ("Unknown member type", mi.GetType ().Name);
+			}
+
+			private static IEnumerable<Tuple<Name, Polytype>> Members (Type type, Namespace ns)
+			{
+				return (from m in type.GetMembers ()
+						select Member (m, ns)).Collect ();
+			}
+
+			private static MonoType TypeToMonoType (Type type)
+			{
+				return type.IsGenericParameter ?
+					Variable (type.Name) :
+					Constant (new Name (type.Name, type.Namespace));
+			}
 
 			private static Polytype TypeToPolytype (Type type)
 			{
+				var mt = TypeToMonoType (type);
 				if (type.IsGenericTypeDefinition)
-					return new Polytype (Constant (new Name (type.Name, type.Namespace)), 
-						type.GetGenericArguments ().Select (t => t.Name));
-				return null;
+					return new Polytype (mt, type.GetGenericArguments ().Select (t => t.Name));
+				else
+					return new Polytype (mt);
+			}
+
+			private static Polytype MethodToPolytype (MethodInfo mi)
+			{
+				var pars = List.FromEnumerable (from pi in mi.GetParameters ()
+												select TypeToMonoType (pi.ParameterType));
+				var mt = Lambda (pars, TypeToMonoType (mi.ReturnType));
+				if (mi.IsGenericMethodDefinition)
+					return new Polytype (mt, mi.GetGenericArguments ().Select (t => t.Name));
+				else
+					return new Polytype (mt);
+			}
+
+			private static Polytype PropertyToPolytype (PropertyInfo pi)
+			{
+				var pars = List.FromEnumerable (from par in pi.GetIndexParameters ()
+												select TypeToMonoType (par.ParameterType));
+				return new Polytype (Lambda (pars, TypeToMonoType (pi.PropertyType)));
 			}
 		}
 	}

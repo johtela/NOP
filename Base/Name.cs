@@ -34,6 +34,11 @@
 			return ns.Value;
 		}
 
+		public static Namespace operator + (Namespace ns, string type)
+		{
+			return Get (ns.Value + '.' + type);
+		}
+
 		public override string ToString ()
 		{
 			return Value;

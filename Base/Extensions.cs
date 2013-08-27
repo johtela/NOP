@@ -57,6 +57,11 @@ namespace NOP
 
 		#region IEnumerable extensions
 
+		public static IEnumerable<T> AsEnumerable<T> (this T value)
+		{
+			yield return value;
+		}
+
 		public static bool IsEmpty<T> (this IEnumerable<T> enumerable)
 		{
 			return !enumerable.GetEnumerator ().MoveNext ();
@@ -88,6 +93,11 @@ namespace NOP
 			foreach (var outer in enumerable) 
 				foreach (var inner in func (outer))
 					yield return inner;
+		}
+
+		public static IEnumerable<T> Collect<T> (this IEnumerable<IEnumerable<T>> enumerable)
+		{
+			return Collect (enumerable, Fun.Identity);
 		}
 
 		public static IEnumerable<V> Combine<T, U, V> (this IEnumerable<T> enum1, 

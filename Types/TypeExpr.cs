@@ -73,7 +73,7 @@ namespace NOP
 				if (!env.Contains (Name)) 
 					throw new Exception (string.Format ("Name {0} not found", Name));
 				var pt = env.Find (Name);
-				MonoType.Unify (pt.Type.ApplySubs (), expected);
+				MonoType.Unify (pt.MonoType.ApplySubs (), expected);
 			}
 		}
 		

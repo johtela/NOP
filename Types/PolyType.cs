@@ -14,7 +14,7 @@ namespace NOP
 		/// <summary>
 		/// The underlying monotype.
 		/// </summary>
-		public readonly MonoType Type;
+		public readonly MonoType MonoType;
 		
 		/// <summary>
 		/// The generic (unbound) type variables in mono type.
@@ -24,32 +24,29 @@ namespace NOP
 		/// <summary>
 		/// Create a polytype.
 		/// </summary>
-		public Polytype (MonoType type, IEnumerable<string> tvars)
+		public Polytype (MonoType monoType, IEnumerable<string> tvars)
 		{
-			Type = type;
+			MonoType = monoType;
 			GenericTypeVars = tvars != null ? Set<string>.Create (tvars) : Set<string>.Empty;
 		}
 		
 		/// <summary>
 		/// Create a polytype.
 		/// </summary>
-		public Polytype (MonoType type, params string[] tvars)
-		{
-			Type = type;
-			GenericTypeVars = tvars != null ? Set<string>.Create (tvars) : Set<string>.Empty;
-		}
+		public Polytype (MonoType monoType, params string[] tvars) : 
+			this (monoType, (IEnumerable<string>)tvars) { }
 			
 		/// <summary>
 		/// Gets the free type variables.
 		/// </summary>
 		public Set<string> GetTypeVars ()
 		{
-			return Type.GetTypeVars () - GenericTypeVars;
+			return MonoType.GetTypeVars () - GenericTypeVars;
 		}
 		
 		public override string ToString ()
 		{
-			return string.Format ("{0} {1}", Type, GenericTypeVars);
+			return string.Format ("{0} {1}", MonoType, GenericTypeVars);
 		}
 	}
 }

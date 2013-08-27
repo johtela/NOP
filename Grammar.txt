@@ -31,3 +31,6 @@ TypeReference:			BasicTypeRefence |
 BasicTypeReference:		SymbolExpression
 LambdaTypeReference:	Symbol("->") TypeReference TypeReference
 GenericTypeReference:	SymbolExpression TypeReference+
+
+
+a<T>.m (int) ===> a.m<T>(this a<T>, int)
