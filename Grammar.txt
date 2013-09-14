@@ -3,8 +3,8 @@ Below is the formal definition of NOP grammar.
 SExp:			Literal | Symbol | List ( SExp* )
 		
 Definition			List ( TypeDefinition | MemberDefinition )
-TypeDefinition:		Symbol("type") Symbol Definition*
-MemberDefinition:	Symbol("def") VariableDefinition Expression
+TypeDefinition:		Symbol("type") SymbolExpression Definition*
+MemberDefinition:	Symbol("def") TypedVariableDefinition Expression
 
 Expression:		SymbolExpression | 
 				LiteralExpression |
@@ -24,7 +24,8 @@ LambdaExpression:		Symbol("lambda") List ( VariableDefinition* ) Expression
 SetExpression:			Symbol("set!") Symbol Expression
 FunctionCallExpression: Expression+
 VariableDefinition:		SymbolExpression | 
-						List ( SymbolExpression TypeReference )
+						TypedVariableDefinition
+TypedVariableDefinition:List ( SymbolExpression TypeReference )
 TypeReference:			BasicTypeRefence | 
 						List (	GenericTypeReference | 
 								LambdaTypeReference )

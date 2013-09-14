@@ -74,7 +74,7 @@
 		public static Parser<Definition, Seq> Member (SExpr lst)
 		{
 			return from sym in Symbol ("def").Seq (Symbol ())
-				   from var in Variable ()
+				   from var in TypedVariable ()
 				   from expr in Expr ()
 				   select Definition.Member (lst, var, expr);
 		}
@@ -82,13 +82,18 @@
 		public static Parser<VariableDefinition, Seq> Variable ()
 		{
 			return (from sym in Symbol ()
-					select new VariableDefinition (sym.SExp, sym, null)).Plus (
-					from lst in List ()
+					select new VariableDefinition (sym.SExp, sym, null)).Plus (TypedVariable ())
+					.Label ("variable definition");
+		}
+
+		public static Parser<VariableDefinition, Seq> TypedVariable ()
+		{
+			return (from lst in List ()
 					from sym in Symbol ()
 					from tref in TypeRef ()
 					from eol in Eol ()
 					select new VariableDefinition (lst, sym, tref))
-					.Label ("variable definition");
+					.Label ("typed variable definition");
 		}
 
 		public static Parser<TypeReference, Seq> TypeRef ()
