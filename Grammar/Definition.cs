@@ -21,10 +21,14 @@ namespace NOP.Grammar
 				Members = members;
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (Name);
-				Members.Foreach (action);
+				return func (Members.ReduceLeft (Name.ReduceLeft (acc, func), func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return Members.ReduceRight (func, Name.ReduceRight (func, func (this, acc)));
 			}
 		}
 
@@ -40,10 +44,14 @@ namespace NOP.Grammar
 				Value = value;
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (Variable);
-				action (Value);
+				return func (Value.ReduceLeft (Variable.ReduceLeft (acc, func), func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return Value.ReduceRight (func, Variable.ReduceRight (func, func (this, acc)));
 			}
 		}
 

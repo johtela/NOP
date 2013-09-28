@@ -16,10 +16,18 @@ namespace NOP.Grammar
 			Type = type;
 		}
 
-		protected override void DoForChildNodes (Action<AstNode> action)
+		public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 		{
-			action (Name);
-			if (Type != null) action (Type);
+			return Type != null ?
+				func (Type.ReduceLeft (Name.ReduceLeft (acc, func), func), this) :
+				func (Name.ReduceLeft (acc, func), this);
+		}
+
+		public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+		{
+			return Type != null ?
+				Type.ReduceRight (func, Name.ReduceRight (func, func (this, acc))) :
+				Name.ReduceRight (func, func (this, acc));
 		}
 	}
 }

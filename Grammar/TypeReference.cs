@@ -19,9 +19,14 @@ namespace NOP.Grammar
 				TypeName = typeName;
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (TypeName);
+				return func (TypeName.ReduceLeft (acc, func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return TypeName.ReduceRight (func, func (this, acc));
 			}
 		}
 
@@ -38,10 +43,14 @@ namespace NOP.Grammar
 				TypeParams = typeParams;
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (TypeName);
-				TypeParams.Foreach (action);
+				return func (TypeParams.ReduceLeft (TypeName.ReduceLeft (acc, func), func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return TypeParams.ReduceRight (func, TypeName.ReduceRight (func, func (this, acc)));
 			}
 		}
 
@@ -57,10 +66,14 @@ namespace NOP.Grammar
 				ResultType = resultType;
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (ArgumentType);
-				action (ResultType);
+				return func (ResultType.ReduceLeft (ArgumentType.ReduceLeft(acc, func), func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return ResultType.ReduceRight (func, ArgumentType.ReduceRight (func, func (this, acc)));
 			}
 		}
 

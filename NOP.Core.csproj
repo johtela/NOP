@@ -51,6 +51,7 @@
     <Compile Include="Base\Functor.cs" />
     <Compile Include="Base\Name.cs" />
     <Compile Include="Collections\IStreamBuilder.cs" />
+    <Compile Include="Grammar\EmitContext.cs" />
     <Compile Include="IO\SExprTextStore.cs" />
     <Compile Include="Base\Unit.cs" />
     <Compile Include="Collections\ISequence.cs" />

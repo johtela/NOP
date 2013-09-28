@@ -18,7 +18,7 @@ namespace NOP.Grammar
 		}
 	}
 
-	public abstract class AstNode
+	public abstract class AstNode : IReducible<AstNode>
 	{
 		public readonly SExpr SExp;
 		
@@ -71,14 +71,6 @@ namespace NOP.Grammar
 		}
 	
 		/// <summary>
-		/// Return the list of abstract syntax tree nodes under this node.
-		/// Must be overridden by AST nodes that have children.
-		/// </summary>
-		protected virtual void DoForChildNodes (Action<AstNode> action)
-		{
-		}
-
-		/// <summary>
 		/// Change the visual depiction of the AST node.
 		/// </summary>
 		protected virtual Visual GetVisual ()
@@ -86,20 +78,24 @@ namespace NOP.Grammar
 			return SExp.Depiction;
 		}
 
-		/// <summary>
-		/// Walk through the AST tree depth first performing a given
-		/// action for each node traversed.
-		/// </summary>
-		public void WalkTreeDepthFirst (Action<AstNode> action)
-		{
-			DoForChildNodes (node => node.WalkTreeDepthFirst (action));
-			action (this);
-		}
-
 		public void ChangeVisualDepictions ()
 		{
-			WalkTreeDepthFirst (node => node.SExp.Depiction = node.GetVisual ());
+			this.Foreach (node => node.SExp.Depiction = node.GetVisual ());
 		}
+
+		#region IReducible<AstNode> implementation
+		
+		public virtual U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+		{
+			return func (acc, this);
+		}
+
+		public virtual U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+		{
+			return func (this, acc);
+		}
+
+		#endregion	
 	}
 }
 

@@ -59,10 +59,14 @@ namespace NOP.Grammar
 				return te;
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (Function);
-				Parameters.Foreach (action);
+				return func (Parameters.ReduceLeft (Function.ReduceLeft (acc, func), func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return Parameters.ReduceRight (func, Function.ReduceRight (func, func (this, acc)));
 			}
 
 			protected override Visual GetVisual ()
@@ -109,11 +113,20 @@ namespace NOP.Grammar
 											ElseExpression.GetTypeExpr ());
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (Condition);
-				action (ThenExpression);
-				action (ElseExpression);
+				return func (ElseExpression.ReduceLeft 
+							(ThenExpression.ReduceLeft 
+							(Condition.ReduceLeft (acc, func), func), func), 
+						this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return	ElseExpression.ReduceRight (func, 
+						ThenExpression.ReduceRight (func, 
+						Condition.ReduceRight (func, 
+						func (this, acc))));
 			}
 		}
 
@@ -136,10 +149,14 @@ namespace NOP.Grammar
 					FunctionBody.GetTypeExpr ());
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				Parameters.Foreach (action);
-				action (FunctionBody);
+				return func (FunctionBody.ReduceLeft (Parameters.ReduceLeft (acc, func), func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return FunctionBody.ReduceRight (func, Parameters.ReduceRight (func, func (this, acc)));
 			}
 
 			protected override Visual GetVisual ()
@@ -176,11 +193,14 @@ namespace NOP.Grammar
 					Body.GetTypeExpr ());
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (Variable);
-				action (Value);
-				action (Body);
+				return func (Body.ReduceLeft (Value.ReduceLeft (Variable.ReduceLeft (acc, func), func), func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return Body.ReduceRight(func, Value.ReduceRight (func, Variable.ReduceRight (func, func (this, acc))));
 			}
 
 			protected override Visual GetVisual ()
@@ -235,9 +255,14 @@ namespace NOP.Grammar
 				return TB.Lit (SExp);
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (QuotedExpression);
+				return func (QuotedExpression.ReduceLeft (acc, func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return QuotedExpression.ReduceRight (func, func (this, acc));
 			}
 		}
 
@@ -260,10 +285,14 @@ namespace NOP.Grammar
 					Value.GetTypeExpr ());
 			}
 
-			protected override void DoForChildNodes (Action<AstNode> action)
+			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				action (Variable);
-				action (Value);
+				return func (Value.ReduceLeft (Variable.ReduceLeft (acc, func), func), this);
+			}
+
+			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+			{
+				return Value.ReduceRight(func, Variable.ReduceRight (func, func (this, acc)));
 			}
 		}
 
