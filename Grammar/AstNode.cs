@@ -4,6 +4,7 @@ namespace NOP.Grammar
 	using Collections;
 	using System.Collections.Generic;
 	using Visuals;
+	using CodeGen;
 
 	/// <summary>
 	/// Exception for interpreter errors.

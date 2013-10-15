@@ -7,23 +7,26 @@
 	using System.Reflection.Emit;
 	using System.Text;
 
-	public class EmitContext
+	public abstract class Emit
 	{
-		public readonly AssemblyBuilder AssemblyBuilder;
-		public readonly ModuleBuilder ModuleBuilder;
-
-		public EmitContext (AssemblyBuilder ab, ModuleBuilder mb)
+		public class Assembly : Emit
 		{
-			AssemblyBuilder = ab;
-			ModuleBuilder = mb;
+			public readonly AssemblyBuilder AssemblyBuilder;
+			public readonly ModuleBuilder ModuleBuilder;
+
+			public Assembly (AssemblyBuilder ab, ModuleBuilder mb)
+			{
+				AssemblyBuilder = ab;
+				ModuleBuilder = mb;
+			}
 		}
 
-		public class Type : EmitContext
+		public class Type : Assembly
 		{
 			public readonly TypeBuilder TypeBuilder;
 
-			public Type (EmitContext ctx, TypeBuilder tb) :
-				base (ctx.AssemblyBuilder, ctx.ModuleBuilder)
+			public Type (Assembly assy, TypeBuilder tb) :
+				base (assy.AssemblyBuilder, assy.ModuleBuilder)
 			{
 				TypeBuilder = tb;
 			}
@@ -64,6 +67,21 @@
 			{
 				ILGenerator = ig;
 			}
+		}
+
+		public Type AsType
+		{
+			get { return (Type)this; }
+		}
+
+		public Method AsMethod
+		{
+			get { return (Method)this; }
+		}
+
+		public MethodBody AsMethodBody
+		{
+			get { return (MethodBody)this; }
 		}
 	}
 }
