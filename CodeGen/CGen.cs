@@ -22,11 +22,27 @@
 			return func (gen ());
 		}
 
+		public static CGen<T> Do<T> (this CGen<T> gen, Action<T> action) where T : Emit
+		{
+			return gen.Bind (t =>
+			{
+				action (t);
+				return gen;
+			});
+		}
+
 		public static CGen<U> Select<T, U> (this CGen<T> gen, Func<T, U> select)
 			where T : Emit where U : Emit
 		{
 			return gen.Bind (x => select (x).ToCGen<U> ());
 		}
+
+		public static CGen<V> SelectMany<T, U, V> (this CGen<T> gen, Func<T, CGen<U>> project, 
+			Func<T, U, V> select) where T : Emit where U : Emit where V : Emit
+		{
+			return gen.Bind (x => project (x).Bind (y => select (x, y).ToCGen<V> ()));
+		}
+
 
 		public static CGen<Emit.Type> Type (this CGen<Emit.Assembly> assembly, string name)
 		{
@@ -44,6 +60,11 @@
 		{
 			return from m in method
 				   select new Emit.MethodBody (m, m.MethodBuilder.GetILGenerator ());
+		}
+
+		public static CGen<Emit.Type> Field (this CGen<Emit.Type> type, string name, Type fieldType)
+		{
+			return type.Do (t => t.TypeBuilder.DefineField (name, fieldType, FieldAttributes.Public));
 		}
 	}
 }
