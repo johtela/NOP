@@ -102,7 +102,7 @@ namespace NOP
 				
 				MonoType.Unify (expected, new MonoType.Lam (a, b));
 				if (Argument != null)
-					env = env.Add (Argument, new Polytype (a, null));
+					env = env.Add (Argument, new Polytype (a));
 				Body.TypeCheck (env, b);
 			}
 		}

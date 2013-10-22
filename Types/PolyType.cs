@@ -3,6 +3,8 @@ namespace NOP
 	using System;
 	using Collections;
 	using System.Collections.Generic;
+	using System.Linq;
+	using System.Reflection;
 	
 	/// <summary>
 	/// Polytypes represent generic types, from which a set of MonoTypes can be generated. They
@@ -20,22 +22,39 @@ namespace NOP
 		/// The generic (unbound) type variables in mono type.
 		/// </summary>
 		public readonly Set<string> GenericTypeVars;
-			
+
+		/// <summary>
+		/// The System.Type corresponding to the polytype.
+		/// </summary>
+		public readonly MemberInfo MemberInfo;
+
 		/// <summary>
 		/// Create a polytype.
 		/// </summary>
-		public Polytype (MonoType monoType, IEnumerable<string> tvars)
+		public Polytype (MonoType monoType, MemberInfo mi, IEnumerable<string> tvars)
 		{
 			MonoType = monoType;
+			MemberInfo = mi;
 			GenericTypeVars = tvars != null ? Set<string>.Create (tvars) : Set<string>.Empty;
 		}
-		
-		/// <summary>
-		/// Create a polytype.
-		/// </summary>
-		public Polytype (MonoType monoType, params string[] tvars) : 
-			this (monoType, (IEnumerable<string>)tvars) { }
-			
+
+		public Polytype (MonoType monoType, MemberInfo mi, params string[] tvars) : 
+			this (monoType, mi, (IEnumerable<string>)tvars) { }
+
+		public Polytype (MonoType monoType, IEnumerable<string> tvars) :
+			this (monoType, null, (IEnumerable<string>)tvars) { }
+
+		public Polytype (MonoType monoType, params string[] tvars) :
+			this (monoType, null, (IEnumerable<string>)tvars) { }
+
+		public static Polytype FromType (Type type)
+		{
+			var mt = MonoType.Builder.FromType (type);
+			return type.IsGenericTypeDefinition ?
+				new Polytype (mt, type, type.GetGenericArguments ().Select (t => t.Name)) :
+				new Polytype (mt, type);
+		}
+
 		/// <summary>
 		/// Gets the free type variables.
 		/// </summary>

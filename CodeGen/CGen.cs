@@ -43,7 +43,6 @@
 			return gen.Bind (x => project (x).Bind (y => select (x, y).ToCGen<V> ()));
 		}
 
-
 		public static CGen<Emit.Type> Type (this CGen<Emit.Assembly> assembly, string name)
 		{
 			return from a in assembly 
@@ -55,6 +54,12 @@
 			return from t in type
 				   select new Emit.Method (t, t.TypeBuilder.DefineMethod (name, MethodAttributes.Public));
 		}
+
+		//public static CGen<Emit.Method> Parameter (this CGen<Emit.Method> method, string name, 
+		//    CGen<Emit.Type> type)
+		//{
+
+		//}
 
 		public static CGen<Emit.MethodBody> MethodBody (this CGen<Emit.Method> method)
 		{

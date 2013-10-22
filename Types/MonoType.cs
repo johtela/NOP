@@ -316,8 +316,15 @@
 			public static MonoType Lambda (StrictList<MonoType> parameters, MonoType result)
 			{
 				return  parameters.IsEmpty ? 
-				result : 
-				new Lam (parameters.First, Lambda (parameters.Rest, result));
+					result : 
+					new Lam (parameters.First, Lambda (parameters.Rest, result));
+			}
+
+			public static MonoType FromType (Type type)
+			{
+				return type.IsGenericParameter ?
+					Variable (type.Name) :
+					Constant (new Name (type.Name, type.Namespace));
 			}
 		}
 	}
