@@ -12,9 +12,9 @@ namespace NOP
 	/// </summary>
 	public class TypeEnv
 	{
-		private readonly Map<Name, Polytype> _map;
+		private readonly Map<string, Polytype> _map;
 			
-		private TypeEnv (Map<Name, Polytype> map)
+		private TypeEnv (Map<string, Polytype> map)
 		{
 			_map = map;
 		}
@@ -22,7 +22,7 @@ namespace NOP
 		/// <summary>
 		/// Returns type of variable with the given name.
 		/// </summary>
-		public Polytype Find (Name name)
+		public Polytype Find (string name)
 		{
 			return _map [name];
 		}
@@ -30,7 +30,7 @@ namespace NOP
 		/// <summary>
 		/// Check whether a type environment has a variable with the specified name defined.
 		/// </summary>
-		public bool Contains (Name name)
+		public bool Contains (string name)
 		{
 			return _map.Contains (name);
 		}
@@ -38,7 +38,7 @@ namespace NOP
 		/// <summary>
 		/// Add a variable with the given type to the enironment.
 		/// </summary>
-		public TypeEnv Add (Name name, Polytype type)
+		public TypeEnv Add (string name, Polytype type)
 		{
 			return new TypeEnv (_map.Add (name, type));
 		}
@@ -66,74 +66,66 @@ namespace NOP
 		{
 			private static IEnumerable<string> GetTypeVars (MonoType[] parameters)
 			{
-				foreach (var par in parameters)
-					if (par is MonoType.Var) yield return (par as MonoType.Var).Name;
+				return from par in parameters
+					   where par is MonoType.Var
+					   select (par as MonoType.Var).Name;
 			}
 
-			private static Polytype Pt (MonoType result, params MonoType[] parameters)
+			private static Polytype Pt (MemberInfo mi, MonoType result, params MonoType[] parameters)
 			{
-				return new Polytype (Lambda (List.Create (parameters), result), GetTypeVars (parameters));
+				return new Polytype (Lambda (List.Create (parameters), result), mi, GetTypeVars (parameters));
 			}
 
-			private static Tuple<Name, Polytype> Ft (string funcName, Polytype pt)
+			private static Tuple<string, Polytype> It (string name)
 			{
-				return Tuple.Create (new Name(funcName), pt);
+				return Tuple.Create (name, new Polytype (Constant (name)));
 			}
 
-			public static readonly TypeEnv Value =
-				new TypeEnv (Map<Name, Polytype>.FromPairs (
-					Ft ("set!", Pt (Constant (new Name ("Void", "System")), Variable ("a"), Variable ("a"))),
-					Ft ("eq?", Pt (Constant (new Name ("Boolean", "System")), Variable ("a"), Variable ("a")))
+			private static Tuple<string, Polytype> It (Type type)
+			{
+				return Tuple.Create (type.Name, new Polytype (Constant (type.Name), type));
+			}
+
+			private static Tuple<string, Polytype> Ft (string funcName, Polytype pt)
+			{
+				return Tuple.Create (funcName, pt);
+			}
+
+			private static MonoType FromType (Type type)
+			{
+				return type.IsGenericParameter ?
+					Variable (type.Name) :
+					type.HasElementType ?
+						FromType (type.GetElementType ()) :
+						type.ContainsGenericParameters ?
+							Constant (type.Name, type.GetGenericArguments ().Select (t => FromType (t))) :
+							Constant (type.Name);
+			}
+
+			private static Polytype Met (Type hostType, string method)
+			{
+				var mi = hostType.GetMethod (method);
+				var ret = FromType (mi.ReturnType);
+				var pars = (from p in mi.GetParameters ()
+						   select FromType (p.ParameterType)).ToArray ();
+				return Pt (mi, ret, pars);
+			}
+
+			private static TypeEnv Generate ()
+			{
+				var Prelude = typeof (Prelude);
+
+				return new TypeEnv (Map<string, Polytype>.FromPairs (
+					It ("Void"), It (typeof (Byte)), It (typeof (SByte)), It (typeof (Int16)), It (typeof (UInt16)),
+					It (typeof (Int32)), It (typeof (UInt32)), It (typeof (Int64)), It (typeof (UInt64)),
+					It (typeof (Single)), It (typeof (Double)), It (typeof (Char)), It (typeof (Boolean)),
+					It (typeof (Object)), It (typeof (String)), It (typeof (Decimal)),
+					Ft ("set!", Met (Prelude, "Set")),
+					Ft ("eq?", Met (Prelude, "Eq"))
 				));
-
-			private static IEnumerable<Tuple<Name, Polytype>> TypesInAssembly (Assembly assy)
-			{
-				return (from t in assy.GetTypes ()
-						let ns = Namespace.Get (t.Namespace)
-						select Members (t, ns).Prepend (Tuple.Create (new Name (t.Name, ns), Polytype.FromType (t))))
-					   .Collect ();
 			}
 
-			private static IEnumerable<Tuple<Name, Polytype>> Member (MemberInfo mi, Namespace ns)
-			{
-				var name = new Name (mi.Name, ns);
-				if (mi is MethodInfo)
-					return Tuple.Create (name, MethodToPolytype (mi as MethodInfo)).AsEnumerable ();
-				if (mi is FieldInfo)
-					return Tuple.Create (name, Polytype.FromType ((mi as FieldInfo).FieldType)).AsEnumerable ();
-				if (mi is PropertyInfo)
-					return Tuple.Create (name, PropertyToPolytype (mi as PropertyInfo)).AsEnumerable ();
-				if (mi is Type)
-				{
-					var type = mi as Type;
-					return Members (type, ns + type.Name).Prepend (Tuple.Create (name, Polytype.FromType (type)));
-				}
-				throw new ArgumentException ("Unknown member type", mi.GetType ().Name);
-			}
-
-			private static IEnumerable<Tuple<Name, Polytype>> Members (Type type, Namespace ns)
-			{
-				return (from m in type.GetMembers ()
-						select Member (m, ns)).Collect ();
-			}
-
-			private static Polytype MethodToPolytype (MethodInfo mi)
-			{
-				var pars = List.FromEnumerable (from pi in mi.GetParameters ()
-												select FromType (pi.ParameterType));
-				var mt = Lambda (pars, FromType (mi.ReturnType));
-				if (mi.IsGenericMethodDefinition)
-					return new Polytype (mt, mi, mi.GetGenericArguments ().Select (t => t.Name));
-				else
-					return new Polytype (mt, mi);
-			}
-
-			private static Polytype PropertyToPolytype (PropertyInfo pi)
-			{
-				var pars = List.FromEnumerable (from par in pi.GetIndexParameters ()
-												select FromType (par.ParameterType));
-				return new Polytype (Lambda (pars, FromType (pi.PropertyType)), pi);
-			}
+			public static readonly TypeEnv Value = Generate ();
 		}
 	}
 }

@@ -49,10 +49,11 @@
     <Compile Include="Base\Container.cs" />
     <Compile Include="Base\Either.cs" />
     <Compile Include="Base\Functor.cs" />
-    <Compile Include="Base\Name.cs" />
+    <Compile Include="Base\Prelude.cs" />
     <Compile Include="CodeGen\CGen.cs" />
     <Compile Include="Collections\IStreamBuilder.cs" />
     <Compile Include="CodeGen\Emit.cs" />
+    <Compile Include="Grammar\Module.cs" />
     <Compile Include="IO\SExprTextStore.cs" />
     <Compile Include="Base\Unit.cs" />
     <Compile Include="Collections\ISequence.cs" />

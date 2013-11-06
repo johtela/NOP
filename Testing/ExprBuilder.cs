@@ -51,7 +51,7 @@ namespace NOP.Testing
 			
 			public override SExpr Build ()
 			{
-				return new SExpr.Symbol (new Name(_name));
+				return new SExpr.Symbol (_name);
 			}
 		}
 		

@@ -25,7 +25,7 @@
 
 			var symbol = from x in StringParser.Letter ()
 						 from xs in StringParser.AlphaNumeric ().Plus (StringParser.Char ('?')).Many ()
-						 select SExpr.Sym (new Name((x | xs).ToString ()));
+						 select SExpr.Sym ((x | xs).ToString ());
 
 			var literal = from ob in StringParser.Char ('{')
 						  from t in type

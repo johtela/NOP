@@ -281,7 +281,7 @@ namespace NOP.Grammar
 			{
 				base.GetTypeExpr ();
 				return TB.App (
-					TB.App (TB.Var (new Name ("set!")), Variable.GetTypeExpr ()),
+					TB.App (TB.Var ("set!"), Variable.GetTypeExpr ()),
 					Value.GetTypeExpr ());
 			}
 

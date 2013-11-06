@@ -1,6 +1,7 @@
 ﻿namespace NOP
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
 	using NOP.Collections;
 	using Grammar;
@@ -183,16 +184,16 @@
 		/// </summary>
 		public class Con : MonoType
 		{
-			public readonly Name Name;
+			public readonly string Name;
 			public readonly StrictList<MonoType> TypeArgs;
 
-			public Con (Name name, StrictList<MonoType> typeArgs)
+			public Con (string name, StrictList<MonoType> typeArgs)
 			{
 				Name = name;
 				TypeArgs = typeArgs;
 			}
 			
-			public Con (Name name) : this (name, StrictList<MonoType>.Empty)
+			public Con (string name) : this (name, StrictList<MonoType>.Empty)
 			{
 			}
 			
@@ -297,11 +298,19 @@
 			/// <summary>
 			/// Builder method for creating a type constant.
 			/// </summary>
-			public static MonoType Constant (Name name)
+			public static  MonoType Constant (string name)
 			{
 				return new Con (name);
 			}
-		
+
+			/// <summary>
+			/// Builder method for creating a type constant.
+			/// </summary>
+			public static MonoType Constant (string name, IEnumerable<MonoType> args)
+			{
+				return new Con (name, List.FromEnumerable (args));
+			}
+
 			/// <summary>
 			/// Builder method for creating a type variable.
 			/// </summary>
@@ -318,13 +327,6 @@
 				return  parameters.IsEmpty ? 
 					result : 
 					new Lam (parameters.First, Lambda (parameters.Rest, result));
-			}
-
-			public static MonoType FromType (Type type)
-			{
-				return type.IsGenericParameter ?
-					Variable (type.Name) :
-					Constant (new Name (type.Name, type.Namespace));
 			}
 		}
 	}

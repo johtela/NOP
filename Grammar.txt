@@ -2,11 +2,8 @@ Below is the formal definition of NOP grammar.
 
 SExp:					Literal | Symbol | List ( SExp* )
 		
-Definition				List ( TypeDefinition | MemberDefinition )
-TypeDefinition:			Symbol("type") TypeDeclaration Definition*
-MemberDefinition:		Symbol("def") TypedVariableDefinition Expression
-TypeDeclaration:		SymbolExpression |
-						List ( SymbolExpression SymbolExpression+ )
+Module:					Symbol("module") SymbolExpression Definition*
+Definition:				Symbol("def") TypedVariableDefinition Expression
 
 Expression:				SymbolExpression | 
 						LiteralExpression |

@@ -47,14 +47,6 @@ namespace NOP
 		public Polytype (MonoType monoType, params string[] tvars) :
 			this (monoType, null, (IEnumerable<string>)tvars) { }
 
-		public static Polytype FromType (Type type)
-		{
-			var mt = MonoType.Builder.FromType (type);
-			return type.IsGenericTypeDefinition ?
-				new Polytype (mt, type, type.GetGenericArguments ().Select (t => t.Name)) :
-				new Polytype (mt, type);
-		}
-
 		/// <summary>
 		/// Gets the free type variables.
 		/// </summary>

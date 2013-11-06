@@ -52,9 +52,9 @@ namespace NOP
 		/// </summary>
 		public class Symbol : SExpr
 		{
-			public readonly Name Name;
+			public readonly string Name;
 
-			public Symbol (Name name)
+			public Symbol (string name)
 			{
 				Name = name;
 				Depiction = Visual.Symbol (this);
@@ -112,7 +112,7 @@ namespace NOP
 			return new Literal (value);
 		}
 
-		public static SExpr Sym (Name name)
+		public static SExpr Sym (string name)
 		{
 			return new Symbol (name);
 		}

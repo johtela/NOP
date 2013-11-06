@@ -13,7 +13,7 @@ namespace NOP.Testbench
 		[Test]
 		public void TestLteral ()
 		{
-			CheckType (Lit ("foo"), "System.String");
+			CheckType (Lit ("foo"), "String");
 		}
 		
 		[Test]
@@ -39,20 +39,20 @@ namespace NOP.Testbench
 		[Test]
 		public void SimpleLetTest ()
 		{
-			CheckType (Lam ("x", Let ("y", Lit (1), Var ("y"))), "a -> System.Int32");
+			CheckType (Lam ("x", Let ("y", Lit (1), Var ("y"))), "a -> Int32");
 		}
 		
 		[Test]
 		public void ComplexLetTest ()
 		{
-			CheckType (Let ("f", Lam ("x", Var ("x")), App (Var ("f"), Lit (1))), "System.Int32");
+			CheckType (Let ("f", Lam ("x", Var ("x")), App (Var ("f"), Lit (1))), "Int32");
 		}
 		
 		[Test]
 		public void SetTest ()
 		{
 			CheckType (Let ("a", Lit (1), Let ("b", Lit (2), App (App (Var ("set!"), Var ("a")), Lit (1)))), 
-			           "System.Void");
+			           "Void");
 		}
 		
 		[Test]
@@ -65,7 +65,7 @@ namespace NOP.Testbench
 		[Test]
 		public void IfTest ()
 		{
-			CheckType (If (Lit (false), Lit ("foo"), Lit ("bar")), "System.String");
+			CheckType (If (Lit (false), Lit ("foo"), Lit ("bar")), "String");
 		}
 	}
 }

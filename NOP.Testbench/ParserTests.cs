@@ -24,43 +24,43 @@ namespace NOP.Testbench
 		[Test]
 		public void TestAtom ()
 		{
-			AssertParsesTo<Expression._Literal> ("System.Int32", A (42));
+			AssertParsesTo<Expression._Literal> ("Int32", A (42));
 		}
 		
 		[Test]
 		public void TestLet ()
 		{
-			AssertParsesTo<Expression._Let> ("System.Int32", TestPrograms.SimpleLet ());
+			AssertParsesTo<Expression._Let> ("Int32", TestPrograms.SimpleLet ());
 		}
 
 		[Test]
 		public void TestLambda ()
 		{
-			AssertParsesTo<Expression._Let> ("System.String", TestPrograms.SimpleLambda ());
+			AssertParsesTo<Expression._Let> ("String", TestPrograms.SimpleLambda ());
 		}
 
 		[Test]
 		public void TestIf ()
 		{
-			AssertParsesTo<Expression._If> ("System.String", TestPrograms.SimpleIf ());
+			AssertParsesTo<Expression._If> ("String", TestPrograms.SimpleIf ());
 		}
 
 		[Test]
 		public void TestComplexIf ()
 		{
-			AssertParsesTo<Expression._Let> ("System.String", TestPrograms.ComplexIf ());
+			AssertParsesTo<Expression._Let> ("String", TestPrograms.ComplexIf ());
 		}
 
 		[Test]
 		public void TestNestedLets ()
 		{
-			AssertParsesTo<Expression._Let> ("System.Boolean", TestPrograms.NestedLets ());
+			AssertParsesTo<Expression._Let> ("Boolean", TestPrograms.NestedLets ());
 		}
 
 		[Test]
 		public void TestNestedLambdas ()
 		{
-			AssertParsesTo<Expression._Application> ("System.Boolean", TestPrograms.NestedLambdas ());
+			AssertParsesTo<Expression._Application> ("Boolean", TestPrograms.NestedLambdas ());
 		}
 	}
 }
