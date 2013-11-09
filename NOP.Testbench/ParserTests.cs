@@ -21,6 +21,15 @@ namespace NOP.Testbench
 			Runner.VConsole.ShowSExpr (sexp);
 		}
 
+		public static void AssertParsesToModule (ExprBuilder eb)
+		{
+			var sexp = eb.Build ();
+			var module = Module.Parse (sexp);
+			module.ChangeVisualDepictions ();
+			Runner.VConsole.ShowSExpr (sexp);
+		}
+
+
 		[Test]
 		public void TestAtom ()
 		{
@@ -61,6 +70,12 @@ namespace NOP.Testbench
 		public void TestNestedLambdas ()
 		{
 			AssertParsesTo<Expression._Application> ("Boolean", TestPrograms.NestedLambdas ());
+		}
+
+		[Test]
+		public void TestSimpleModule ()
+		{
+			AssertParsesToModule (TestPrograms.SimpleModule ());
 		}
 	}
 }

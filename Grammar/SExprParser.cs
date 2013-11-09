@@ -55,26 +55,22 @@
 			return parser.Bracket (List (), Eol ());
 		}
 
-		public static Parser<Module, Seq> Module (SExpr lst)
+		public static Parser<Module, Seq> Module ()
 		{
-			return from sym in Symbol ("module").Seq (Symbol ())
+			return from lst in List ()
+				   from sym in Symbol ("module").Seq (Symbol ())
 				   from defs in Define ().Many ()
+				   from eol in Eol ()
 				   select new Module (lst, sym, defs);
 		}
 
 		public static Parser<Definition, Seq> Define ()
 		{
 			return from lst in List ()
-				   from def in Definition (lst)
-				   from eol in Eol ()
-				   select def;
-		}
-
-		public static Parser<Definition, Seq> Definition (SExpr lst)
-		{
-			return from sym in Symbol ("def").Seq (Symbol ())
+				   from sym in Symbol ("def")
 				   from var in TypedVariable ()
 				   from expr in Expr ()
+				   from eol in Eol ()
 				   select new Definition (lst, var, expr);
 		}
 

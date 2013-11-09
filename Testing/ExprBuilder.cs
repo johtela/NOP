@@ -111,7 +111,37 @@ namespace NOP.Testing
 		{
 			return new ListBuilder (items);
 		}
-		
+
+		public static ExprBuilder T (string typeName)
+		{
+			return S (typeName);
+		}
+
+		public static ExprBuilder T (string typeName, params ExprBuilder[] genericParams)
+		{
+			return L (S (typeName) | List.FromArray (genericParams));
+		}
+
+		public static ExprBuilder LT (ExprBuilder sourceType, ExprBuilder targetType)
+		{
+			return L (S ("->"), sourceType, targetType);
+		}
+
+		public static ExprBuilder V (string varName, ExprBuilder type)
+		{
+			return L (S (varName), type);
+		}
+
+		public static ExprBuilder Def (string defName, ExprBuilder type, ExprBuilder definition)
+		{
+			return L (S ("def"), V (defName, type), definition);
+		}
+
+		public static ExprBuilder Mod (string moduleName, params ExprBuilder[] definitions)
+		{
+			return L (S ("module") | (S (moduleName) | List.FromArray (definitions)));
+		}
+
 		/// <summary>
 		/// Create a builder for the "quote" expression.
 		/// </summary>
@@ -134,14 +164,6 @@ namespace NOP.Testing
 		public static ExprBuilder Begin (params ExprBuilder[] items)
 		{
 			return new ListBuilder (S ("begin") | List.Create (items));
-		}
-		
-		/// <summary>
-		/// Create a builder for the "define" expression.
-		/// </summary>
-		public static ExprBuilder Define (string symbol, ExprBuilder value)
-		{
-			return new ListBuilder (List.Create (S ("define"), S (symbol), value));
 		}
 		
 		/// <summary>

@@ -25,8 +25,8 @@
 			return
 				Let ("foo", Lambda (P ("i"),
 				If (Call ("eq?", S ("i"), A (3)),
-					A ("It's numberwang!"),
-					A ("It's a number"))),
+					A ("That's numberwang!"),
+					A ("That's a number"))),
 				Call ("foo", A (3)));
 		}
 
@@ -45,6 +45,12 @@
 					Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
 					Call ("bar", S ("foo"), A (3)))
 			), A (4));
+		}
+
+		public static ExprBuilder SimpleModule ()
+		{
+			return Mod ("test",
+				Def ("foo", T ("Int32"), A (42)));
 		}
 	}
 }

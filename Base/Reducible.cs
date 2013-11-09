@@ -69,6 +69,16 @@
 	/// </summary>
 	public static class Reducible
 	{
+		public static Func<U, T, U> Recurse<T, U> (Func<U, T, U> func) where T : IReducible<T>
+		{
+			return (a, r) => r.ReduceLeft (a, func); 
+		}
+
+		public static Func<T, U, U> Recurse<T, U> (Func<T, U, U> func) where T : IReducible<T>
+		{
+			return (r, a) => r.ReduceRight (func, a);
+		}
+
 		public static void Foreach<T> (this IReducible<T> reducible, Action<T> action)
 		{
 			reducible.ReduceLeft<object> (null, (_, item) =>

@@ -3,6 +3,8 @@ namespace NOP.Grammar
 	using System;
 	using System.Collections.Generic;
 	using NOP.Collections;
+	using Visuals;
+	using V = NOP.Visuals.Visual;
 
 	public class VariableDefinition : AstNode
 	{
@@ -28,6 +30,19 @@ namespace NOP.Grammar
 			return Type != null ?
 				Type.ReduceRight (func, Name.ReduceRight (func, func (this, acc))) :
 				Name.ReduceRight (func, func (this, acc));
+		}
+
+		protected override V GetVisual ()
+		{
+			if (SExp is SExpr.List)
+			{
+				var sexps = ((SExpr.List)SExp).Items;
+				var variable = sexps.First;
+				var vartype = sexps.RestL.First;
+
+				return V.HStack (VAlign.Top, V.Depiction (variable), V.Label (":"), V.Depiction (vartype));
+			}
+			else return base.GetVisual ();
 		}
 	}
 }

@@ -694,6 +694,15 @@
 		}
 
 		/// <summary>
+		/// Draws first a paragraph with a header and indented body. The amount
+		/// of indentation is given as the last parameter.
+		/// </summary>
+		public static Visual Indented (Visual header, Visual body, int indent)
+		{
+			return VStack (HAlign.Left, header, Margin (body, left: indent));
+		}
+
+		/// <summary>
 		/// Return the visualization of any object. This works by first chechking if the object
 		/// implements the IVisualizable interface; if not, a label is returned with value of the
 		/// object's ToString function.

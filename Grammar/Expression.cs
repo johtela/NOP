@@ -61,12 +61,12 @@ namespace NOP.Grammar
 
 			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				return func (Parameters.ReduceLeft (Function.ReduceLeft (acc, func), func), this);
+				return func (Parameters.ReduceLeft (Function.ReduceLeft (acc, func), Reducible.Recurse (func)), this);
 			}
 
 			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
 			{
-				return Parameters.ReduceRight (func, Function.ReduceRight (func, func (this, acc)));
+				return Parameters.ReduceRight (Reducible.Recurse (func), Function.ReduceRight (func, func (this, acc)));
 			}
 
 			protected override Visual GetVisual ()
@@ -151,12 +151,12 @@ namespace NOP.Grammar
 
 			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 			{
-				return func (FunctionBody.ReduceLeft (Parameters.ReduceLeft (acc, func), func), this);
+				return func (FunctionBody.ReduceLeft (Parameters.ReduceLeft (acc, func), Reducible.Recurse(func)), this);
 			}
 
 			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
 			{
-				return FunctionBody.ReduceRight (func, Parameters.ReduceRight (func, func (this, acc)));
+				return FunctionBody.ReduceRight (func, Parameters.ReduceRight (Reducible.Recurse (func), func (this, acc)));
 			}
 
 			protected override Visual GetVisual ()
@@ -166,9 +166,9 @@ namespace NOP.Grammar
 				var sparams = sexps.RestL.First;
 				var sbody = sexps.RestL.RestL.First;
 
-				return V.VStack (HAlign.Left,
-					V.HStack (VAlign.Top, V.Frame (V.Depiction (slambda), FrameKind.Rectangle), V.Depiction (sparams)),
-					V.Margin (V.Depiction (sbody), 24));
+				return V.Indented (
+					V.HStack (VAlign.Top, V.Depiction (slambda), V.Depiction (sparams)),
+					V.Depiction (sbody), 24);
 			}
 		}
 

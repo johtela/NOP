@@ -25,8 +25,8 @@ namespace NOP.Testbench
 					new TypeCheckingTests (),
 					new ParserTests (),
 					new SExprPathTests (),
-					new ParserMonadTests (),
-					new IOTests ())
+					new ParserMonadTests ())
+					//new IOTests ())
 			);
 			Application.Run (VConsole);
 			VConsole.Dispose ();
