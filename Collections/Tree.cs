@@ -221,30 +221,30 @@
 				return (T)tree.Clone(Left(tree), Remove(Right(tree), key), false);
 		}
 
-        /// <summary>
-        /// Replace an item with another one with the same key.
-        /// </summary>
-        /// <param name="tree">The tree where the item is replaced.</param>
-        /// <param name="key">The key to be searched for.</param>
-        /// <param name="item">The item to be replaced.</param>
-        /// <returns>A new tree that contains the item with given key.</returns>
-        public static T Replace(T tree, K key, T item)
-        {
-            if (!key.Equals(item.Key))
-                throw new ArgumentException("Key must be the same in the item to be replaced");
-            if (tree.IsEmpty())
-                throw new ArgumentException(string.Format("Key '{0}' not found in the tree", key));
+		/// <summary>
+		/// Replace an item with another one with the same key.
+		/// </summary>
+		/// <param name="tree">The tree where the item is replaced.</param>
+		/// <param name="key">The key to be searched for.</param>
+		/// <param name="item">The item to be replaced.</param>
+		/// <returns>A new tree that contains the item with given key.</returns>
+		public static T Replace(T tree, K key, T item)
+		{
+			if (!key.Equals(item.Key))
+				throw new ArgumentException("Key must be the same in the item to be replaced");
+			if (tree.IsEmpty())
+				throw new ArgumentException(string.Format("Key '{0}' not found in the tree", key));
 
-            var comp = key.CompareTo(tree.Key);
-            if (comp == 0)
-                return (T)item.Clone(tree.Left, tree.Right, false);
-            else if (comp > 0)
-                return (T)tree.Clone(tree.Left, Replace(Right(tree), key, item), false);
-            else
-                return (T)tree.Clone(Replace(Left(tree), key, item), tree.Right, false);
-        }
+			var comp = key.CompareTo(tree.Key);
+			if (comp == 0)
+				return (T)item.Clone(tree.Left, tree.Right, false);
+			else if (comp > 0)
+				return (T)tree.Clone(tree.Left, Replace(Right(tree), key, item), false);
+			else
+				return (T)tree.Clone(Replace(Left(tree), key, item), tree.Right, false);
+		}
 
-        /// <summary>
+		/// <summary>
 		/// Traverse the tree depth first and in-order.
 		/// </summary>
 		/// <param name="tree">The tree to be traversed.</param>

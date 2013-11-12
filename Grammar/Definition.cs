@@ -17,14 +17,9 @@ namespace NOP.Grammar
 			Value = value;
 		}
 
-		public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+		protected override ILeftReducible<AstNode> AsReducible ()
 		{
-			return func (Value.ReduceLeft (Variable.ReduceLeft (acc, func), func), this);
-		}
-
-		public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-		{
-			return Value.ReduceRight (func, Variable.ReduceRight (func, func (this, acc)));
+			return Variable.LeftConcat (Value);
 		}
 
 		protected override Visuals.Visual GetVisual ()

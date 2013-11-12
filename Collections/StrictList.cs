@@ -505,7 +505,7 @@
 		/// <summary>
 		/// Create a list from a reducible structure.
 		/// </summary>
-		public static StrictList<T> FromReducible<T> (IReducible<T> reducible)
+		public static StrictList<T> FromReducible<T> (IRightReducible<T> reducible)
 		{
 			return reducible.ReduceRight (StrictList<T>.Cons, StrictList<T>.Empty);
 		}
@@ -513,7 +513,7 @@
 		/// <summary>
 		/// Create a list from a reducible structure.
 		/// </summary>
-		public static StrictList<U> MapReducible<T, U> (IReducible<T> reducible, Func<T, U> map)
+		public static StrictList<U> MapReducible<T, U> (IRightReducible<T> reducible, Func<T, U> map)
 		{
 			return reducible.ReduceRight ((t, l) => map (t) | l, StrictList<U>.Empty);
 		}

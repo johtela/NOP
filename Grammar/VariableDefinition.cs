@@ -18,18 +18,11 @@ namespace NOP.Grammar
 			Type = type;
 		}
 
-		public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+		protected override ILeftReducible<AstNode> AsReducible ()
 		{
 			return Type != null ?
-				func (Type.ReduceLeft (Name.ReduceLeft (acc, func), func), this) :
-				func (Name.ReduceLeft (acc, func), this);
-		}
-
-		public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-		{
-			return Type != null ?
-				Type.ReduceRight (func, Name.ReduceRight (func, func (this, acc))) :
-				Name.ReduceRight (func, func (this, acc));
+				Name.LeftConcat (Type) : 
+				Name;
 		}
 
 		protected override V GetVisual ()

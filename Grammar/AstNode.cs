@@ -19,7 +19,7 @@ namespace NOP.Grammar
 		}
 	}
 
-	public abstract class AstNode : IReducible<AstNode>
+	public abstract class AstNode : ILeftReducible<AstNode>
 	{
 		public readonly SExpr SExp;
 		
@@ -84,16 +84,19 @@ namespace NOP.Grammar
 			this.Foreach (node => node.SExp.Depiction = node.GetVisual ());
 		}
 
-		#region IReducible<AstNode> implementation
-		
-		public virtual U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+		protected virtual ILeftReducible<AstNode> AsReducible ()
 		{
-			return func (acc, this);
+			return null;
 		}
 
-		public virtual U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
+		#region IReducible<AstNode> implementation
+		
+		public U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
 		{
-			return func (this, acc);
+			var reducible = AsReducible ();
+			return reducible != null ?
+				func (reducible.ReduceLeft (acc, func), this) :
+				func (acc, this);
 		}
 
 		#endregion	

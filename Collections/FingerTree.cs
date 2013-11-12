@@ -568,7 +568,7 @@
 				if (tree is _Single)
 					return Append (items).AddRight ((tree as _Single).Item);
 				var other = tree as _Deep;
-				var innerItems = List.FromReducible (Reducible.Concat (Reducible.Concat (Back, items), other.Front));
+				var innerItems = List.FromReducible (Back.RightConcat (items).RightConcat (other.Front));
 				return new _Deep (Front,
 					Inner.AppendTree (Node<T, V>.CreateMany (innerItems), other.Inner),
 					other.Back);

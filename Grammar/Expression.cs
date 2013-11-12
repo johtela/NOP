@@ -59,14 +59,9 @@ namespace NOP.Grammar
 				return te;
 			}
 
-			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+			protected override ILeftReducible<AstNode> AsReducible ()
 			{
-				return func (Parameters.ReduceLeft (Function.ReduceLeft (acc, func), Reducible.Recurse (func)), this);
-			}
-
-			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-			{
-				return Parameters.ReduceRight (Reducible.Recurse (func), Function.ReduceRight (func, func (this, acc)));
+				return Function.LeftConcat (Parameters.LeftCast<Expression, AstNode> ().LeftRecurse ());
 			}
 
 			protected override Visual GetVisual ()
@@ -113,20 +108,9 @@ namespace NOP.Grammar
 											ElseExpression.GetTypeExpr ());
 			}
 
-			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+			protected override ILeftReducible<AstNode> AsReducible ()
 			{
-				return func (ElseExpression.ReduceLeft 
-							(ThenExpression.ReduceLeft 
-							(Condition.ReduceLeft (acc, func), func), func), 
-						this);
-			}
-
-			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-			{
-				return	ElseExpression.ReduceRight (func, 
-						ThenExpression.ReduceRight (func, 
-						Condition.ReduceRight (func, 
-						func (this, acc))));
+				return Condition.LeftConcat (ThenExpression).LeftConcat (ElseExpression);
 			}
 		}
 
@@ -149,14 +133,9 @@ namespace NOP.Grammar
 					FunctionBody.GetTypeExpr ());
 			}
 
-			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+			protected override ILeftReducible<AstNode> AsReducible ()
 			{
-				return func (FunctionBody.ReduceLeft (Parameters.ReduceLeft (acc, func), Reducible.Recurse(func)), this);
-			}
-
-			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-			{
-				return FunctionBody.ReduceRight (func, Parameters.ReduceRight (Reducible.Recurse (func), func (this, acc)));
+				return (Parameters.LeftCast<VariableDefinition, AstNode> ().LeftRecurse ().LeftConcat (FunctionBody));
 			}
 
 			protected override Visual GetVisual ()
@@ -193,14 +172,9 @@ namespace NOP.Grammar
 					Body.GetTypeExpr ());
 			}
 
-			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+			protected override ILeftReducible<AstNode> AsReducible ()
 			{
-				return func (Body.ReduceLeft (Value.ReduceLeft (Variable.ReduceLeft (acc, func), func), func), this);
-			}
-
-			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-			{
-				return Body.ReduceRight(func, Value.ReduceRight (func, Variable.ReduceRight (func, func (this, acc))));
+				return Variable.LeftConcat (Value).LeftConcat (Body);
 			}
 
 			protected override Visual GetVisual ()
@@ -255,14 +229,9 @@ namespace NOP.Grammar
 				return TB.Lit (SExp);
 			}
 
-			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+			protected override ILeftReducible<AstNode> AsReducible ()
 			{
-				return func (QuotedExpression.ReduceLeft (acc, func), this);
-			}
-
-			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-			{
-				return QuotedExpression.ReduceRight (func, func (this, acc));
+				return QuotedExpression;
 			}
 		}
 
@@ -285,14 +254,9 @@ namespace NOP.Grammar
 					Value.GetTypeExpr ());
 			}
 
-			public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+			protected override ILeftReducible<AstNode> AsReducible ()
 			{
-				return func (Value.ReduceLeft (Variable.ReduceLeft (acc, func), func), this);
-			}
-
-			public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-			{
-				return Value.ReduceRight(func, Variable.ReduceRight (func, func (this, acc)));
+				return Variable.LeftConcat (Value);
 			}
 		}
 

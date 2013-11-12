@@ -19,14 +19,9 @@
 			Members = members;
 		}
 
-		public override U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
+		protected override ILeftReducible<AstNode> AsReducible ()
 		{
-			return func (Members.ReduceLeft (Name.ReduceLeft (acc, func), Reducible.Recurse(func)), this);
-		}
-
-		public override U ReduceRight<U> (Func<AstNode, U, U> func, U acc)
-		{
-			return Members.ReduceRight (Reducible.Recurse (func), Name.ReduceRight (func, func (this, acc)));
+			return Name.LeftConcat (Members.LeftCast<Definition, AstNode> ().LeftRecurse ());
 		}
 
 		protected override Visuals.Visual GetVisual ()
