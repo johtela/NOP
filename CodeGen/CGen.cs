@@ -49,27 +49,28 @@
 				   select new Emit.Type (a, a.ModuleBuilder.DefineType (name));
 		}
 
-		public static CGen<Emit.Method> Method (this CGen<Emit.Type> type, string name)
+		public static CGen<Emit.Type> Field (this CGen<Emit.Type> type, string name, Type fieldType)
 		{
-			return from t in type
-				   select new Emit.Method (t, t.TypeBuilder.DefineMethod (name, MethodAttributes.Public));
+			return type.Do (t => t.TypeBuilder.DefineField (name, fieldType, FieldAttributes.Public));
 		}
 
-		//public static CGen<Emit.Method> Parameter (this CGen<Emit.Method> method, string name, 
-		//    CGen<Emit.Type> type)
-		//{
+		public static CGen<Emit.Method> Method (this CGen<Emit.Type> type, string name, Type returnType,
+			params Type[] paramTypes)
+		{
+			return from t in type
+				   select new Emit.Method (t, t.TypeBuilder.DefineMethod (name, MethodAttributes.Public,
+					   returnType, paramTypes));
+		}
 
-		//}
-
-		public static CGen<Emit.MethodBody> MethodBody (this CGen<Emit.Method> method)
+		public static CGen<Emit.MethodBody> Begin (this CGen<Emit.Method> method)
 		{
 			return from m in method
 				   select new Emit.MethodBody (m, m.MethodBuilder.GetILGenerator ());
 		}
 
-		public static CGen<Emit.Type> Field (this CGen<Emit.Type> type, string name, Type fieldType)
+		public static CGen<Emit.MethodBody> LoadArg (CGen<Emit.MethodBody> body, int paramNo)
 		{
-			return type.Do (t => t.TypeBuilder.DefineField (name, fieldType, FieldAttributes.Public));
+			return null;
 		}
 	}
 }
