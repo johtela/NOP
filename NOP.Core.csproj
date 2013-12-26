@@ -88,6 +88,7 @@
     </Compile>
     <Compile Include="Base\SExprPath.cs" />
     <Compile Include="IO\SExprStore.cs" />
+    <Compile Include="Types\TypeCheck.cs" />
     <Compile Include="Visuals\Animation.cs" />
     <Compile Include="Visuals\HitRect.cs" />
     <Compile Include="Visuals\Visual.cs" />
