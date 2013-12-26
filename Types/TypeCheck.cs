@@ -7,27 +7,25 @@ namespace NOP
 	/// <summary>
 	/// State that is carried along when type checking is performed.
 	/// </summary>
-	/// <typeparam name="T">Type of the satellite data carried with state.</typeparam>
-	public class TCState<T>
+	public class TCState
 	{
 		public readonly TypeEnv Env;
 		public readonly Substitution Subs;
 		public readonly int LastVar;
-		public readonly T Satellite;
 
-		public TCState (TypeEnv env, Substitution subs, int lastVar, T satellite)
+		public TCState (TypeEnv env, Substitution subs, int lastVar)
 		{
 			Env = env;
 			Subs = subs;
 			LastVar = lastVar;
-			Satellite = satellite;
 		}
 
-		public TCState (TCState<T> old, TypeEnv env) :
-			this (env, old.Subs, old.LastVar, old.Satellite) { }
+		public TCState (TCState old, TypeEnv env) :
+			this (env, old.Subs, old.LastVar) { }
 
-		public TCState (TCState<T> old, Substitution subs) :
-			this (old.Env, subs, old.LastVar, old.Satellite) { }
+		public TCState (TCState old, Substitution subs) :
+			this (old.Env, subs, old.LastVar) { }
+
 	}
 
 	/// <summary>
@@ -38,7 +36,7 @@ namespace NOP
 	/// <param name="state">The state used within type check.</param>
 	/// <param name='expected'>The base type with which the expression type is unified.</param>
 	/// <returns>The new state after the type check.</returns>
-	public delegate TCState<T> TypeCheck<T> (TCState<T> state, MonoType expected);
+	public delegate TCState TypeCheck (TCState state, MonoType expected);
 
 	/// <summary>
 	/// TypeCheck class defines a simple typed lambda calculus that is used
@@ -46,22 +44,17 @@ namespace NOP
 	/// expressions and then infer the type of the expression using the
 	/// Hindley-Milner algorithm W.
 	/// </summary>
-	public class TypeCheck
+	public class TC
 	{
-		public static TypeCheck<T> Sequence<T> (TypeCheck<T> tc, TypeCheck<T> other)
+		public static TypeCheck Sequence (TypeCheck tc, TypeCheck other)
 		{
 			return (st, exp) => other (tc (st, exp), exp);
-		}
-
-		public static TypeCheck<T> SetState<T> (TCState<T> state)
-		{
-			return (st, exp) => state;
 		}
 
 		/// <summary>
 		/// Literal expression. Can be any literal object.
 		/// </summary>
-		public static TypeCheck<T> Literal<T> (object value)
+		public static TypeCheck Literal (object value)
 		{
 			var type = value.GetType ();
 			return (st, exp) =>
@@ -74,7 +67,7 @@ namespace NOP
 		/// <summary>
 		/// Variables are symbols with type.
 		/// </summary>
-		public static TypeCheck<T> Variable<T> (string name)
+		public static TypeCheck Variable (string name)
 		{
 			return (st, exp) =>
 			{
@@ -90,7 +83,7 @@ namespace NOP
 		/// Lambda expression defines a function of one argument. The argument can
 		/// also be null, in which case the function is of type () -> 'a
 		/// </summary>
-		public static TypeCheck<T> Lambda<T> (string arg, TypeCheck<T> body)
+		public static TypeCheck Lambda (string arg, TypeCheck body)
 		{
 			return (st, exp) =>
 			{
@@ -101,7 +94,7 @@ namespace NOP
 				
 				MonoType.Unify (exp, new MonoType.Lam (a, b));
 				if (arg != null)
-					st = new TCState<T> (st, st.Env.Add (arg, new Polytype (a)));
+					st = new TCState (st, st.Env.Add (arg, new Polytype (a)));
 				return body (st, b);
 			};
 		}
@@ -109,7 +102,7 @@ namespace NOP
 		/// <summary>
 		/// Function application checks the type of argument and return type.
 		/// </summary>
-		public static TypeCheck<T> Application<T> (TypeCheck<T> func, TypeCheck<T> arg)
+		public static TypeCheck Application (TypeCheck func, TypeCheck arg)
 		{
 			return (st, exp) =>
 			{
@@ -125,8 +118,8 @@ namespace NOP
 		/// If expression checks that the condition evaluates to boolean type, and
 		/// that the then and else expressions have the same type.
 		/// </summary>
-		public static TypeCheck<T> IfElse<T> (TypeCheck<T> cond, TypeCheck<T> thenExpr, 
-			TypeCheck<T> elseExpr)
+		public static TypeCheck IfElse (TypeCheck cond, TypeCheck thenExpr, 
+			TypeCheck elseExpr)
 		{
 			return (st, exp) =>
 			{
@@ -150,7 +143,7 @@ namespace NOP
 		/// Let in expression defines a variable and an expression where the variable is
 		/// bound to a value.
 		/// </summary>
-		public static TypeCheck<T> LetIn<T> (string variable, TypeCheck<T> value, TypeCheck<T> body) 
+		public static TypeCheck LetIn (string variable, TypeCheck value, TypeCheck body) 
 		{
 			return (st, exp) =>
 			{
@@ -158,32 +151,32 @@ namespace NOP
 				st = value (st, a);
 				MonoType t = a.ApplySubs ();
 				Polytype newPt = new Polytype (t, t.GetTypeVars () - st.Env.GetTypeVars ());
-				return body (new TCState<T> (st, st.Env.Add (variable, newPt)), exp);
+				return body (new TCState (st, st.Env.Add (variable, newPt)), exp);
 			};
 		}
 		
 		/// <summary>
 		/// Construct a lambda expression that has zero or more arguments.
 		/// </summary>
-		public static TypeCheck<T> MultiLambda<T> (StrictList<string> args, TypeCheck<T> body)
+		public static TypeCheck MultiLambda (StrictList<string> args, TypeCheck body)
 		{
 			if (args.IsEmpty)
-				return Lambda<T> (null, body);
+				return Lambda (null, body);
 			else
 			if (args.Rest.IsEmpty)
-				return Lambda<T> (args.First, body);
+				return Lambda (args.First, body);
 			else
-				return Lambda<T> (args.First, MultiLambda (args.Rest, body));
+				return Lambda (args.First, MultiLambda (args.Rest, body));
 		}
 
 		/// <summary>
 		/// Infers the the type of this expression using the specified type environment.
 		/// </summary>
-		public static MonoType InferType<T> (TypeCheck<T> tc, TypeEnv env)
+		public static MonoType InferType (TypeCheck tc, TypeEnv env)
 		{
 			MonoType.ClearSubs ();
 			var a = MonoType.NewTypeVar ();
-			var st = tc (new TCState<T> (env, Substitution.Empty, 0, default(T)), a);
+			var st = tc (new TCState (env, Substitution.Empty, 0), a);
 			return a.ApplySubs ().RenameTypeVarsToLetters ();
 		}
 	}
