@@ -25,6 +25,9 @@ namespace NOP
 
 		public TCState (TCState old, Substitution subs) :
 			this (old.Env, subs, old.LastVar) { }
+
+		public TCState (TCState old) :
+			this (old.Env, old.Subs, old.LastVar + 1) { }
 	}
 
 	/// <summary>
@@ -61,11 +64,8 @@ namespace NOP
 		public static TypeCheck Literal (object value)
 		{
 			var type = value.GetType ();
-			return (st, exp) =>
-			{
-				MonoType.Unify (new MonoType.Con (type.Name, StrictList<MonoType>.Empty), exp);
-				return st;
-			};
+			return (st, exp) => new TCState (st, 
+				MonoType.Unify (new MonoType.Con (type.Name, StrictList<MonoType>.Empty), exp, st.Subs));
 		}
 
 		/// <summary>
@@ -78,8 +78,7 @@ namespace NOP
 				if (!st.Env.Contains (name)) 
 					throw new Exception (string.Format ("Name {0} not found", name));
 				var pt = st.Env.Find (name);
-				MonoType.Unify (pt.MonoType.ApplySubs (), exp);
-				return st;
+				return new TCState (st, MonoType.Unify (pt.MonoType.ApplySubs (st.Subs), exp, st.Subs));
 			};
 		}
 
@@ -91,15 +90,18 @@ namespace NOP
 		{
 			return (st, exp) =>
 			{
+				var i = st.LastVar;
+				var subs = st.Subs;
+				var env = st.Env;
 				var a = arg != null ? 
-					MonoType.NewTypeVar () :
+					MonoType.NewTypeVar (++i) :
 					new MonoType.Con ("Void");
-				var b = MonoType.NewTypeVar ();
+				var b = MonoType.NewTypeVar (++i);
 				
-				MonoType.Unify (exp, new MonoType.Lam (a, b));
+				subs = MonoType.Unify (exp, new MonoType.Lam (a, b), subs);
 				if (arg != null)
-					st = new TCState (st, st.Env.Add (arg, new Polytype (a)));
-				return body (st, b);
+					env = st.Env.Add (arg, new Polytype (a));
+				return body (new TCState (env, subs, i), b);
 			};
 		}
 
@@ -110,9 +112,15 @@ namespace NOP
 		{
 			return (st, exp) =>
 			{
-				var a = arg != null ? 
-					MonoType.NewTypeVar () :
-					new MonoType.Con ("Void");
+				MonoType a;
+
+				if (arg != null)
+				{
+					a = MonoType.NewTypeVar (st.LastVar + 1);
+					st = new TCState (st);
+				}
+				else 
+					a = new MonoType.Con ("Void");
 				st = func (st, new MonoType.Lam (a, exp));
 				return arg == null ? st : arg (st, a);
 			};
@@ -127,19 +135,17 @@ namespace NOP
 		{
 			return (st, exp) =>
 			{
-				var c = MonoType.NewTypeVar ();
-				st = cond (st, c);
-				MonoType.Unify (c, new MonoType.Con ("Boolean"));
+				var c = MonoType.NewTypeVar (st.LastVar + 1);
+				st = cond (new TCState (st), c);
+				st = new TCState (st, MonoType.Unify (c, new MonoType.Con ("Boolean"), st.Subs));
 
-				var t = MonoType.NewTypeVar ();
-				st = thenExpr (st, t);
+				var t = MonoType.NewTypeVar (st.LastVar + 1);
+				st = thenExpr (new TCState (st), t);
 
-				var e = MonoType.NewTypeVar ();
-				st = elseExpr (st, e);
+				var e = MonoType.NewTypeVar (st.LastVar + 1);
+				st = elseExpr (new TCState (st), e);
 
-				MonoType.Unify (t, e);
-				MonoType.Unify (t, exp);
-				return st;
+				return new TCState (st, MonoType.Unify (t, exp, MonoType.Unify (t, e, st.Subs)));
 			};
 		}
 		
@@ -151,9 +157,9 @@ namespace NOP
 		{
 			return (st, exp) =>
 			{
-				MonoType a = MonoType.NewTypeVar ();
-				st = value (st, a);
-				MonoType t = a.ApplySubs ();
+				MonoType a = MonoType.NewTypeVar (st.LastVar + 1);
+				st = value (new TCState (st), a);
+				MonoType t = a.ApplySubs (st.Subs);
 				Polytype newPt = new Polytype (t, t.GetTypeVars () - st.Env.GetTypeVars ());
 				return body (new TCState (st, st.Env.Add (variable, newPt)), exp);
 			};
@@ -178,10 +184,9 @@ namespace NOP
 		/// </summary>
 		public static MonoType InferType (TypeCheck tc, TypeEnv env)
 		{
-			MonoType.ClearSubs ();
-			var a = MonoType.NewTypeVar ();
-			var st = tc (new TCState (env, Substitution.Empty, 0), a);
-			return a.ApplySubs ().RenameTypeVarsToLetters ();
+			var a = MonoType.NewTypeVar (1);
+			var st = tc (new TCState (env, Substitution.Empty, 1), a);
+			return a.ApplySubs (st.Subs).RenameTypeVarsToLetters ();
 		}
 	}
 }

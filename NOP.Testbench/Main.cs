@@ -22,7 +22,6 @@ namespace NOP.Testbench
 					new MapTests (),
 					new SetTests (),
 					new FingerTreeTests (),
-					new TypeCheckingTests (),
 					new ParserTests (),
 					new SExprPathTests (),
 					new ParserMonadTests ())

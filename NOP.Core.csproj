@@ -102,7 +102,6 @@
     <Compile Include="Types\PolyType.cs" />
     <Compile Include="Types\TypeEnv.cs" />
     <Compile Include="Types\MonoType.cs" />
-    <Compile Include="Types\TypeExpr.cs" />
     <Compile Include="Grammar\Definition.cs" />
     <Compile Include="Grammar\AstNode.cs" />
     <Compile Include="Grammar\TypeReference.cs" />

@@ -48,7 +48,6 @@
     <Compile Include="TestPrograms.cs" />
     <Compile Include="Arithmetic.cs" />
     <Compile Include="Collections\SetTests.cs" />
-    <Compile Include="TypeCheckingTests.cs" />
     <Compile Include="ParserTests.cs" />
     <Compile Include="Collections\StrictListTests.cs" />
   </ItemGroup>

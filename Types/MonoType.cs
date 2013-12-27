@@ -14,14 +14,12 @@
 	{
 		public readonly MonoType Type1;
 		public readonly MonoType Type2;
-		public readonly Expression Expression;
 			
 		public UnificationError (MonoType type1, MonoType type2) 
 				: base (string.Format ("Could not unify type {0} with {1}", type1, type2))
 		{
 			Type1 = type1;
 			Type2 = type2;
-			Expression = TypeExpr.CurrentExpression;
 		}
 	}
 	
@@ -31,19 +29,8 @@
 	/// </summary>
 	public abstract class MonoType
 	{
-		private static int _lastVar;
 		private static char _nextTVarLetter;
 		private static Map<string, char> _tVarMap;
-		private static Substitution _subs;
-		
-		/// <summary>
-		/// Clears the substitution table.
-		/// </summary>
-		public static void ClearSubs ()
-		{
-			_subs = Substitution.Empty;
-			_lastVar = 0;
-		}
 		
 		/// <summary>
 		/// Map a generated type variable name (T1, T2, T3...) to a single letter (a, b, c...)
@@ -63,15 +50,15 @@
 		/// <summary>
 		/// Generate a new unique type variable.
 		/// </summary>
-		public static MonoType NewTypeVar ()
+		public static MonoType NewTypeVar (int lastVar)
 		{
-			return new Var ("T" + (++_lastVar).ToString ());
+			return new Var ("T" + (lastVar).ToString ());
 		}
 		
 		/// <summary>
 		/// Apply the substitutions to this type.
 		/// </summary>
-		public abstract MonoType ApplySubs ();
+		public abstract MonoType ApplySubs (Substitution subs);
 		
 		/// <summary>
 		/// Gets the type variables of the type.
@@ -95,10 +82,10 @@
 				Name = name;
 			}
 			
-			public override MonoType ApplySubs ()
+			public override MonoType ApplySubs (Substitution subs)
 			{
-				var t = _subs.Lookup (Name);
-				return (t.Equals (this)) ? this : t.ApplySubs ();
+				var t = subs.Lookup (Name);
+				return (t.Equals (this)) ? this : t.ApplySubs (subs);
 			}
 			
 			public override Set<string> GetTypeVars ()
@@ -141,9 +128,9 @@
 				Result = result;
 			}
 			
-			public override MonoType ApplySubs ()
+			public override MonoType ApplySubs (Substitution subs)
 			{
-				return new Lam (Argument.ApplySubs (), Result.ApplySubs ());
+				return new Lam (Argument.ApplySubs (subs), Result.ApplySubs (subs));
 			}
 			
 			public override Set<string> GetTypeVars ()
@@ -197,9 +184,9 @@
 			{
 			}
 			
-			public override MonoType ApplySubs ()
+			public override MonoType ApplySubs (Substitution subs)
 			{
-				return new Con (Name, TypeArgs.Map (t => t.ApplySubs ()));
+				return new Con (Name, TypeArgs.Map (t => t.ApplySubs (subs)));
 			}
 			
 			public override Set<string> GetTypeVars ()
@@ -236,34 +223,27 @@
 		/// <param name='type1'>The first monotype to be unified.</param>
 		/// <param name='type2'>the second monotype to be unified.</param>
 		/// <param name='subs'>The substitution table used.</param>
-		public static void Unify (MonoType type1, MonoType type2)
+		public static Substitution Unify (MonoType type1, MonoType type2, Substitution subs)
 		{
-			var a = type1.ApplySubs ();
-			var b = type2.ApplySubs ();
+			var a = type1.ApplySubs (subs);
+			var b = type2.ApplySubs (subs);
 						
 			if (a is Var && b is Var && a.Equals (b))
-				return;
+				return subs;
 			
 			var va = a as Var;
 			if (va != null && !b.GetTypeVars ().Contains (va.Name))
-			{ 
-				_subs = _subs.Extend (va.Name, b);
-				return;
-			}
+				return subs.Extend (va.Name, b);
+
 			var vb = b as Var;
 			if (vb != null && !a.GetTypeVars ().Contains (vb.Name))
-			{
-				_subs = _subs.Extend (vb.Name, a);
-				return;
-			}
+				return subs.Extend (vb.Name, a);
+
 			var la = a as Lam;
 			var lb = b as Lam;
 			if (la != null && lb != null)
-			{
-				Unify (la.Result, lb.Result);
-				Unify (la.Argument, lb.Argument);
-				return;
-			}
+				return Unify (la.Argument, lb.Argument, Unify (la.Result, lb.Result, subs));
+
 			var ca = a as Con;
 			var cb = b as Con;
 			if (ca != null && cb != null && ca.Equals (cb))
@@ -273,12 +253,12 @@
 				
 				while (!taa.IsEmpty && !tab.IsEmpty)
 				{
-					Unify (taa.First, tab.First);
+					subs = Unify (taa.First, tab.First, subs);
 					taa = taa.Rest;
 					tab = tab.Rest;
 				}		
 				if (taa.IsEmpty && tab.IsEmpty)
-					return;
+					return subs;
 			}
 			throw new UnificationError (a, b);
 		}
