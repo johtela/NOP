@@ -16,7 +16,7 @@ namespace NOP.Testbench
 			var expr = Expression.Parse (sexp);
 			//System.Diagnostics.Debug.WriteLine (sexp);
 			Check.IsOfType<T> (expr);
-			Check.AreEqual (type, expr.GetTypeExpr ().InferType (TypeEnv.Initial).ToString ());
+			Check.AreEqual (type, TC.InferType (expr.TypeCheck (), TypeEnv.Initial).ToString ());
 			expr.ChangeVisualDepictions ();
 			Runner.VConsole.ShowSExpr (sexp);
 		}

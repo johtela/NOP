@@ -25,7 +25,6 @@ namespace NOP
 
 		public TCState (TCState old, Substitution subs) :
 			this (old.Env, subs, old.LastVar) { }
-
 	}
 
 	/// <summary>
@@ -46,9 +45,14 @@ namespace NOP
 	/// </summary>
 	public class TC
 	{
-		public static TypeCheck Sequence (TypeCheck tc, TypeCheck other)
+		public static TypeCheck DoAfter (TypeCheck tc, Action<TCState, MonoType> action)
 		{
-			return (st, exp) => other (tc (st, exp), exp);
+			return (st, exp) =>
+			{
+				st = tc (st, exp);
+				action (st, exp);
+				return st;
+			};
 		}
 
 		/// <summary>

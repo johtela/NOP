@@ -6,7 +6,6 @@ namespace NOP.Grammar
 	using Parsing;
 	using Visuals;
 	using V = NOP.Visuals.Visual;
-	using TB = NOP.TypeExpr.Builder;
 
 	/// <summary>
 	/// Abstract class representing any language expression. The root class of the 
@@ -14,16 +13,25 @@ namespace NOP.Grammar
 	/// </summary>
 	public abstract class Expression : AstNode
 	{
+		public TCState TypeCheckState;
+		public MonoType Type;
+
 		public Expression (SExpr sexp) : base (sexp)
 		{ }
-		
+
+		protected abstract TypeCheck GetTypeCheck ();
+
 		/// <summary>
 		/// Get the type expression that is used to type check this expression.
 		/// </summary>
-		public virtual TypeExpr GetTypeExpr ()
+		public TypeCheck TypeCheck ()
 		{
-			TypeExpr.CurrentExpression = this;
-			return null;
+			return TC.DoAfter (GetTypeCheck (), 
+				(st, exp) => 
+				{
+					TypeCheckState = st;
+					Type = exp;
+				});
 		}
 				
 		/// <summary>
@@ -46,17 +54,16 @@ namespace NOP.Grammar
 				Parameters = parameters;
 			}
 
-			public override TypeExpr GetTypeExpr ()
+			protected override TypeCheck GetTypeCheck ()
 			{
-				base.GetTypeExpr ();
-				var te = Function.GetTypeExpr ();
+				var tc = Function.TypeCheck ();
 
 				if (Parameters.IsEmpty)
-					return TB.App (te, null);
+					return TC.Application (tc, null);
 
 				for (var pars = Parameters; !pars.IsEmpty; pars = pars.Rest)
-					te = TB.App (te, pars.First.GetTypeExpr ());
-				return te;
+					tc = TC.Application (tc, pars.First.TypeCheck ());
+				return tc;
 			}
 
 			protected override ILeftReducible<AstNode> AsReducible ()
@@ -101,11 +108,10 @@ namespace NOP.Grammar
 				);
 			}
 
-			public override TypeExpr GetTypeExpr ()
+			protected override TypeCheck GetTypeCheck ()
 			{
-				base.GetTypeExpr ();
-				return TB.If (Condition.GetTypeExpr (), ThenExpression.GetTypeExpr (),
-											ElseExpression.GetTypeExpr ());
+				return TC.IfElse (Condition.TypeCheck (), ThenExpression.TypeCheck (),
+					ElseExpression.TypeCheck ());
 			}
 
 			protected override ILeftReducible<AstNode> AsReducible ()
@@ -126,11 +132,10 @@ namespace NOP.Grammar
 				FunctionBody = functionBody;
 			}
 
-			public override TypeExpr GetTypeExpr ()
+			protected override TypeCheck GetTypeCheck ()
 			{
-				base.GetTypeExpr ();
-				return TB.MultiLam (Parameters.Map (p => p.Name.Symbol.Name),
-					FunctionBody.GetTypeExpr ());
+				return TC.MultiLambda (Parameters.Map (p => p.Name.Symbol.Name),
+					FunctionBody.TypeCheck ());
 			}
 
 			protected override ILeftReducible<AstNode> AsReducible ()
@@ -165,11 +170,10 @@ namespace NOP.Grammar
 				Body = body;
 			}
 
-			public override TypeExpr GetTypeExpr ()
+			protected override TypeCheck GetTypeCheck ()
 			{
-				base.GetTypeExpr ();
-				return TB.Let (Variable.Name.Symbol.Name, Value.GetTypeExpr (),
-					Body.GetTypeExpr ());
+				return TC.LetIn (Variable.Name.Symbol.Name, Value.TypeCheck (),
+					Body.TypeCheck ());
 			}
 
 			protected override ILeftReducible<AstNode> AsReducible ()
@@ -200,10 +204,9 @@ namespace NOP.Grammar
 				Literal = literal;
 			}
 
-			public override TypeExpr GetTypeExpr ()
+			protected override TypeCheck GetTypeCheck ()
 			{
-				base.GetTypeExpr ();
-				return TB.Lit (Literal.Value);
+				return TC.Literal (Literal.Value);
 			}
 
 			protected override Visual GetVisual ()
@@ -223,10 +226,9 @@ namespace NOP.Grammar
 				QuotedExpression = quotedExpression;
 			}
 
-			public override TypeExpr GetTypeExpr ()
+			protected override TypeCheck GetTypeCheck ()
 			{
-				base.GetTypeExpr ();
-				return TB.Lit (SExp);
+				return TC.Literal (SExp);
 			}
 
 			protected override ILeftReducible<AstNode> AsReducible ()
@@ -246,12 +248,11 @@ namespace NOP.Grammar
 				Value = value;
 			}
 
-			public override TypeExpr GetTypeExpr ()
+			protected override TypeCheck GetTypeCheck ()
 			{
-				base.GetTypeExpr ();
-				return TB.App (
-					TB.App (TB.Var ("set!"), Variable.GetTypeExpr ()),
-					Value.GetTypeExpr ());
+				return TC.Application (
+					TC.Application (TC.Variable ("set!"), Variable.TypeCheck ()),
+					Value.TypeCheck ());
 			}
 
 			protected override ILeftReducible<AstNode> AsReducible ()
@@ -269,10 +270,9 @@ namespace NOP.Grammar
 				Symbol = symbol;
 			}
 
-			public override TypeExpr GetTypeExpr ()
+			protected override TypeCheck GetTypeCheck ()
 			{
-				base.GetTypeExpr ();
-				return TB.Var (Symbol.Name);
+				return TC.Variable (Symbol.Name);
 			}
 		}
 
