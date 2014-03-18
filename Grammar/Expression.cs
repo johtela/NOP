@@ -13,7 +13,8 @@ namespace NOP.Grammar
 	/// </summary>
 	public abstract class Expression : AstNode
 	{
-		public TCState TypeCheckState;
+		public TypeEnv TypeEnvironment;
+		public Substitution Subs;
 		public MonoType Type;
 
 		public Expression (SExpr sexp) : base (sexp)
@@ -29,7 +30,8 @@ namespace NOP.Grammar
 			return TC.DoAfter (GetTypeCheck (), 
 				(st, exp) => 
 				{
-					TypeCheckState = st;
+					TypeEnvironment = st.Env;
+					Subs = st.Subs;
 					Type = exp;
 				});
 		}

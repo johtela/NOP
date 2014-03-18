@@ -120,14 +120,14 @@ namespace NOP.Collections
 			return !Tree<Map<K, V>, K>.Search (this, key).IsEmpty ();
 		}
 
-        public Option<V> TryGetValue (K key)
-        {
-            var node = Tree<Map<K, V>, K>.Search(this, key);
+		public Option<V> TryGetValue (K key)
+		{
+			var node = Tree<Map<K, V>, K>.Search(this, key);
 
-            return node.IsEmpty() ?
-                new Option<V> () :
-                new Option<V>(node.Value);
-        }
+			return node.IsEmpty() ?
+				new Option<V> () :
+				new Option<V>(node.Value);
+		}
 
 		/// <summary>
 		/// Returns the value associated with the key.
