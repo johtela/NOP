@@ -13,7 +13,7 @@ namespace NOP
 	{
 		private readonly Map<string, MonoType> _map;
 			
-		private Substitution (Map<string, MonoType> map)
+		public Substitution (Map<string, MonoType> map)
 		{
 			_map = map;
 		}

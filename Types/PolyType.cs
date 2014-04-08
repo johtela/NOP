@@ -54,6 +54,18 @@ namespace NOP
 		{
 			return MonoType.GetTypeVars () - GenericTypeVars;
 		}
+
+        /// <summary>
+        /// Create a monotype by instantiating the generic type parameters 
+        /// with fresh type variables.
+        /// </summary>
+        public MonoType Instantiate ()
+        {
+            var pairs = from tv in GenericTypeVars
+                        select Tuple.Create (tv, MonoType.NewTypeVar ());
+            var subs = new Substitution (Map<string, MonoType>.FromPairs (pairs));
+            return MonoType.ApplySubs (subs);
+        }
 		
 		public override string ToString ()
 		{
