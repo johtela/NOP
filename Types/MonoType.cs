@@ -5,6 +5,7 @@
 	using System.Linq;
 	using NOP.Collections;
 	using Grammar;
+	using System.Reflection;
 	
 	/// <summary>
 	/// Unification error is thrown when two monotypes cannot be unified, i.e. when there
@@ -60,7 +61,17 @@
 		{
 			_lastVar = 0;
 		}
-		
+
+		public MonoType (MemberInfo mi)
+		{
+			MemberInfo = mi;
+		}
+
+		/// <summary>
+		/// The underlying System.Type object.
+		/// </summary>
+		public readonly MemberInfo MemberInfo;
+
 		/// <summary>
 		/// Apply the substitutions to this type.
 		/// </summary>
@@ -83,7 +94,7 @@
 		{
 			public readonly string Name;
 
-			public Var (string name)
+			public Var (string name) : base(null)
 			{
 				Name = name;
 			}
@@ -128,15 +139,16 @@
 		{
 			public readonly MonoType Argument, Result;
 
-			public Lam (MonoType argument, MonoType result)
+			public Lam (MonoType argument, MonoType result, MemberInfo mi)
+				: base (mi)
 			{
 				Argument = argument;
 				Result = result;
 			}
-			
+
 			public override MonoType ApplySubs (Substitution subs)
 			{
-				return new Lam (Argument.ApplySubs (subs), Result.ApplySubs (subs));
+				return new Lam (Argument.ApplySubs (subs), Result.ApplySubs (subs), MemberInfo);
 			}
 			
 			public override Set<string> GetTypeVars ()
@@ -146,7 +158,7 @@
 			
 			protected override MonoType TypeVarsToLetters ()
 			{
-				return new Lam (Argument.TypeVarsToLetters (), Result.TypeVarsToLetters ());
+				return new Lam (Argument.TypeVarsToLetters (), Result.TypeVarsToLetters (), MemberInfo);
 			}
 			
 			public override bool Equals (object obj)
@@ -180,19 +192,16 @@
 			public readonly string Name;
 			public readonly StrictList<MonoType> TypeArgs;
 
-			public Con (string name, StrictList<MonoType> typeArgs)
+			public Con (string name, StrictList<MonoType> typeArgs, MemberInfo mi)
+				: base (mi)
 			{
 				Name = name;
 				TypeArgs = typeArgs;
 			}
-			
-			public Con (string name) : this (name, StrictList<MonoType>.Empty)
-			{
-			}
-			
+
 			public override MonoType ApplySubs (Substitution subs)
 			{
-				return new Con (Name, TypeArgs.Map (t => t.ApplySubs (subs)));
+				return new Con (Name, TypeArgs.Map (t => t.ApplySubs (subs)), MemberInfo);
 			}
 			
 			public override Set<string> GetTypeVars ()
@@ -202,7 +211,7 @@
 			
 			protected override MonoType TypeVarsToLetters ()
 			{
-				return new Con (Name, TypeArgs.Map (t => t.TypeVarsToLetters ()));
+				return new Con (Name, TypeArgs.Map (t => t.TypeVarsToLetters ()), MemberInfo);
 			}
 			
 			public override bool Equals (object obj)
@@ -283,7 +292,7 @@
 		/// Generalize monotype to polytype by promoting free type variables in
 		/// monotype to generic type parameters.
 		/// </summary>
-		public Polytype Generalize(TypeEnv env)
+		public Polytype Generalize(Bindings env)
 		{
 			return new Polytype(this, GetTypeVars() - env.GetTypeVars());
 		}
@@ -293,17 +302,11 @@
 			/// <summary>
 			/// Builder method for creating a type constant.
 			/// </summary>
-			public static  MonoType Constant (string name)
+			public static MonoType Constant (string name, IEnumerable<MonoType> args = null, MemberInfo mi = null)
 			{
-				return new Con (name);
-			}
-
-			/// <summary>
-			/// Builder method for creating a type constant.
-			/// </summary>
-			public static MonoType Constant (string name, IEnumerable<MonoType> args)
-			{
-				return new Con (name, List.FromEnumerable (args));
+				return new Con (name, 
+					args == null ? StrictList<MonoType>.Empty : List.FromEnumerable (args), 
+					mi);
 			}
 
 			/// <summary>
@@ -317,11 +320,12 @@
 			/// <summary>
 			/// Builder method for creating lambdas with multiple parameters.
 			/// </summary>
-			public static MonoType Lambda (StrictList<MonoType> parameters, MonoType result)
+			public static MonoType Lambda (StrictList<MonoType> parameters, MonoType result, 
+				MemberInfo mi = null)
 			{
 				return  parameters.IsEmpty ? 
 					result : 
-					new Lam (parameters.First, Lambda (parameters.Rest, result));
+					new Lam (parameters.First, Lambda (parameters.Rest, result, mi), mi);
 			}
 		}
 	}

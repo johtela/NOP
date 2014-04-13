@@ -13,7 +13,7 @@ namespace NOP.Grammar
 	/// </summary>
 	public abstract class Expression : AstNode
 	{
-		public TypeEnv TypeEnvironment;
+		public Bindings TypeEnvironment;
 		public Substitution Subs;
 		public MonoType Type;
 

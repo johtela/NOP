@@ -16,36 +16,25 @@ namespace NOP
 		/// <summary>
 		/// The underlying monotype.
 		/// </summary>
+
 		public readonly MonoType MonoType;
 		
 		/// <summary>
-		/// The generic (unbound) type variables in mono type.
+		/// The generic (unbound) type variables in monotype.
 		/// </summary>
 		public readonly Set<string> GenericTypeVars;
 
 		/// <summary>
-		/// The System.Type corresponding to the polytype.
-		/// </summary>
-		public readonly MemberInfo MemberInfo;
-
-		/// <summary>
 		/// Create a polytype.
 		/// </summary>
-		public Polytype (MonoType monoType, MemberInfo mi, IEnumerable<string> tvars)
+		public Polytype (MonoType monoType, IEnumerable<string> tvars)
 		{
 			MonoType = monoType;
-			MemberInfo = mi;
 			GenericTypeVars = tvars != null ? Set<string>.Create (tvars) : Set<string>.Empty;
 		}
 
-		public Polytype (MonoType monoType, MemberInfo mi, params string[] tvars) : 
-			this (monoType, mi, (IEnumerable<string>)tvars) { }
-
-		public Polytype (MonoType monoType, IEnumerable<string> tvars) :
-			this (monoType, null, (IEnumerable<string>)tvars) { }
-
-		public Polytype (MonoType monoType, params string[] tvars) :
-			this (monoType, null, (IEnumerable<string>)tvars) { }
+		public Polytype (MonoType monoType, params string[] tvars) : 
+			this (monoType, (IEnumerable<string>)tvars) { }
 
 		/// <summary>
 		/// Gets the free type variables.
@@ -55,17 +44,17 @@ namespace NOP
 			return MonoType.GetTypeVars () - GenericTypeVars;
 		}
 
-        /// <summary>
-        /// Create a monotype by instantiating the generic type parameters 
-        /// with fresh type variables.
-        /// </summary>
-        public MonoType Instantiate ()
-        {
-            var pairs = from tv in GenericTypeVars
-                        select Tuple.Create (tv, MonoType.NewTypeVar ());
-            var subs = new Substitution (Map<string, MonoType>.FromPairs (pairs));
-            return MonoType.ApplySubs (subs);
-        }
+		/// <summary>
+		/// Create a monotype by instantiating the generic type parameters 
+		/// with fresh type variables.
+		/// </summary>
+		public MonoType Instantiate ()
+		{
+			var pairs = from tv in GenericTypeVars
+						select Tuple.Create (tv, MonoType.NewTypeVar ());
+			var subs = new Substitution (Map<string, MonoType>.FromPairs (pairs));
+			return MonoType.ApplySubs (subs);
+		}
 		
 		public override string ToString ()
 		{

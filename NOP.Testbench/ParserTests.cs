@@ -16,7 +16,7 @@ namespace NOP.Testbench
 			var expr = Expression.Parse (sexp);
 			//System.Diagnostics.Debug.WriteLine (sexp);
 			Check.IsOfType<T> (expr);
-			Check.AreEqual (type, TC.InferType (expr.TypeCheck (), TypeEnv.Initial).ToString ());
+			Check.AreEqual (type, TC.InferType (expr.TypeCheck (), Bindings.Initial).ToString ());
 			expr.ChangeVisualDepictions ();
 			Runner.VConsole.ShowSExpr (sexp);
 		}
@@ -28,7 +28,6 @@ namespace NOP.Testbench
 			module.ChangeVisualDepictions ();
 			Runner.VConsole.ShowSExpr (sexp);
 		}
-
 
 		[Test]
 		public void TestAtom ()
