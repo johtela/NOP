@@ -74,7 +74,7 @@ namespace NOP
 					throw new Exception (string.Format ("Name {0} not found", name));
 				var pt = st.Env.Find (name);
 				return new TCState (st, 
-                    MonoType.Unify (pt.Instantiate ().ApplySubs (st.Subs), exp, st.Subs));
+					MonoType.Unify (pt.Instantiate ().ApplySubs (st.Subs), exp, st.Subs));
 			};
 		}
 
@@ -146,14 +146,35 @@ namespace NOP
 		{
 			return (st, exp) =>
 			{
-				MonoType a = MonoType.NewTypeVar ();
+				var a = MonoType.NewTypeVar ();
 				st = value (st, a);
-				MonoType t = a.ApplySubs (st.Subs);
-				Polytype newPt = new Polytype (t, t.GetTypeVars () - st.Env.GetTypeVars ());
+				var newPt = a.ApplySubs (st.Subs).Generalize (st.Env);
 				return body (new TCState (st, st.Env.Add (variable, newPt)), exp);
 			};
 		}
-		
+
+		/// <summary>
+		/// Letrec in expression defines a variable which is already in scope in the definition
+		/// of the variable. With that, recursive definitions can be created. The expression
+		/// can consist of multiple recursive let definitions. Instead of single name and value 
+		/// expression, the function takes a list of (name, value) pairs. This ability is needed 
+		/// for defining mutually recursive functions or variables.
+		/// </summary>
+		public static TypeCheck LetRec (StrictList<Tuple<string, TypeCheck>> definitions, TypeCheck body)
+		{
+			return (st, exp) =>
+			{
+				var tvars = definitions.Map (_ => MonoType.NewTypeVar ());
+				var newEnv = definitions.ReduceWith (st.Env, tvars, 
+					(e, def, tv) => e.Add (def.Item1, new Polytype (tv)));
+				st = definitions.ReduceWith (new TCState (st, newEnv), tvars,
+					(s, def, tv) => def.Item2 (s, tv));
+				newEnv = definitions.ReduceWith(newEnv, tvars,
+					(e, def, tv) => e.Replace (def.Item1, tv.ApplySubs (st.Subs).Generalize (e)));
+				return body (new TCState (st, newEnv), exp);
+			};
+		}
+
 		/// <summary>
 		/// Construct a lambda expression that has zero or more arguments.
 		/// </summary>
@@ -171,12 +192,12 @@ namespace NOP
 		/// <summary>
 		/// Infers the the type of this expression using the specified type environment.
 		/// </summary>
-        public static MonoType InferType (TypeCheck tc, TypeEnv env)
-        {
-            MonoType.InitLastVar ();
-            var a = MonoType.NewTypeVar ();
-            var st = tc (new TCState (env, Substitution.Empty), a);
-            return a.ApplySubs (st.Subs).RenameTypeVarsToLetters ();
-        }
+		public static MonoType InferType (TypeCheck tc, TypeEnv env)
+		{
+			MonoType.InitLastVar ();
+			var a = MonoType.NewTypeVar ();
+			var st = tc (new TCState (env, Substitution.Empty), a);
+			return a.ApplySubs (st.Subs).RenameTypeVarsToLetters ();
+		}
 	}
 }

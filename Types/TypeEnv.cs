@@ -5,6 +5,7 @@ namespace NOP
 	using Collections;
 	using System.Collections.Generic;
 	using System.Reflection;
+	using System.Text;
 	
 	/// <summary>
 	/// The type environment maps expression variables (NOT type variables) to polytypes.
@@ -36,19 +37,34 @@ namespace NOP
 		}
 			
 		/// <summary>
-		/// Add a variable with the given type to the enironment.
+		/// Add a variable with the given type to the environment.
 		/// </summary>
 		public TypeEnv Add (string name, Polytype type)
 		{
 			return new TypeEnv (_map.Add (name, type));
 		}
-			
+
+		/// <summary>
+		/// Replace a variable with the new type.
+		/// </summary>
+		public TypeEnv Replace (string name, Polytype type)
+		{
+			return new TypeEnv (_map.Replace (name, type));
+		}
+
 		/// <summary>
 		/// Returns all the type variables defined in the environment.
 		/// </summary>
 		public Set<string> GetTypeVars ()
 		{
 			return _map.Values.Aggregate (Set<string>.Empty, (s, pt) => s + pt.GetTypeVars ());
+		}
+
+		public override string ToString ()
+		{
+			return _map.ReduceLeft (new StringBuilder (),
+				(sb, t) => sb.AppendLine (string.Format ("{0} :: {1}", t.Item1, t.Item2)))
+				.ToString ();
 		}
 		
 		/// <summary>
@@ -83,7 +99,8 @@ namespace NOP
 
 			private static Tuple<string, Polytype> It (Type type)
 			{
-				return Tuple.Create (type.Name, new Polytype (Constant (type.Name), type));
+				var mt = FromType(type);
+				return Tuple.Create (type.Name, new Polytype (mt, type, mt.GetTypeVars ()));
 			}
 
 			private static Tuple<string, Polytype> Ft (string funcName, Polytype pt)
@@ -119,7 +136,7 @@ namespace NOP
 					It ("Void"), It (typeof (Byte)), It (typeof (SByte)), It (typeof (Int16)), It (typeof (UInt16)),
 					It (typeof (Int32)), It (typeof (UInt32)), It (typeof (Int64)), It (typeof (UInt64)),
 					It (typeof (Single)), It (typeof (Double)), It (typeof (Char)), It (typeof (Boolean)),
-					It (typeof (Object)), It (typeof (String)), It (typeof (Decimal)),
+					It (typeof (Object)), It (typeof (String)), It (typeof (Decimal)), It (typeof (StrictList<>)),
 					Ft ("set!", Met (Prelude, "Set")),
 					Ft ("eq?", Met (Prelude, "Eq"))
 				));

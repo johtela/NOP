@@ -2,7 +2,7 @@ namespace NOP
 {
 	using System;
 	using Collections;
-    using System.Text;
+	using System.Text;
 
 	/// <summary>
 	/// Substitution table provides a mapping from type variables to concrete monotypes.
@@ -46,10 +46,10 @@ namespace NOP
 
 		public override string ToString()
 		{
-            return _map.ReduceLeft(new StringBuilder("{ "), 
-                (sb, t) => sb.AppendFormat("{0}{1} => {2}", 
-                    sb.Length > 2 ? ", " : "", t.Item1, t.Item2)) 
-                .Append(" }").ToString();
+			return _map.ReduceLeft(new StringBuilder("{ "), 
+				(sb, t) => sb.AppendFormat("{0}{1} => {2}", 
+					sb.Length > 2 ? ", " : "", t.Item1, t.Item2)) 
+				.Append(" }").ToString();
 		}
 	}		
 }

@@ -50,6 +50,7 @@
     <Compile Include="Collections\SetTests.cs" />
     <Compile Include="ParserTests.cs" />
     <Compile Include="Collections\StrictListTests.cs" />
+    <Compile Include="TypeClasses.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

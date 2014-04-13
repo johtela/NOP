@@ -172,11 +172,11 @@ namespace NOP.Testbench.Collections
 			var l1 = List.Create (1, 2, 3, 4);
 			var l2 = List.Create (2, 2, 2, 2);
 
-			var sum = l1.ReduceWith (0, (a, i1, i2) => a + i1 * i2, l2);
+			var sum = l1.ReduceWith (0, l2, (a, i1, i2) => a + i1 * i2);
 			Check.AreEqual (20, sum);
 
 			l2 = List.Create (2, 3);
-			sum = l1.ReduceWith (0, (a, i1, i2) => a + i1 * i2, l2);
+			sum = l1.ReduceWith (0, l2, (a, i1, i2) => a + i1 * i2);
 			Check.AreEqual (8, sum);
 		}
 

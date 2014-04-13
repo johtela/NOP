@@ -320,7 +320,7 @@
 		/// <param name='acc'>Initial accumulator value.</param>
 		/// <param name='func'>The function applied to the lists' items.</param>
 		/// <param name='other'>The list to be reduced with.</param>
-		public U ReduceWith<U, V> (U acc, Func<U, T, V, U> func, IStream<V> other)
+		public U ReduceWith<U, V> (U acc, IStream<V> other, Func<U, T, V, U> func)
 		{
 			for (var list = this; !(list.IsEmpty || other.IsEmpty); 
 				 list = list.Rest, other = other.Rest)

@@ -52,5 +52,10 @@
 			return Mod ("test",
 				Def ("foo", T ("Int32"), A (42)));
 		}
+
+		public static ExprBuilder RecursiveFunction ()
+		{
+			return null;
+		}
 	}
 }

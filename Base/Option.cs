@@ -2,7 +2,7 @@
 {
 	using System;
 
-	public class Option<T>
+	public struct Option<T>
 	{
 		private readonly T _value;
 		
@@ -18,11 +18,6 @@
 			}
 		}
 
-		public Option()
-		{
-			HasValue = false;
-		}
-
 		public Option(T value)
 		{
 			HasValue = true;
@@ -32,6 +27,11 @@
 		public static implicit operator T (Option<T> option)
 		{
 			return option.Value;
+		}
+
+		public static implicit operator bool (Option<T> option)
+		{
+			return option.HasValue;
 		}
 	}
 }

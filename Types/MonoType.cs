@@ -31,7 +31,7 @@
 	{
 		private static char _nextTVarLetter;
 		private static Map<string, char> _tVarMap;
-        private static int _lastVar;
+		private static int _lastVar;
 		
 		/// <summary>
 		/// Map a generated type variable name (T1, T2, T3...) to a single letter (a, b, c...)
@@ -56,10 +56,10 @@
 			return new Var ("T" + (++_lastVar).ToString ());
 		}
 
-        public static void InitLastVar ()
-        {
-            _lastVar = 0;
-        }
+		public static void InitLastVar ()
+		{
+			_lastVar = 0;
+		}
 		
 		/// <summary>
 		/// Apply the substitutions to this type.
@@ -279,14 +279,14 @@
 			return TypeVarsToLetters ();
 		}
 
-        /// <summary>
-        /// Generalize monotype to polytype by promoting free type variables in
-        /// monotype to generic type parameters.
-        /// </summary>
-        public Polytype Generalize(TypeEnv env)
-        {
-            return new Polytype(this, GetTypeVars() - env.GetTypeVars());
-        }
+		/// <summary>
+		/// Generalize monotype to polytype by promoting free type variables in
+		/// monotype to generic type parameters.
+		/// </summary>
+		public Polytype Generalize(TypeEnv env)
+		{
+			return new Polytype(this, GetTypeVars() - env.GetTypeVars());
+		}
 	
 		public class Builder
 		{
