@@ -168,6 +168,22 @@
 				   select Expression.Let (lst, var, val, body);
 		}
 
+		public static Parser<Expression, Seq> LetRec (SExpr lst)
+		{
+			return from var in Symbol ("letrec").Seq (Variable ())
+				   from val in Expr ()
+				   from body in Expr ()
+				   select Expression.LetRec (lst, var, val, body);
+		}
+
+		public static Parser<Expression, Seq> And (SExpr lst)
+		{
+			return from var in Symbol ("and").Seq (Variable ())
+				   from val in Expr ()
+				   from body in Expr ()
+				   select Expression.LetRec (lst, var, val, body);
+		}
+
 		public static Parser<Expression, Seq> Quoted (SExpr lst)
 		{
 			return from expr in Symbol ("quote").Seq (Expr ())

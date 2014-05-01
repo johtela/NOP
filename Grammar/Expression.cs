@@ -197,6 +197,32 @@ namespace NOP.Grammar
 			}
 		}
 
+		public class _LetRec : Expression
+		{
+			public readonly StrictList<Tuple<VariableDefinition, Expression>> Definitions;
+			public readonly Expression Body;
+
+			public _LetRec (SExpr sexp, StrictList<Tuple<VariableDefinition, Expression>> definitions, 
+				Expression body) : base (sexp) 
+			{
+				Definitions = definitions;
+			}
+
+			protected override TypeCheck GetTypeCheck ()
+			{
+				return TC.LetRec (Definitions.Map(
+					t => Tuple.Create(t.Item1.Name.Symbol.Name, t.Item2.TypeCheck ())),
+					Body.GetTypeCheck ());
+			}
+
+			protected override ILeftReducible<AstNode> AsReducible ()
+			{
+				return (ILeftReducible<AstNode>)Definitions.Collect<ILeftReducible<AstNode>> (
+					t => List.Create<ILeftReducible<AstNode>>(t.Item1, t.Item2));
+			}
+
+		}
+
 		public class _Literal : Expression
 		{
 			public readonly new SExpr.Literal Literal;
@@ -300,6 +326,12 @@ namespace NOP.Grammar
 			Expression body)
 		{
 			return new _Let (sexp, variable, value, body);
+		}
+
+		public static Expression LetRec (SExpr sexp, VariableDefinition variable, Expression value,
+			Expression body)
+		{
+			return null; // new _LetRec (sexp, variable, value, body);
 		}
 
 		public static Expression Literal (SExpr.Literal literal)

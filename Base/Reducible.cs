@@ -187,7 +187,7 @@
 			return new _LeftRecurse<T> (reducible);
 		}
 
-		public static IRightReducible<T> RightRecurse<T, U> (this IRightReducible<T> reducible) where T : IRightReducible<T>
+		public static IRightReducible<T> RightRecurse<T> (this IRightReducible<T> reducible) where T : IRightReducible<T>
 		{
 			return new _RightRecurse<T> (reducible);
 		}

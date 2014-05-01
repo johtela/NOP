@@ -101,9 +101,7 @@
 		{
 			private static IEnumerable<string> GetTypeVars (MonoType[] parameters)
 			{
-				return from par in parameters
-					   where par is MonoType.Var
-					   select (par as MonoType.Var).Name;
+				return parameters.ReduceLeft (Set<string>.Empty, (s, p) => s + p.GetTypeVars ());
 			}
 
 			private static Polytype Pt (MemberInfo mi, MonoType result, params MonoType[] parameters)
@@ -150,13 +148,23 @@
 				var mi = hostType.GetMethod (method);
 				var ret = FromType (mi.ReturnType);
 				var pars = (from p in mi.GetParameters ()
-							select FromType (p.ParameterType)).ToArray ();
-				return Pt (mi, ret, pars);
+							select FromType (p.ParameterType));
+				if (!mi.IsStatic)
+					pars = pars.Prepend (FromType (hostType));
+				return Pt (mi, ret, pars.ToArray ());
+			}
+
+			private static Polytype Prop (Type hostType, string property)
+			{
+				var pi = hostType.GetProperty (property);
+				var ret = FromType (pi.PropertyType);
+				return Pt (pi, ret, FromType (hostType));
 			}
 
 			private static Bindings Generate ()
 			{
 				var Prelude = typeof (Prelude);
+				var List = typeof (StrictList<>);
 
 				return new Bindings (
 					Map<string, Polytype>.FromPairs (
@@ -166,7 +174,9 @@
 						It (typeof (Object)), It (typeof (String)), It (typeof (Decimal)), It (typeof (StrictList<>))),
 					Map<string, Polytype>.FromPairs (
 						Ft ("set!", Met (Prelude, "Set")),
-						Ft ("eq?", Met (Prelude, "Eq"))
+						Ft ("eq?", Met (Prelude, "Eq")),
+						Ft ("first", Prop (List, "First")),
+						Ft ("rest", Prop (List, "Rest"))
 				));
 			}
 
