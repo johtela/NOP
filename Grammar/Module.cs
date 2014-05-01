@@ -19,9 +19,11 @@
 			Members = members;
 		}
 
-		protected override ILeftReducible<AstNode> AsReducible ()
+		public override void VisitNodes (Action<AstNode> visitor)
 		{
-			return Name.LeftConcat (Members.LeftCast<Definition, AstNode> ().LeftRecurse ());
+			Name.VisitNodes (visitor);
+			Members.Foreach (n => n.VisitNodes (visitor));
+			base.VisitNodes (visitor);
 		}
 
 		protected override Visuals.Visual GetVisual ()

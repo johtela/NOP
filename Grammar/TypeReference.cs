@@ -19,9 +19,10 @@ namespace NOP.Grammar
 				TypeName = typeName;
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return TypeName;
+				TypeName.VisitNodes (visitor);
+				base.VisitNodes (visitor);
 			}
 		}
 
@@ -38,9 +39,11 @@ namespace NOP.Grammar
 				TypeParams = typeParams;
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return TypeName.LeftConcat (TypeParams.LeftCast<TypeReference, AstNode> ().LeftRecurse ());
+				TypeName.VisitNodes (visitor);
+				TypeParams.Foreach (n => n.VisitNodes (visitor));
+				base.VisitNodes (visitor);
 			}
 		}
 
@@ -56,9 +59,11 @@ namespace NOP.Grammar
 				ResultType = resultType;
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return ArgumentType.LeftConcat (ResultType);
+				ArgumentType.VisitNodes (visitor);
+				ResultType.VisitNodes (visitor);
+				base.VisitNodes (visitor);
 			}
 		}
 

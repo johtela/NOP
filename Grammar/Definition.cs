@@ -17,9 +17,11 @@ namespace NOP.Grammar
 			Value = value;
 		}
 
-		protected override ILeftReducible<AstNode> AsReducible ()
+		public override void VisitNodes (Action<AstNode> visitor)
 		{
-			return Variable.LeftConcat (Value);
+			Variable.VisitNodes (visitor);
+			Value.VisitNodes (visitor);
+			base.VisitNodes (visitor);
 		}
 
 		protected override Visuals.Visual GetVisual ()

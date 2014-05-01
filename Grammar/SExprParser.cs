@@ -3,6 +3,7 @@
 	using System;
 	using System.Linq;
 	using NOP.Parsing;
+	using NOP.Collections;
 	using Seq = NOP.Collections.Sequence<SExpr>;
 
 	public static class SExprParser
@@ -172,16 +173,16 @@
 		{
 			return from var in Symbol ("letrec").Seq (Variable ())
 				   from val in Expr ()
+				   from ands in And ().Many ()
 				   from body in Expr ()
-				   select Expression.LetRec (lst, var, val, body);
+				   select Expression.LetRec (lst, Tuple.Create (var, val) | ands, body);
 		}
 
-		public static Parser<Expression, Seq> And (SExpr lst)
+		public static Parser<Tuple<VariableDefinition, Expression>, Seq> And ()
 		{
 			return from var in Symbol ("and").Seq (Variable ())
 				   from val in Expr ()
-				   from body in Expr ()
-				   select Expression.LetRec (lst, var, val, body);
+				   select Tuple.Create (var, val);
 		}
 
 		public static Parser<Expression, Seq> Quoted (SExpr lst)

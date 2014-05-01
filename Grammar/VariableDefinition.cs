@@ -18,11 +18,12 @@ namespace NOP.Grammar
 			Type = type;
 		}
 
-		protected override ILeftReducible<AstNode> AsReducible ()
+		public override void VisitNodes (Action<AstNode> visitor)
 		{
-			return Type != null ?
-				Name.LeftConcat (Type) : 
-				Name;
+			Name.VisitNodes (visitor);
+			if (Type != null)
+				Type.VisitNodes (visitor);
+			base.VisitNodes (visitor);
 		}
 
 		protected override V GetVisual ()

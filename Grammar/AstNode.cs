@@ -19,7 +19,7 @@ namespace NOP.Grammar
 		}
 	}
 
-	public abstract class AstNode : ILeftReducible<AstNode>
+	public abstract class AstNode
 	{
 		public readonly SExpr SExp;
 		
@@ -81,25 +81,17 @@ namespace NOP.Grammar
 
 		public void ChangeVisualDepictions ()
 		{
-			this.Foreach (node => node.SExp.Depiction = node.GetVisual ());
+			this.VisitNodes (node => node.SExp.Depiction = node.GetVisual ());
 		}
 
-		protected virtual ILeftReducible<AstNode> AsReducible ()
+		/// <summary>
+		/// Visits all the subnodes in the AST tree in depth first order
+		/// (e.g. children first then this node).
+		/// </summary>
+		public virtual void VisitNodes (Action<AstNode> visitor)
 		{
-			return null;
+			visitor (this);
 		}
-
-		#region IReducible<AstNode> implementation
-		
-		public U ReduceLeft<U> (U acc, Func<U, AstNode, U> func)
-		{
-			var reducible = AsReducible ();
-			return reducible != null ?
-				func (reducible.ReduceLeft (acc, func), this) :
-				func (acc, this);
-		}
-
-		#endregion	
 	}
 }
 

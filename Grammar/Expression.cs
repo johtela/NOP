@@ -68,9 +68,11 @@ namespace NOP.Grammar
 				return tc;
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return Function.LeftConcat (Parameters.LeftCast<Expression, AstNode> ().LeftRecurse ());
+				Function.VisitNodes (visitor);
+				Parameters.Foreach (n => n.VisitNodes (visitor));
+				base.VisitNodes (visitor);
 			}
 
 			protected override Visual GetVisual ()
@@ -116,9 +118,12 @@ namespace NOP.Grammar
 					ElseExpression.TypeCheck ());
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return Condition.LeftConcat (ThenExpression).LeftConcat (ElseExpression);
+				Condition.VisitNodes (visitor);
+				ThenExpression.VisitNodes (visitor);
+				ElseExpression.VisitNodes (visitor);
+				base.VisitNodes (visitor);
 			}
 		}
 
@@ -140,9 +145,11 @@ namespace NOP.Grammar
 					FunctionBody.TypeCheck ());
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return (Parameters.LeftCast<VariableDefinition, AstNode> ().LeftRecurse ().LeftConcat (FunctionBody));
+				Parameters.Foreach (n => n.VisitNodes (visitor));
+				FunctionBody.VisitNodes (visitor);
+				base.VisitNodes (visitor);
 			}
 
 			protected override Visual GetVisual ()
@@ -178,9 +185,12 @@ namespace NOP.Grammar
 					Body.TypeCheck ());
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return Variable.LeftConcat (Value).LeftConcat (Body);
+				Variable.VisitNodes (visitor);
+				Value.VisitNodes (visitor);
+				Body.VisitNodes (visitor);
+				base.VisitNodes (visitor);
 			}
 
 			protected override Visual GetVisual ()
@@ -215,12 +225,16 @@ namespace NOP.Grammar
 					Body.GetTypeCheck ());
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return (ILeftReducible<AstNode>)Definitions.Collect<ILeftReducible<AstNode>> (
-					t => List.Create<ILeftReducible<AstNode>>(t.Item1, t.Item2));
-			}
-
+				Definitions.Foreach (t =>
+				{
+					t.Item1.VisitNodes (visitor);
+					t.Item2.VisitNodes (visitor);
+				});
+				Body.VisitNodes (visitor);
+				base.VisitNodes (visitor);
+			} 
 		}
 
 		public class _Literal : Expression
@@ -259,9 +273,10 @@ namespace NOP.Grammar
 				return TC.Literal (SExp);
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return QuotedExpression;
+				QuotedExpression.VisitNodes (visitor);
+				base.VisitNodes (visitor);
 			}
 		}
 
@@ -283,9 +298,11 @@ namespace NOP.Grammar
 					Value.TypeCheck ());
 			}
 
-			protected override ILeftReducible<AstNode> AsReducible ()
+			public override void VisitNodes (Action<AstNode> visitor)
 			{
-				return Variable.LeftConcat (Value);
+				Variable.VisitNodes (visitor);
+				Value.VisitNodes (visitor);
+				base.VisitNodes (visitor);
 			}
 		}
 
@@ -328,10 +345,10 @@ namespace NOP.Grammar
 			return new _Let (sexp, variable, value, body);
 		}
 
-		public static Expression LetRec (SExpr sexp, VariableDefinition variable, Expression value,
+		public static Expression LetRec (SExpr sexp, StrictList<Tuple<VariableDefinition, Expression>> definitions,
 			Expression body)
 		{
-			return null; // new _LetRec (sexp, variable, value, body);
+			return new _LetRec (sexp, definitions, body);
 		}
 
 		public static Expression Literal (SExpr.Literal literal)

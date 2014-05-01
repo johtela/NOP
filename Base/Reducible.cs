@@ -84,70 +84,6 @@
 	/// </summary>
 	public static class Reducible
 	{
-		private class _LeftRecurse<T> : ILeftReducible<T> where T : ILeftReducible<T>
-		{
-			private ILeftReducible<T> _reducible;
-
-			public _LeftRecurse (ILeftReducible<T> reducible)
-			{
-				_reducible = reducible;
-			}
-
-			public U ReduceLeft<U> (U acc, Func<U, T, U> func)
-			{
-				return _reducible.ReduceLeft (acc, (a, r) => r.ReduceLeft (a, func));
-			}
-		}
-
-		private class _RightRecurse<T> : IRightReducible<T> where T : IRightReducible<T>
-		{
-			private IRightReducible<T> _reducible;
-
-			public _RightRecurse (IRightReducible<T> reducible)
-			{
-				_reducible = reducible;
-			}
-
-			public U ReduceRight<U> (Func<T, U, U> func, U acc)
-			{
-				return _reducible.ReduceRight ((r, a) => r.ReduceRight (func, a), acc);
-			}
-		}
-
-		private class _LeftMap<T, V> : ILeftReducible<V>
-		{
-			private ILeftReducible<T> _reducible;
-			private Func<T, V> _map;
-
-			public _LeftMap (ILeftReducible<T> reducible, Func<T, V> map)
-			{
-				_reducible = reducible;
-				_map = map;
-			}
-
-			public U ReduceLeft<U> (U acc, Func<U, V, U> func)
-			{
-				return _reducible.ReduceLeft (acc, (a, t) => func (a, _map(t)));
-			}
-		}
-
-		private class _RightMap<T, V> : IRightReducible<V>
-		{
-			private IRightReducible<T> _reducible;
-			private Func<T, V> _map;
-
-			public _RightMap (IRightReducible<T> reducible, Func<T, V> map)
-			{
-				_reducible = reducible;
-				_map = map;
-			}
-
-			public U ReduceRight<U> (Func<V, U, U> func, U acc)
-			{
-				return _reducible.ReduceRight ((t, a) => func (_map (t), a), acc);
-			}
-		}
-
 		private class _LeftConcat<T> : ILeftReducible<T>
 		{
 			public readonly ILeftReducible<T> First;
@@ -180,36 +116,6 @@
 			{
 				return First.ReduceRight (func, Second.ReduceRight (func, acc));
 			}
-		}
-
-		public static ILeftReducible<T> LeftRecurse<T> (this ILeftReducible<T> reducible) where T : ILeftReducible<T>
-		{
-			return new _LeftRecurse<T> (reducible);
-		}
-
-		public static IRightReducible<T> RightRecurse<T> (this IRightReducible<T> reducible) where T : IRightReducible<T>
-		{
-			return new _RightRecurse<T> (reducible);
-		}
-
-		public static ILeftReducible<V> LeftMap<T, V> (this ILeftReducible<T> reducible, Func<T, V> map)
-		{
-			return new _LeftMap<T, V> (reducible, map);
-		}
-
-		public static IRightReducible<V> RightMap<T, V> (this IRightReducible<T> reducible, Func<T, V> map)
-		{
-			return new _RightMap<T, V> (reducible, map);
-		}
-
-		public static ILeftReducible<V> LeftCast<T, V> (this ILeftReducible<T> reducible) where T : V
-		{
-			return reducible.LeftMap (t => (V)t);
-		}
-
-		public static IRightReducible<V> RightCast<T, V> (this IRightReducible<T> reducible) where T : V
-		{
-			return reducible.RightMap (t => (V)t);
 		}
 
 		public static ILeftReducible<T> LeftConcat<T> (this ILeftReducible<T> first, ILeftReducible<T> second)
