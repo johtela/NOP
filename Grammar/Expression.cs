@@ -1,6 +1,8 @@
 namespace NOP.Grammar
 {
 	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 	using Collections;
 	using Grammar;
 	using Parsing;
@@ -80,7 +82,7 @@ namespace NOP.Grammar
 				var sexps = ((SExpr.List)SExp).Items;
 
 				return V.HStack (VAlign.Top, V.Depiction (sexps.First),
-					V.Parenthesize (V.HList (sexps.RestL)));
+					V.Parenthesize (V.HList (sexps.RestL, ",")));
 			}
 		}
 
@@ -216,12 +218,13 @@ namespace NOP.Grammar
 				Expression body) : base (sexp) 
 			{
 				Definitions = definitions;
+				Body = body;
 			}
 
 			protected override TypeCheck GetTypeCheck ()
 			{
-				return TC.LetRec (Definitions.Map(
-					t => Tuple.Create(t.Item1.Name.Symbol.Name, t.Item2.TypeCheck ())),
+				return TC.LetRec (Definitions.Map (
+					t => Tuple.Create (t.Item1.Name.Symbol.Name, t.Item2.TypeCheck ())),
 					Body.GetTypeCheck ());
 			}
 
@@ -234,7 +237,27 @@ namespace NOP.Grammar
 				});
 				Body.VisitNodes (visitor);
 				base.VisitNodes (visitor);
-			} 
+			}
+
+			private IEnumerable<V> LetVisual (IStream<SExpr> lets)
+			{
+				SExpr.Symbol next;
+				do
+				{
+					yield return V.HStack (VAlign.Top, V.Depiction (lets.First), V.Depiction (lets.ItemAt (1)),
+						V.Label ("="), V.Depiction (lets.ItemAt (2)));
+					lets = lets.Drop (3);
+					next = lets.First as SExpr.Symbol;
+				}
+				while (next != null && next.Name == "and");
+				yield return V.HStack (VAlign.Top, V.Depiction (lets.First));
+			}
+
+			protected override Visual GetVisual ()
+			{
+				return V.VStack (HAlign.Left,
+					LetVisual ((SExp as SExpr.List).Items).ToArray ());
+			}
 		}
 
 		public class _Literal : Expression

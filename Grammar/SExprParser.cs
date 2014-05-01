@@ -129,6 +129,7 @@
 					from expr in If (lst)
 						.Plus (Lambda (lst))
 						.Plus (Let (lst))
+						.Plus (LetRec (lst))
 						.Plus (Quoted (lst))
 						.Plus (Set (lst))
 						.Plus (Application (lst))

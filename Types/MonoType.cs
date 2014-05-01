@@ -261,7 +261,7 @@
 
 			var ca = a as Con;
 			var cb = b as Con;
-			if (ca != null && cb != null && ca.Equals (cb))
+			if (ca != null && cb != null && ca.Name.Equals (cb.Name))
 			{
 				var taa = ca.TypeArgs;
 				var tab = cb.TypeArgs;

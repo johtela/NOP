@@ -87,7 +87,7 @@ namespace NOP
 			public List (Sequence<SExpr> items)
 			{
 				Items = items;
-				Depiction = Visual.Parenthesize (Visual.HList (Items));
+				Depiction = Visual.Parenthesize (Visual.HList (Items, ","));
 			}
 			
 			public override bool Equals (object obj)

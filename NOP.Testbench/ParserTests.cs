@@ -76,5 +76,11 @@ namespace NOP.Testbench
 		{
 			AssertParsesToModule (TestPrograms.SimpleModule ());
 		}
+
+		[Test]
+		public void TestRecursiveFunction ()
+		{
+			AssertParsesTo<Expression._LetRec> ("StrictList<a> -> a -> Boolean", TestPrograms.RecursiveFunction ());
+		}
 	}
 }

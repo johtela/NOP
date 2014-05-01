@@ -79,6 +79,21 @@
 		}
 
 		/// <summary>
+		/// Empty visual is handy for creating placeholders.
+		/// </summary>
+		private class _Empty : Visual
+		{
+			protected override VBox CalculateSize (GraphicsContext context)
+			{
+				return VBox.Empty;
+			}
+
+			protected override void Draw (GraphicsContext context, VBox availableSize)
+			{
+			}
+		}
+
+		/// <summary>
 		/// Helper base class to create wrapped visuals.
 		/// </summary>
 		private abstract class _Wrapped : Visual
@@ -544,6 +559,14 @@
 		}
 
 		/// <summary>
+		/// Create an empty visual.
+		/// </summary>
+		public static Visual Empty ()
+		{
+			return new _Empty ();
+		}
+
+		/// <summary>
 		/// Create a new label.
 		/// </summary>
 		public static Visual Label (string text)
@@ -621,6 +644,14 @@
 		public static Visual HList (ISequence<SExpr> sexps)
 		{
 			return HStack (VAlign.Top, FromSExpList (sexps));
+		}
+
+		/// <summary>
+		/// Create a horizontal list of S-expressions.
+		/// </summary>
+		public static Visual HList (ISequence<SExpr> sexps, string separator)
+		{
+			return HStack (VAlign.Top, FromSExpList (sexps, Label (separator)));
 		}
 
 		/// <summary>
@@ -719,7 +750,19 @@
 		/// </summary>
 		private static ISequence<Visual> FromSExpList (ISequence<SExpr> sexps)
 		{
-			return (ISequence<Visual>)sexps.Map (se => Depiction (se));
+			return sexps.Map (Depiction);
+		}
+
+		/// <summary>
+		/// Map a list of S-expressions to a sequence of visuals interlaved with a separator.
+		/// </summary>
+		private static StrictList<Visual> FromSExpList (IStream<SExpr> sexps, Visual separator)
+		{
+			if (sexps.IsEmpty)
+				return StrictList<Visual>.Empty;
+			if (sexps.Rest.IsEmpty)
+				return List.Create (Depiction (sexps.First));
+			return Depiction (sexps.First) | (separator | FromSExpList (sexps.Rest, separator)); 
 		}
 	}
 }

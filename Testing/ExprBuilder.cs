@@ -165,15 +165,57 @@ namespace NOP.Testing
 		{
 			return new ListBuilder (S ("begin") | List.Create (items));
 		}
-		
+
+		/// <summary>
+		/// Single let binding.
+		/// </summary>
+		public static Tuple<string, ExprBuilder> Let (string name, ExprBuilder value)
+		{
+			return Tuple.Create (name, value);
+		}
+
+		/// <summary>
+		/// Multiple let bindings
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public static StrictList<Tuple<string, ExprBuilder>> And (params Tuple<string, ExprBuilder>[] lets)
+		{
+			return List.FromArray (lets);
+		}
+
 		/// <summary>
 		/// Create a builder for the "let" expression.
 		/// </summary>
-		public static ExprBuilder Let (string symbol, ExprBuilder value, ExprBuilder inExpr)
+		public static ExprBuilder LetIn (Tuple<string, ExprBuilder> let, ExprBuilder inExpr)
 		{
-			return new ListBuilder (List.Create (S ("let"), S (symbol), value, inExpr));
+			return new ListBuilder (List.Create (S ("let"), S (let.Item1), let.Item2, inExpr));
 		}
-		
+
+		/// <summary>
+		/// Create a builder for the "letrec" expression.
+		/// </summary>
+		public static ExprBuilder LetRec (StrictList<Tuple<string, ExprBuilder>> lets, ExprBuilder inExpr)
+		{
+			return new ListBuilder (BuildLetRec (lets, inExpr));
+		}
+
+		private static IEnumerable<ExprBuilder> BuildLetRec (StrictList<Tuple<string, ExprBuilder>> lets, 
+			ExprBuilder inExpr)
+		{
+			yield return S ("letrec");
+			yield return S (lets.First.Item1);
+			yield return lets.First.Item2;
+			for (var ands = lets.Rest; !ands.IsEmpty; ands = ands.Rest)
+			{
+				yield return S ("and");
+				yield return S (ands.First.Item1);
+				yield return ands.First.Item2;
+			}
+			yield return inExpr;
+		}
+
 		/// <summary>
 		/// Create a list of parameter names.
 		/// </summary>

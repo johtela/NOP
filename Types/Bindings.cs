@@ -164,7 +164,8 @@
 			private static Bindings Generate ()
 			{
 				var Prelude = typeof (Prelude);
-				var List = typeof (StrictList<>);
+				var StrictList = typeof (StrictList<>);
+				var List = typeof (List);
 
 				return new Bindings (
 					Map<string, Polytype>.FromPairs (
@@ -175,8 +176,8 @@
 					Map<string, Polytype>.FromPairs (
 						Ft ("set!", Met (Prelude, "Set")),
 						Ft ("eq?", Met (Prelude, "Eq")),
-						Ft ("first", Prop (List, "First")),
-						Ft ("rest", Prop (List, "Rest"))
+						Ft ("first", Prop (StrictList, "First")),
+						Ft ("rest", Prop (StrictList, "Rest"))
 				));
 			}
 

@@ -7,12 +7,12 @@
 	{
 		public static ExprBuilder SimpleLet ()
 		{
-			return Let ("x", A (33), S ("x"));
+			return LetIn (Let ("x", A (33)), S ("x"));
 		}
 
 		public static ExprBuilder SimpleLambda ()
 		{
-			return Let ("getFoo", Lambda (P (), A ("foo")), Call ("getFoo"));
+			return LetIn (Let ("getFoo", Lambda (P (), A ("foo"))), Call ("getFoo"));
 		}
 
 		public static ExprBuilder SimpleIf ()
@@ -23,18 +23,18 @@
 		public static ExprBuilder ComplexIf ()
 		{
 			return
-				Let ("foo", Lambda (P ("i"),
-				If (Call ("eq?", S ("i"), A (3)),
-					A ("That's numberwang!"),
-					A ("That's a number"))),
+				LetIn (Let ("foo", Lambda (P ("i"),
+					If (Call ("eq?", S ("i"), A (3)),
+						A ("That's numberwang!"),
+						A ("That's a number")))),
 				Call ("foo", A (3)));
 		}
 
 		public static ExprBuilder NestedLets ()
 		{
 			return
-				Let ("foo", A (42),
-				Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
+				LetIn (Let ("foo", A (42)),
+				LetIn (Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y")))),
 				Call ("bar", S ("foo"), A (3))));
 		}
 
@@ -42,7 +42,7 @@
 		{
 			return Call (
 				Lambda (P ("foo"),
-					Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y"))),
+					LetIn (Let ("bar", Lambda (P ("x", "y"), Call ("eq?", S ("x"), S ("y")))),
 					Call ("bar", S ("foo"), A (3)))
 			), A (4));
 		}
@@ -55,10 +55,10 @@
 
 		public static ExprBuilder RecursiveFunction ()
 		{
-			return null; //Let("member", Lambda(P("list", "item"),
-				//If(Call("eq?", Call("first", S("list")), S("item")),
-				//    A(true), Call("member", Call("rest", S("list")), S("item")))),
-				//Call("member", ));
+			return LetRec (And (Let ("member", Lambda (P ("list", "item"),
+				If (Call ("eq?", Call ("first", S ("list")), S ("item")),
+					A (true), Call ("member", Call ("rest", S ("list")), S ("item")))))),
+				S ("member"));
 		}
 	}
 }
