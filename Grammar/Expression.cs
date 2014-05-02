@@ -107,11 +107,12 @@ namespace NOP.Grammar
 				var sthen = ThenExpression.SExp;
 				var selse = ElseExpression.SExp;
 
-				return V.HStack (VAlign.Top,
-					V.Depiction (skeyword), V.Depiction (scond), V.VStack (HAlign.Left,
+				return V.Indented (
+					V.HStack (VAlign.Top, V.Depiction (skeyword), V.Depiction (scond)),
+					V.VStack (HAlign.Left,
 						V.HStack (VAlign.Top, V.Label ("then"), V.Depiction (sthen)),
-						V.HStack (VAlign.Top, V.Label ("else"), V.Depiction (selse)))
-				);
+						V.HStack (VAlign.Top, V.Label ("else"), V.Depiction (selse))), 
+					24);
 			}
 
 			protected override TypeCheck GetTypeCheck ()

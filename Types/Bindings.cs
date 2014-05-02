@@ -177,7 +177,9 @@
 						Ft ("set!", Met (Prelude, "Set")),
 						Ft ("eq?", Met (Prelude, "Eq")),
 						Ft ("first", Prop (StrictList, "First")),
-						Ft ("rest", Prop (StrictList, "Rest"))
+						Ft ("rest", Prop (StrictList, "Rest")),
+						Ft ("empty?", Prop (StrictList, "IsEmpty")),
+						Ft ("dec", Met (Prelude, "Dec"))
 				));
 			}
 

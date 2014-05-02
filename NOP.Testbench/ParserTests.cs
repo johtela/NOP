@@ -82,5 +82,11 @@ namespace NOP.Testbench
 		{
 			AssertParsesTo<Expression._LetRec> ("StrictList<a> -> a -> Boolean", TestPrograms.RecursiveFunction ());
 		}
+
+		[Test]
+		public void TestMutualRecursion ()
+		{
+			AssertParsesTo<Expression._LetRec> ("Int32 -> Boolean", TestPrograms.MutualRecursion ());
+		}
 	}
 }

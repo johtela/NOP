@@ -92,9 +92,10 @@ namespace NOP
 				var b = MonoType.NewTypeVar ();
 				
 				subs = MonoType.Unify (exp, new MonoType.Lam (a, b, null), subs);
-				if (arg != null)
-					env = st.Env.AddDefinition (arg, new Polytype (a));
-				return body (new TCState (env, subs), b);
+				subs = body (
+					new TCState (arg == null ? env : env.AddDefinition (arg, new Polytype (a)), subs), 
+					b).Subs;
+				return new TCState (env, subs);
 			};
 		}
 

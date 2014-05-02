@@ -56,9 +56,26 @@
 		public static ExprBuilder RecursiveFunction ()
 		{
 			return LetRec (And (Let ("member", Lambda (P ("list", "item"),
-				If (Call ("eq?", Call ("first", S ("list")), S ("item")),
-					A (true), Call ("member", Call ("rest", S ("list")), S ("item")))))),
+				If (Call ("empty?", S("list")),
+					A (false),
+					If (Call ("eq?", Call ("first", S ("list")), S ("item")),
+						A (true), Call ("member", Call ("rest", S ("list")), S ("item"))))))),
 				S ("member"));
+		}
+
+		public static ExprBuilder MutualRecursion ()
+		{
+			return LetRec (And (
+				Let ("isodd", Lambda (P ("i"),
+					If (Call ("eq?", S ("i"), A (0)),
+						A (false), 
+						Call ("iseven", Call ("dec", S ("i")))))),
+				Let ("iseven", Lambda (P ("i"),
+					If (Call ("eq?", S ("i"), A (0)),
+						A (true), 
+						Call ("isodd", Call ("dec", S ("i"))))))),
+				S ("isodd"));
+
 		}
 	}
 }

@@ -15,7 +15,7 @@
 		private readonly Pen _pen;
 
 		public static VisualStyle Default = new VisualStyle (
-			font: new Font ("DejaVu Sans Mono", 11),
+			font: new Font ("Consolas", 11),
 			brush: Brushes.Lime,
 			pen: new Pen (Color.Lime, 1) { DashStyle = DashStyle.Dash });
 

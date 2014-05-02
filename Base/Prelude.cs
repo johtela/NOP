@@ -13,5 +13,10 @@
 		{
 			return Equals (value1, value2);
 		}
+
+		public static int Dec (int i)
+		{
+			return i - 1;
+		}
 	}
 }
