@@ -45,7 +45,7 @@ namespace NOP.Testbench
 			_value = value;
 			Func<double, double> sin = Math.Sin;
 			Func<double, double> cos = Math.Cos; 
-			var sincos = Fun.Compose (sin, cos);
+			var sincos = sin.Compose (cos);
 		}
 		
 		public int Value

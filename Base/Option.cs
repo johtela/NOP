@@ -5,7 +5,7 @@
 	public struct Option<T>
 	{
 		private readonly T _value;
-		
+			
 		public readonly bool HasValue;
 
 		public T Value
