@@ -6,18 +6,25 @@ Values and Immutability
 
 Functional programming differs from object-oriented programming in many ways. Perhaps the most fundamental trait separating the two is that in FP value types are prevalent whereas in OOP reference types are the default. Objects have both state and identity, and the reference usually acts as object's identity. Value types used in FP have just state. Moreover, once initialized, the state does not change. Value types are said to be *immutable* in FP.
 
-The implications of this basic difference are quite far-reaching. In FP computations are performed by functions which take values as arguments and produce new values. In OOP computations happen through side effects when existing objects are mutated. The OO-style is inherently imperative and the language constructs of C# adhere to this style for the most part. Interestingly, many of the more recent features of C# are actually inspired by functional languages. These features include generics (which is called parametric polymorphism in FP), anonymous functions a.k.a. lambdas, and LINQ, which is inspired by list comprehensions.
+The implications of this distinction are quite far-reaching. In FP computations are performed by functions which take values as arguments and produce new values. In OOP computations happen through side effects when existing objects are mutated. The OO-style is inherently imperative and the language constructs of C# adhere to this style for the most part. Interestingly, many of the more recent features of C# are actually inspired by functional languages. These features include generics (which is called parametric polymorphism in FP), anonymous functions a.k.a. lambdas, and LINQ, which is inspired by list comprehensions.
 
-The new features make it possible to write C# in functional way although the language itself does not enforce this style. For example, you can write so called "functional objects" that are immutable, but these are still reference types, not values. Any function that takes an object as a argument carries the risk of failing unexpectedly, if it does not explicitly check that the argument is not null. Sometimes you see code bases where functions *are*  littered with tons of null argument checks. This is just silly as most of the time functions require that their arguments actually have values. However, since objects are inherently nullable it is necessary to practice defensive programming to enforce this fact.
+The new features make it possible to write C# in functional way although the language itself does not enforce this style. For example, you can write so called "functional objects" that are immutable, but these are still reference types, not values. Any function that takes an object as a argument carries the risk of failing unexpectedly, if it does not explicitly check that the argument is not null. Sometimes you see code bases in which all functions are littered with null argument checks. This is just silly, and even affects the performance, as a same value is checked many times inside loops and other methods. Since objects are inherently nullable, some people feel that it is necessary to practice defensive programming to keep their methods honest.
 
-In Flop all types are essentially value types, even if they are implemented as classes. There are no excessive null checks, rather the value semantics is assumed to hold everywhere. If this is not case, a null reference exception is probably thrown by the .NET framework at some point. The responsibility lies with the user to make sure that no null references are passed to Flop. In practice, it is quite unusual to get problems because of this requirement. Once the functional style is embraced, null values in the code will be few and far between. Almost only way to trip with this is to forget to initialize some class member field in the constructor.
+In Flop all types are essentially value types, even if they are implemented as classes. There are no excessive null checks, rather the value semantics is assumed to hold everywhere. If this is not case, a null reference exception is probably thrown at you by the .NET framework at some point. The responsibility lies with the user to make sure that no null references are passed to Flop. In practice, it is quite unusual to get problems because of this requirement. Once the functional style is embraced, null values in the code will be few and far between. The most likely way to trip on this requirement is to forget to initialize some member field in a class constructor.
 
-Of course C# has also the struct type which *is* a true value type. Alas, the utility of structs is diminished by the fact that they are allocated from stack instead of garbage collected object heap. This makes their performance worse than objects' when they contain more than just a couple of fields. Consequently, structs are only good for types that are sufficiently small and simple.
+Of course C# has also the `struct` type which *is* a true value type. Alas, the utility of structs is diminished by the fact that they are allocated from stack instead of garbage collected object heap. This makes their performance worse than objects' when they contain more than just a couple of fields. Consequently, structs are only good for types that are sufficiently small and simple.
 
-Option and Either
------------------
+Assuming value semantics for all types has other consequences as well. Since nulls are not allowed, there needs to be an explicit way of denoting that a type might have no value. This the purpose of the `Option<T>` type. 
 
-TBD.
+Option is similar to the `Nullable<T>` type found in the `System` namespace, but has one important difference: it can encapsulate both reference and value types while Nullable can contain only value types. In other words, Nullable has the `struct` restriction on its generic type parameter. Option will work with any type. 
+
+The name Option is borrowed from F# where the type is part of the core library. In Haskell the same type is known as Maybe. A beloved child has many names[^beloved].	 
+
+Continuing stealing good ideas from F# and Haskell, the next obvious loot is the `Either<T, U>` type. It is only a slightly more complex than Option. Either can hold a value of type `T` or `U`, but not both at the same time. It is a convenient type to use when, for example, a function can return either some value or an error message, if something went wrong.
+
+The value of type `T` is contained in the `Left` property of the Either class, and the value of type `U` in the `Right` property. The properties `IsLeft` and `IsRight` tell which one has the value. If you try to access the wrong one, an `EitherException` is thrown.
+
+A final remark about the value semantics: because the equality operator `==` compares object references by default, it is used very little in Flop. Almost always, when equality comparison is needed, it is done using the `Object.Equals()` method. This means that for user-defined types overriding Equals is almost mandatory. As .NET framework has coupled the usage of Equals to the `GetHashCode()` method, the latter needs to be implemented as well. Fortunately the implementation of these methods is most often a trivial aggregation of the member fields.
 
 
 Tuples
@@ -198,3 +205,5 @@ public static void Ignore<T> (T value)
 {	
 }
 ```
+
+[^beloved]: A Finnish proverb meaning that the importance of something becomes evident when many people find the thing valuable, but still like to call it by different name.

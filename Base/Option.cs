@@ -28,10 +28,5 @@
 		{
 			return option.Value;
 		}
-
-		public static implicit operator bool (Option<T> option)
-		{
-			return option.HasValue;
-		}
 	}
 }

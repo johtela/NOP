@@ -31,7 +31,7 @@
 		public Polytype FindName (string name, Func<Bindings, Map<string, Polytype>> selector)
 		{
 			var res = selector (this).TryGetValue (name);
-			if (!res)
+			if (!res.HasValue)
 				throw new BindingException ("Named binding '{0}' not found.", name);
 			return res;
 		}
